@@ -881,7 +881,7 @@
     </section>
 
     <!-- ABOUT -->
-    <section class="about scroll-reveal" id="about">
+    <section class="about" id="about">
         <div class="about__container">
             <div class="about__text">
                 <h2 class="section-title">Řemeslo s tradicí</h2>
@@ -911,7 +911,7 @@
     </section>
 
     <!-- PRODUCTS -->
-    <section class="products scroll-reveal" id="products">
+    <section class="products" id="products">
         <div class="products__container">
             <h2 class="section-title products__title">Naše výrobky</h2>
             <div class="products__tabs" role="tablist">
@@ -929,7 +929,7 @@
     </section>
 
     <!-- AUTHOR -->
-    <section class="author scroll-reveal" id="author">
+    <section class="author" id="author">
         <div class="author__container">
             <div class="author__image">
                 <div class="author__image-placeholder">
@@ -948,7 +948,7 @@
     </section>
 
     <!-- CUSTOM ORDERS -->
-    <section class="custom scroll-reveal" id="custom">
+    <section class="custom" id="custom">
         <div class="custom__container">
             <h2 class="custom__title">Nevíte si rady s vlastním návrhem?</h2>
             <p class="custom__text">Každý výrobek umíme přizpůsobit vašim představám. Ať už jde o rozměr, motiv, materiál nebo úplně nový návrh — probereme to společně a najdeme řešení.</p>
@@ -1151,25 +1151,6 @@
 
                 document.getElementById('products').scrollIntoView({ behavior: 'smooth' });
             });
-        });
-
-        // Scroll reveal
-        const observerOptions = {
-            threshold: 0.1,
-            rootMargin: '0px 0px -50px 0px'
-        };
-
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('revealed');
-                    observer.unobserve(entry.target);
-                }
-            });
-        }, observerOptions);
-
-        document.querySelectorAll('.about, .products, .custom, .author').forEach(section => {
-            observer.observe(section);
         });
 
         // Tab filtering

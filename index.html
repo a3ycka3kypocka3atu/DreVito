@@ -102,7 +102,6 @@
         .nav__link--dropdown svg { transition: transform var(--transition-smooth); }
 
         .nav__dropdown-panel {
-            display: none;
             position: absolute;
             top: calc(100% + 0.75rem);
             left: 50%;
@@ -114,13 +113,19 @@
             box-shadow: 0 8px 32px rgba(0,0,0,0.3);
             padding: 0.5rem;
             flex-direction: column;
+            opacity: 0;
+            pointer-events: none;
+            transform: translateX(-50%) translateY(6px);
+            transition: opacity 0.2s ease, transform 0.2s ease;
         }
 
-        .nav__dropdown-panel.open { display: flex; }
+        .nav__dropdown-panel.open {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateX(-50%) translateY(0);
+        }
 
-        .nav__item-with-dropdown:hover .nav__dropdown-panel { display: flex; }
-
-        .nav__item-with-dropdown:hover .nav__link--dropdown svg { transform: rotate(180deg); }
+        .nav__item-with-dropdown.open .nav__link--dropdown svg { transform: rotate(180deg); }
 
         .nav__dropdown-link {
             display: block;
@@ -1078,6 +1083,24 @@
         });
 
         // Desktop dropdown panel + product filter links
+        const itemWithDropdown = document.querySelector('.nav__item-with-dropdown');
+        const dropdownPanel = document.querySelector('.nav__dropdown-panel');
+
+        itemWithDropdown.addEventListener('click', (e) => {
+            e.preventDefault();
+            const isOpen = dropdownPanel.classList.contains('open');
+            dropdownPanel.classList.toggle('open');
+            itemWithDropdown.classList.toggle('open');
+            dropdownToggle.setAttribute('aria-expanded', !isOpen);
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.nav__item-with-dropdown')) {
+                dropdownPanel.classList.remove('open');
+                itemWithDropdown.classList.remove('open');
+            }
+        });
+
         document.querySelectorAll('.nav__dropdown-link[data-scroll]').forEach(link => {
             link.addEventListener('click', (e) => {
                 e.preventDefault();

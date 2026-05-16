@@ -89,6 +89,54 @@
 
         .nav__link:hover { color: var(--color-accent); }
 
+        .nav__item-with-dropdown {
+            position: relative;
+        }
+
+        .nav__link--dropdown {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .nav__link--dropdown svg { transition: transform var(--transition-smooth); }
+
+        .nav__dropdown-panel {
+            display: none;
+            position: absolute;
+            top: calc(100% + 0.75rem);
+            left: 50%;
+            transform: translateX(-50%);
+            min-width: 200px;
+            background: var(--color-primary);
+            border: 1px solid rgba(201, 169, 110, 0.2);
+            border-radius: var(--radius-card);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+            padding: 0.5rem;
+            flex-direction: column;
+        }
+
+        .nav__dropdown-panel.open { display: flex; }
+
+        .nav__item-with-dropdown:hover .nav__dropdown-panel { display: flex; }
+
+        .nav__item-with-dropdown:hover .nav__link--dropdown svg { transform: rotate(180deg); }
+
+        .nav__dropdown-link {
+            display: block;
+            padding: 0.5rem 0.875rem;
+            color: rgba(253, 252, 250, 0.8);
+            text-decoration: none;
+            font-size: 0.875rem;
+            border-radius: 6px;
+            transition: all var(--transition-smooth);
+        }
+
+        .nav__dropdown-link:hover {
+            background: rgba(201, 169, 110, 0.1);
+            color: var(--color-card);
+        }
+
         /* DROPDOWN */
         .nav__dropdown {
             display: none;
@@ -764,7 +812,20 @@
             </a>
             <div class="nav__links">
                 <a href="#about" class="nav__link">O nás</a>
-                <a href="#products" class="nav__link">Produkty</a>
+                <div class="nav__item-with-dropdown">
+                    <a href="#products" class="nav__link nav__link--dropdown" aria-haspopup="true">
+                        Produkty
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                    </a>
+                    <div class="nav__dropdown-panel">
+                        <a href="#products" class="nav__dropdown-link" data-scroll="all">Vše</a>
+                        <a href="#products" class="nav__dropdown-link" data-scroll="tables">Stolice & stolky</a>
+                        <a href="#products" class="nav__dropdown-link" data-scroll="pictures">Obrazy</a>
+                        <a href="#products" class="nav__dropdown-link" data-scroll="candles">Svícínky</a>
+                        <a href="#products" class="nav__dropdown-link" data-scroll="boxes">Krabičky & prkénky</a>
+                        <a href="#products" class="nav__dropdown-link" data-scroll="benches">Lavičky</a>
+                    </div>
+                </div>
                 <a href="#author" class="nav__link">Autor</a>
                 <a href="#custom" class="nav__link">Zakázky</a>
                 <a href="#contact" class="nav__link">Kontakt</a>
@@ -988,13 +1049,9 @@
             `).join('');
         }
 
-        // Nav dropdown
+        // Nav dropdown (mobile)
         const dropdownToggle = document.querySelector('.nav__dropdown-toggle');
         const dropdownMenu = document.querySelector('.nav__dropdown-menu');
-        const dropdownItems = document.querySelectorAll('.nav__dropdown-item');
-        const dropdownSubItems = document.querySelectorAll('.nav__dropdown-sub-item');
-        const subBackBtn = document.querySelector('.nav__dropdown-sub-back');
-        const dropdownSub = document.querySelector('.nav__dropdown-sub');
 
         dropdownToggle.addEventListener('click', () => {
             const expanded = dropdownToggle.getAttribute('aria-expanded') === 'true';
@@ -1018,6 +1075,27 @@
 
         subBackBtn.addEventListener('click', () => {
             dropdownSub.classList.remove('open');
+        });
+
+        // Desktop dropdown panel + product filter links
+        document.querySelectorAll('.nav__dropdown-link[data-scroll]').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const category = link.dataset.scroll;
+
+                document.querySelectorAll('.products__tab').forEach(t => {
+                    t.classList.remove('active');
+                    t.setAttribute('aria-selected', 'false');
+                });
+                const targetTab = document.querySelector(`.products__tab[data-category="${category}"]`);
+                if (targetTab) {
+                    targetTab.classList.add('active');
+                    targetTab.setAttribute('aria-selected', 'true');
+                    renderProducts(category);
+                }
+
+                document.getElementById('products').scrollIntoView({ behavior: 'smooth' });
+            });
         });
 
         document.querySelectorAll('.nav__dropdown-sub-item').forEach(item => {

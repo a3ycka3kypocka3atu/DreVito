@@ -201,6 +201,76 @@
             .about__values { align-items: center; }
         }
 
+        /* AUTHOR */
+        .author {
+            padding: 6rem 2rem;
+            background: var(--color-primary);
+        }
+
+        .author__container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+        }
+
+        .author__text .section-title {
+            color: var(--color-card);
+            text-align: left;
+        }
+
+        .author__lead {
+            font-family: var(--font-display);
+            font-size: 1.375rem;
+            color: var(--color-accent);
+            line-height: 1.5;
+            margin-bottom: 1.25rem;
+            font-style: italic;
+        }
+
+        .author__body {
+            font-size: 1rem;
+            color: rgba(253, 252, 250, 0.8);
+            line-height: 1.8;
+            margin-bottom: 1rem;
+        }
+
+        .author__signature {
+            font-family: var(--font-display);
+            font-size: 1.125rem;
+            color: var(--color-accent);
+            margin-top: 1.5rem;
+            font-style: italic;
+        }
+
+        .author__image-placeholder {
+            width: 100%;
+            aspect-ratio: 3 / 4;
+            background: linear-gradient(145deg, #4A3728 0%, #3D2B1F 100%);
+            border-radius: var(--radius-card);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: rgba(253, 252, 250, 0.4);
+            font-size: 0.875rem;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        @media (max-width: 768px) {
+            .author__container {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+            .author__container .author__image {
+                order: 2;
+            }
+            .author__text .section-title { text-align: center; }
+            .author__text { text-align: center; }
+        }
+
         /* PRODUCTS */
         .products {
             padding: 6rem 2rem;
@@ -547,33 +617,51 @@
         </div>
     </section>
 
-    <!-- ABOUT / AUTHOR -->
+    <!-- ABOUT -->
     <section class="about scroll-reveal" id="about">
         <div class="about__container">
             <div class="about__text">
-                <h2 class="section-title">Příběh za značkou</h2>
-                <p class="about__lead">Stromy jsou mým životem. Sázím je, kácám je, osobně je znám. Přinášet krásu dřeva do lidských domovů — udržitelně a s respektem k přírodě — to je to, co mě definuje.</p>
-                <p class="about__body">Dílna na rodinném statku je splněný téměř dvacetiletý sen. Dnes mám funkční pilu a truhlářskou dílnu, díky které zvládnu celý proces — od pokácení stromu až po dokončení nábytku vlastníma rukama. Netvořím ze dřeva, které kupuji kdovíkde. Tvořím ze stromů, které jsem znal a kterým jsem osobně poděkoval za jejich život.</p>
-                <p class="about__body">Práce se dřevem je pro mě meditace a vnitřní naplnění. Jsem milovníkem organických tvarů — příroda je mou učitelkou. Zřídka používám rovné hrany, pokud to zákazník přímo nepožaduje. Mé nejoblíbenější dřevo je dub; z jehličnanů preferuji modřín a borovici.</p>
+                <h2 class="section-title">Řemeslo s tradicí</h2>
+                <p class="about__lead">Každý výrobek Dřevito vzniká z touhy zachovat a předat dál staré řemeslo. Pracujeme s masivním dřevem — dubem, bukem, modřínem — protože jen přírodní materiál nese tu správnou energii a příběh.</p>
+                <p class="about__body">V naší dílně každý kus vzniká ruční prací. Řezbářské umění, které se předává z generace na generaci, spojuje moderní design s úctou k tradici. Věříme, že dřevo má duši — a naším úkolem je ji probudit.</p>
                 <ul class="about__values">
                     <li>
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="M9 12l2 2 4-4"/></svg>
-                        Dřevo z stromů, které osobně znám
+                        100% přírodní materiály
                     </li>
                     <li>
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="M9 12l2 2 4-4"/></svg>
-                        Ruční výroba od začátku do konce
+                        Ruční výroba
                     </li>
                     <li>
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="M9 12l2 2 4-4"/></svg>
-                        Respekt k přírodě a udržitelnost
+                        Každý kus je originál
                     </li>
                 </ul>
             </div>
             <div class="about__image">
                 <div class="about__image-placeholder">
+                    <span>Přidáme fotku</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- AUTHOR -->
+    <section class="author scroll-reveal" id="author">
+        <div class="author__container">
+            <div class="author__image">
+                <div class="author__image-placeholder">
                     <span>Foto autora<br>přidáme později</span>
                 </div>
+            </div>
+            <div class="author__text">
+                <h2 class="section-title">Příběh za značkou</h2>
+                <p class="author__lead">Stromy jsou mým životem. Sázím je, kácám je, osobně je znám.</p>
+                <p class="author__body">Přinášet krásu dřeva do lidských domovů — udržitelně a s respektem k přírodě — to je to, co mě definuje. Dílna na rodinném statku je splněný téměř dvacetiletý sen.</p>
+                <p class="author__body">Dnes mám funkční pilu a truhlářskou dílnu, díky které zvládnu celý proces — od pokácení stromu až po dokončení nábytku vlastníma rukama. Netvořím ze dřeva, které kupuji kdovíkde. Tvořím ze stromů, které jsem znal a kterým jsem osobně poděkoval za jejich život.</p>
+                <p class="author__body">Práce se dřevem je pro mě meditace a vnitřní naplnění. Jsem milovníkem organických tvarů — příroda je mou učitelkou. Zřídka používám rovné hrany, pokud to zákazník přímo nepožaduje.</p>
+                <p class="author__signature">— tvůrce Dřevito</p>
             </div>
         </div>
     </section>
@@ -718,7 +806,7 @@
             });
         }, observerOptions);
 
-        document.querySelectorAll('.about, .products, .custom').forEach(section => {
+        document.querySelectorAll('.about, .products, .custom, .author').forEach(section => {
             observer.observe(section);
         });
 

@@ -1058,7 +1058,8 @@
         const dropdownToggle = document.querySelector('.nav__dropdown-toggle');
         const dropdownMenu = document.querySelector('.nav__dropdown-menu');
 
-        dropdownToggle.addEventListener('click', () => {
+        dropdownToggle.addEventListener('click', (e) => {
+            e.stopPropagation();
             const expanded = dropdownToggle.getAttribute('aria-expanded') === 'true';
             dropdownToggle.setAttribute('aria-expanded', !expanded);
             dropdownMenu.classList.toggle('open');
@@ -1073,12 +1074,14 @@
         });
 
         document.querySelectorAll('.nav__dropdown-item.has-sub').forEach(item => {
-            item.addEventListener('click', () => {
+            item.addEventListener('click', (e) => {
+                e.stopPropagation();
                 dropdownSub.classList.add('open');
             });
         });
 
-        subBackBtn.addEventListener('click', () => {
+        subBackBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
             dropdownSub.classList.remove('open');
         });
 
@@ -1087,24 +1090,29 @@
         const dropdownPanel = document.querySelector('.nav__dropdown-panel');
 
         itemWithDropdown.addEventListener('click', (e) => {
-            e.preventDefault();
+            e.stopPropagation();
             const isOpen = dropdownPanel.classList.contains('open');
             dropdownPanel.classList.toggle('open');
             itemWithDropdown.classList.toggle('open');
-            dropdownToggle.setAttribute('aria-expanded', !isOpen);
         });
 
         document.addEventListener('click', (e) => {
-            if (!e.target.closest('.nav__item-with-dropdown')) {
+            if (!e.target.closest('.nav__item-with-dropdown') && !e.target.closest('.nav__dropdown')) {
                 dropdownPanel.classList.remove('open');
                 itemWithDropdown.classList.remove('open');
+                dropdownMenu.classList.remove('open');
+                dropdownSub.classList.remove('open');
+                dropdownToggle.setAttribute('aria-expanded', 'false');
             }
         });
 
         document.querySelectorAll('.nav__dropdown-link[data-scroll]').forEach(link => {
             link.addEventListener('click', (e) => {
                 e.preventDefault();
+                e.stopPropagation();
                 const category = link.dataset.scroll;
+                dropdownPanel.classList.remove('open');
+                itemWithDropdown.classList.remove('open');
 
                 document.querySelectorAll('.products__tab').forEach(t => {
                     t.classList.remove('active');
@@ -1124,10 +1132,11 @@
         document.querySelectorAll('.nav__dropdown-sub-item').forEach(item => {
             item.addEventListener('click', (e) => {
                 e.preventDefault();
+                e.stopPropagation();
                 const category = item.dataset.scroll;
-                dropdownToggle.setAttribute('aria-expanded', 'false');
                 dropdownMenu.classList.remove('open');
                 dropdownSub.classList.remove('open');
+                dropdownToggle.setAttribute('aria-expanded', 'false');
 
                 const targetTab = document.querySelector(`.products__tab[data-category="${category}"]`);
                 if (targetTab) {

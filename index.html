@@ -434,6 +434,18 @@
             overflow: hidden;
             box-shadow: 0 8px 32px rgba(0,0,0,0.3);
         }
+        .custom__images {
+            display: flex;
+            gap: 1.5rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 2rem;
+        }
+        .custom__images .custom__image {
+            margin: 0;
+            flex: 1 1 300px;
+            max-width: 400px;
+        }
         .custom__image img { width: 100%; height: auto; display: block; }
         .custom__title {
             font-family: var(--font-display);
@@ -614,8 +626,13 @@
     <!-- CUSTOM ORDERS -->
     <section class="custom" id="custom">
         <div class="custom__container">
-            <div class="custom__image">
-                <img src="custom-service.jpg" alt="Zakázková výroba dřevěných výrobků">
+            <div class="custom__images">
+                <div class="custom__image">
+                    <img src="custom-service.jpg" alt="Zakázková výroba dřevěných výrobků">
+                </div>
+                <div class="custom__image">
+                    <img src="custom.JPG" alt="Ukázka zakázkové výroby">
+                </div>
             </div>
             <h2 class="custom__title">Zakázková výroba</h2>
             <p class="custom__text">Každý výrobek umíme přizpůsobit vašim představám. Ať už jde o rozměr, motiv, materiál nebo úplně nový návrh — probereme to společně a najdeme řešení.</p>

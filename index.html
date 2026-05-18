@@ -678,32 +678,13 @@
 <script>
 (function() {
     var products = [
-        { id: 'P00002', name: 'Stoleček Kruh Stromu', desc: 'Dřevěný stoleček se symbolem Stromu života a slunečního kruhu.', price: 1790, category: 'tables', url: 'https://drevito.t2.upgates.shop/p/stolecek-strom-zivota-slunecni-kruh', image: '' },
-        { id: 'P00011', name: 'Stoleček Květ života', desc: 'Majestátní stoleček s vyřezávaným motivem Květu života.', price: 0, category: 'tables', url: 'https://drevito.t2.upgates.shop/p/stolecek-flower-of-life', image: '' },
-        { id: 'P00012', name: 'Stoleček Tygr a Drak', desc: 'Nejoblíbenější čajový stoleček s motivem tygra a draka.', price: 0, category: 'tables', url: 'https://drevito.t2.upgates.shop/p/stolecek-dragon-tiger', image: '' },
-        { id: 'P00013', name: 'Oltářík Mandala 30', desc: 'Modřínový oltářík s typickou vyrytou mandalou.', price: 5555, category: 'tables', url: 'https://drevito.t2.upgates.shop/p/stolecek-flower', image: '' },
-        { id: 'P00029', name: 'Dubová napájecí stolička', desc: 'Dubová stolička pro pohodlnou bylinnou napájku.', price: 4440, category: 'tables', url: 'https://drevito.t2.upgates.shop/p/dalsi-stolicka', image: '' },
-        { id: 'P00018', name: 'Vlk', desc: 'Dřevěný obraz vlka vyřezaný do OSB desky.', price: 2000, category: 'pictures', url: 'https://drevito.t2.upgates.shop/p/vlk', image: '' },
-        { id: 'P00019', name: 'Jelen na houbách', desc: 'Dřevěný obraz jelena v podzimním lese.', price: 0, category: 'pictures', url: 'https://drevito.t2.upgates.shop/p/jelen-na-houbach', image: '' },
-        { id: 'P00020', name: 'Kůň', desc: 'Obraz koně vytvořený z kresby větví stromu.', price: 0, category: 'pictures', url: 'https://drevito.t2.upgates.shop/p/kun', image: '' },
-        { id: 'P00022', name: 'Lev v květinových ornamentech', desc: 'Lev v květinových ornamentech — symbol síly a elegance.', price: 0, category: 'pictures', url: 'https://drevito.t2.upgates.shop/p/lev-kvetinovych-ornamentech', image: '' },
-        { id: 'P00023', name: 'Bohyně', desc: 'Motiv jogínky na masivní borovicové desce.', price: 0, category: 'pictures', url: 'https://drevito.t2.upgates.shop/p/bohyne', image: '' },
-        { id: 'P00024', name: 'Květ života, velký formát', desc: 'Květ života na bukové překližce 80×80 cm.', price: 0, category: 'pictures', url: 'https://drevito.t2.upgates.shop/p/kvet-zivota-velky-format', image: '' },
-        { id: 'P00026', name: 'Lední Medvěd', desc: 'Masivní borovicová dekorace ledního medvěda.', price: 0, category: 'pictures', url: 'https://drevito.t2.upgates.shop/p/ledni-medved', image: '' },
-        { id: 'P00016', name: 'Svícelenka ostrá', desc: 'Svícínka pro svíčky z ohýbané překližky na modřínové základně.', price: 1555, category: 'candles', url: 'https://drevito.t2.upgates.shop/p/svicelenka-osta', image: '' },
-        { id: 'P00017', name: 'Svícelenka oblá', desc: 'Designová svícínka na masivní modřínové základně.', price: 0, category: 'candles', url: 'https://drevito.t2.upgates.shop/p/svicelenka-obla', image: '' },
-        { id: 'P00004', name: 'Krabička Jin Jang', desc: 'Zasouvací krabička z modřínového masivu s motivem Jinu a Jangu.', price: 1111, category: 'boxes', url: 'https://drevito.t2.upgates.shop/p/krabicka-jin-jang', image: '' },
-        { id: 'P00005', name: 'Krabička Srdeční čakra', desc: 'Modřínová krabička s motivem srdeční čakry.', price: 1111, category: 'boxes', url: 'https://drevito.t2.upgates.shop/p/krabicka-srdecni-cakra', image: '' },
-        { id: 'P00006', name: '7 čaker na modřínovém menhiru', desc: '7 vyřezaných čaker na modřínovém základu připomínajícím menhir.', price: 4555, category: 'boxes', url: 'https://drevito.t2.upgates.shop/p/7-caker-na-modrinovem-menhiru', image: '' },
-        { id: 'P00007', name: 'Prkénko Jin-Jang', desc: 'Prkénko s motivem Jin-Jang, masivní dub.', price: 0, category: 'boxes', url: 'https://drevito.t2.upgates.shop/p/prkenko-jin-jang', image: '' },
-        { id: 'P00008', name: 'Prkénko Lev', desc: 'Masivní dubové prkénko s motivem lva.', price: 0, category: 'boxes', url: 'https://drevito.t2.upgates.shop/p/prkenko-lev', image: '' },
-        { id: 'P00009', name: 'Prkénko dva Tygři', desc: 'Velké masivní dubové prkénko s motivem dvou tygrů.', price: 0, category: 'boxes', url: 'https://drevito.t2.upgates.shop/p/prkenko-tiger-tiger', image: '' },
-        { id: 'P00010', name: 'Tree of Life', desc: 'Prkénko s vyřezávaným stromem života.', price: 0, category: 'boxes', url: 'https://drevito.t2.upgates.shop/p/tree-of-life', image: '' },
-        { id: 'P00014', name: 'Dýmka Kanec', desc: 'Gurmánova specialita — dýmka s dírkami v očích.', price: 0, category: 'boxes', url: 'https://drevito.t2.upgates.shop/p/dymka-kanec', image: '' },
-        { id: 'P00027', name: 'Prkénko Měsíční Strom', desc: 'Prkénko s motivem stromu a měsíčními prvky.', price: 0, category: 'boxes', url: 'https://drevito.t2.upgates.shop/p/prkenko-mesicni-strom', image: '' },
-        { id: 'P00028', name: 'Lavice', desc: 'Masivní dřevěná lavice s čistým designem.', price: 0, category: 'benches', url: 'https://drevito.t2.upgates.shop/p/lavice', image: '' },
-        { id: 'P00030', name: 'Lavička z břízy', desc: 'Stylová lavička ze březového masivu.', price: 0, category: 'benches', url: 'https://drevito.t2.upgates.shop/p/lavicka-z-brizy', image: '' },
-        { id: 'P00031', name: 'Stůl', desc: 'Masivní dřevěný stůl s přírodní kresbou.', price: 0, category: 'benches', url: 'https://drevito.t2.upgates.shop/p/stul', image: '' }
+        { id: 'P00002', name: 'Stoleček Kruh Stromu', desc: 'Dřevěný stoleček se symbolem Stromu života a slunečního kruhu.', price: 1790, category: 'tables', url: 'https://drevito.t2.upgates.shop/p/stolecek-strom-zivota-slunecni-kruh', image: 'cajne-stolicky.JPG' },
+        { id: 'P00016', name: 'Svícelenka ostrá', desc: 'Svícínka pro svíčky z ohýbané překližky na modřínové základně.', price: 1555, category: 'candles', url: 'https://drevito.t2.upgates.shop/p/svicelenka-osta', image: 'dekoracni-tabulka.JPG' },
+        { id: 'P00004', name: 'Krabička Jin Jang', desc: 'Zasouvací krabička z modřínového masivu s motivem Jinu a Jangu.', price: 1111, category: 'boxes', url: 'https://drevito.t2.upgates.shop/p/krabicka-jin-jang', image: 'krabicka.JPG' },
+        { id: 'P00020', name: 'Kůň', desc: 'Obraz koně vytvořený z kresby větví stromu.', price: 0, category: 'pictures', url: 'https://drevito.t2.upgates.shop/p/kun', image: 'kun-dekorace.JPG' },
+        { id: 'P00018', name: 'Vlk', desc: 'Dřevěný obraz vlka vyřezaný do OSB desky.', price: 2000, category: 'pictures', url: 'https://drevito.t2.upgates.shop/p/vlk', image: 'dekorace-zena.JPG' },
+        { id: 'P00023', name: 'Bohyně', desc: 'Motiv jogínky na masivní borovicové desce.', price: 0, category: 'pictures', url: 'https://drevito.t2.upgates.shop/p/bohyne', image: 'stojan-na-telefon.JPG' },
+        { id: 'P00022', name: 'Lev v květinových ornamentech', desc: 'Lev v květinových ornamentech — symbol síly a elegance.', price: 0, category: 'pictures', url: 'https://drevito.t2.upgates.shop/p/lev-kvetinovych-ornamentech', image: 'hracka-auticko.JPG' }
     ];
 
     function renderProducts(cat) {

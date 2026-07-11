@@ -64,6 +64,47 @@ const DEFAULT_PRODUCT_IMAGE_TARGETS = [
   { key: 'P00022', label: 'Hračka autíčko', url: '/hracka-auticko.JPG', alt: 'Hračka autíčko' }
 ];
 
+const DEFAULT_BLOG_POSTS = [
+  {
+    id: 'placeholder-o-tvurci',
+    title: 'O tvůrci',
+    slug: 'o-tvurci',
+    excerpt: 'Příběh tvůrce Dřevito připravujeme.',
+    main_content: 'Příběh tvůrce Dřevito připravujeme. Brzy tu najdete osobnější pohled na řemeslo, dřevo a cestu k výrobkům, které vznikají v dílně.',
+    content_format: 'html',
+    photos: [],
+    featured_image: null,
+    author_name: 'Dřevito',
+    categories: [{ title: 'Author', slug: 'author' }],
+    published_at: null,
+    updated_at: null
+  },
+  {
+    id: 'placeholder-pribeh-teto-lavice-a-stolu',
+    title: 'Příběh této lavice a stolu',
+    slug: 'pribeh-teto-lavice-a-stolu',
+    excerpt: 'Příběh lavice a stolu připravujeme.',
+    main_content: 'Příběh této lavice a stolu připravujeme. Tady bude místo pro původ dřeva, návrh, ruční práci a detaily konkrétního kusu.',
+    content_format: 'html',
+    photos: [],
+    featured_image: null,
+    author_name: 'Dřevito',
+    categories: [{ title: 'Craft', slug: 'craft' }, { title: 'Products', slug: 'products' }],
+    published_at: null,
+    updated_at: null
+  }
+];
+
+const BLOG_ROUTE_ALIASES = {
+  'o-tvurci': 'o-tvurci',
+  tvurce: 'o-tvurci',
+  autor: 'o-tvurci',
+  'pribeh-teto-lavice-a-stolu': 'pribeh-teto-lavice-a-stolu',
+  'pribeh-lavice-a-stolu': 'pribeh-teto-lavice-a-stolu',
+  'lavice-a-stul': 'pribeh-teto-lavice-a-stolu',
+  'lavice-a-stolu': 'pribeh-teto-lavice-a-stolu'
+};
+
 const TARGET_TYPES = {
   site_sections: 'Sekce webu',
   products: 'Výrobky',
@@ -5723,6 +5764,302 @@ async function handleSiteContentPhotoUpload(req, res, session) {
   }
 }
 
+function normalizeBlogRouteSlug(pathname) {
+  const decodedPath = decodeURIComponent(pathname || '').replace(/\/+$/, '');
+  const segments = decodedPath.split('/').filter(Boolean);
+  if (!segments.length) return '';
+
+  if (segments[0] === 'blog' && segments[1]) {
+    const routeSlug = slugify(segments[1], '');
+    return BLOG_ROUTE_ALIASES[routeSlug] || routeSlug;
+  }
+
+  if (segments.length === 1) {
+    const routeSlug = slugify(segments[0], '');
+    return BLOG_ROUTE_ALIASES[routeSlug] || '';
+  }
+
+  return '';
+}
+
+function fallbackBlogPost(slug) {
+  return DEFAULT_BLOG_POSTS.find((post) => post.slug === slug) || null;
+}
+
+function stripHtmlToText(value) {
+  return String(value || '')
+    .replace(/<br\s*\/?>/gi, '\n')
+    .replace(/<\/p>/gi, '\n\n')
+    .replace(/<[^>]+>/g, '')
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .trim();
+}
+
+function textBlocks(value) {
+  return String(value || '')
+    .split(/\n{2,}|\r?\n/)
+    .map((part) => part.trim())
+    .filter(Boolean);
+}
+
+function formatDateCs(value) {
+  if (!value) return '';
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return '';
+  return new Intl.DateTimeFormat('cs-CZ', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  }).format(date);
+}
+
+async function getPublicBlogPost(slug, locale = 'cs') {
+  const fallback = fallbackBlogPost(slug);
+  if (!isSupabaseConfigured()) return fallback;
+
+  const payload = await getPublicCmsPayload(locale);
+  const post = (payload.blog_posts || []).find((item) => item.slug === slug);
+  return post || fallback;
+}
+
+function blogPostMeta(post) {
+  const parts = [];
+  if (Array.isArray(post.categories)) {
+    post.categories
+      .map((category) => category && category.title)
+      .filter(Boolean)
+      .forEach((title) => parts.push(title));
+  }
+  if (post.author_name) parts.push(post.author_name);
+  const date = formatDateCs(post.published_at);
+  if (date) parts.push(date);
+  return parts.join(' / ') || 'Blog Dřevito';
+}
+
+function renderPublicBlogPostPage(post, statusCode = 200) {
+  const image = (post.featured_image && post.featured_image.url) || '';
+  const imageAlt = (post.featured_image && post.featured_image.alt) || post.title;
+  const bodyText = stripHtmlToText(post.main_content || post.excerpt || '');
+  const bodyBlocks = textBlocks(bodyText);
+  const body = bodyBlocks.length
+    ? bodyBlocks.map((block) => `<p>${escapeHtml(block)}</p>`).join('')
+    : '<p>Článek připravujeme.</p>';
+  const imageHtml = image
+    ? `<figure class="article-image"><img src="${escapeHtml(image)}" alt="${escapeHtml(imageAlt)}"></figure>`
+    : '';
+
+  return {
+    statusCode,
+    html: `<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>${escapeHtml(post.title)} - Dřevito</title>
+  <meta name="description" content="${escapeHtml(post.excerpt || stripHtmlToText(post.main_content).slice(0, 155) || 'Blog Dřevito')}">
+  <link rel="canonical" href="/blog/${escapeHtml(post.slug)}">
+  <link rel="icon" href="/favicon.ico?v=20260622-3" sizes="any">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #f5f0e8;
+      --panel: #fdfcfa;
+      --ink: #3d2b1f;
+      --muted: #6b5a4a;
+      --accent: #c9a96e;
+      --line: rgba(61, 43, 31, 0.14);
+      --font-display: 'Cormorant Garamond', Georgia, serif;
+      --font-body: 'DM Sans', system-ui, sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: var(--font-body);
+      line-height: 1.7;
+    }
+    a { color: inherit; }
+    .topbar {
+      background: #2a1f16;
+      color: var(--panel);
+      border-bottom: 1px solid rgba(201, 169, 110, 0.2);
+    }
+    .topbar-inner {
+      width: min(1120px, calc(100% - 32px));
+      min-height: 78px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      font-family: var(--font-display);
+      font-size: 1.3rem;
+      font-weight: 600;
+    }
+    .brand img {
+      width: 56px;
+      height: 56px;
+      object-fit: contain;
+      background: var(--panel);
+      border-radius: 2px;
+    }
+    .nav-link {
+      color: rgba(253, 252, 250, 0.78);
+      font-size: 0.92rem;
+      font-weight: 600;
+      text-decoration: none;
+    }
+    .nav-link:hover { color: var(--accent); }
+    main {
+      width: min(920px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: clamp(42px, 8vw, 86px) 0;
+    }
+    .kicker {
+      color: var(--accent);
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      margin-bottom: 14px;
+      text-transform: uppercase;
+    }
+    h1 {
+      font-family: var(--font-display);
+      font-size: clamp(2.4rem, 9vw, 5rem);
+      font-weight: 500;
+      line-height: 0.98;
+      margin: 0 0 20px;
+    }
+    .excerpt {
+      max-width: 720px;
+      color: var(--muted);
+      font-family: var(--font-display);
+      font-size: clamp(1.25rem, 3vw, 1.75rem);
+      line-height: 1.35;
+      margin: 0 0 34px;
+    }
+    .article-image {
+      margin: 0 0 36px;
+      border-radius: 8px;
+      overflow: hidden;
+      background: #e8dfd0;
+    }
+    .article-image img {
+      display: block;
+      width: 100%;
+      max-height: 560px;
+      object-fit: cover;
+    }
+    .article-body {
+      max-width: 760px;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: clamp(24px, 5vw, 44px);
+      box-shadow: 0 14px 40px rgba(61, 43, 31, 0.09);
+    }
+    .article-body p {
+      margin: 0 0 18px;
+      color: var(--muted);
+      font-size: 1.03rem;
+    }
+    .article-body p:last-child { margin-bottom: 0; }
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      margin-top: 34px;
+    }
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 44px;
+      padding: 0 18px;
+      border-radius: 999px;
+      border: 1.5px solid var(--accent);
+      color: var(--ink);
+      font-weight: 700;
+      text-decoration: none;
+    }
+    .button--primary {
+      background: var(--accent);
+      color: #fff;
+    }
+    @media (max-width: 640px) {
+      .topbar-inner { align-items: flex-start; flex-direction: column; padding: 12px 0; gap: 10px; }
+      .brand img { width: 48px; height: 48px; }
+      .actions { flex-direction: column; }
+      .button { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="/">
+        <img src="/logo.jpg" alt="Dřevito">
+        <span>Dřevito</span>
+      </a>
+      <a class="nav-link" href="/#blog">Zpět na blog</a>
+    </div>
+  </header>
+  <main>
+    <div class="kicker">${escapeHtml(blogPostMeta(post))}</div>
+    <h1>${escapeHtml(post.title)}</h1>
+    ${post.excerpt ? `<p class="excerpt">${escapeHtml(post.excerpt)}</p>` : ''}
+    ${imageHtml}
+    <article class="article-body">
+      ${body}
+    </article>
+    <div class="actions">
+      <a class="button button--primary" href="/#contact">Kontakt</a>
+      <a class="button" href="/#blog">Další články</a>
+    </div>
+  </main>
+</body>
+</html>`
+  };
+}
+
+async function handlePublicBlogRoute(req, res, url) {
+  const slug = normalizeBlogRouteSlug(url.pathname);
+  if (!slug) return false;
+
+  try {
+    const post = await getPublicBlogPost(slug, (url.searchParams.get('locale') || 'cs').trim().toLowerCase());
+    if (!post) return false;
+    const rendered = renderPublicBlogPostPage(post);
+    send(res, rendered.statusCode, rendered.html, {
+      'Cache-Control': 'no-cache'
+    });
+  } catch (error) {
+    const fallback = fallbackBlogPost(slug);
+    if (!fallback) throw error;
+    console.error(error);
+    const rendered = renderPublicBlogPostPage(fallback);
+    send(res, rendered.statusCode, rendered.html, {
+      'Cache-Control': 'no-store'
+    });
+  }
+  return true;
+}
+
 function serveStatic(req, res, pathname) {
   const requestedPath = pathname === '/' ? '/index.html' : pathname;
   const filePath = path.resolve(ROOT_DIR, `.${decodeURIComponent(requestedPath)}`);
@@ -6320,7 +6657,14 @@ function handleRequest(req, res) {
     return;
   }
 
-  serveStatic(req, res, url.pathname);
+  handlePublicBlogRoute(req, res, url)
+    .then((handled) => {
+      if (!handled) serveStatic(req, res, url.pathname);
+    })
+    .catch((error) => {
+      console.error(error);
+      send(res, 500, 'Internal server error');
+    });
 }
 
 if (require.main === module) {

@@ -21,8 +21,6 @@ const SESSION_COOKIE = 'drevito_admin_session';
 const OAUTH_STATE_COOKIE = 'drevito_oauth_state';
 const SESSION_MAX_AGE_SECONDS = 60 * 60 * 12;
 const OAUTH_STATE_MAX_AGE_SECONDS = 10 * 60;
-const sessions = new Map();
-const oauthStates = new Map();
 
 const MIME_TYPES = {
   '.html': 'text/html; charset=utf-8',
@@ -100,8 +98,8 @@ function parseCookies(req) {
   return cookies;
 }
 
-function signSessionId(sessionId) {
-  return crypto.createHmac('sha256', SESSION_SECRET).update(sessionId).digest('base64url');
+function signValue(value) {
+  return crypto.createHmac('sha256', SESSION_SECRET).update(String(value)).digest('base64url');
 }
 
 function safeEqual(a, b) {
@@ -110,45 +108,74 @@ function safeEqual(a, b) {
   return left.length === right.length && crypto.timingSafeEqual(left, right);
 }
 
+function createSignedPayload(payload) {
+  const body = Buffer.from(JSON.stringify(payload)).toString('base64url');
+  return `${body}.${signValue(body)}`;
+}
+
+function readSignedPayload(token) {
+  if (!token || !token.includes('.')) return null;
+
+  const dotIndex = token.lastIndexOf('.');
+  const body = token.slice(0, dotIndex);
+  const signature = token.slice(dotIndex + 1);
+  if (!safeEqual(signature, signValue(body))) return null;
+
+  try {
+    return JSON.parse(Buffer.from(body, 'base64url').toString('utf8'));
+  } catch {
+    return null;
+  }
+}
+
 function createSession(email) {
-  const sessionId = crypto.randomBytes(32).toString('base64url');
   const expiresAt = Date.now() + SESSION_MAX_AGE_SECONDS * 1000;
-  sessions.set(sessionId, { email, expiresAt });
-  return `${sessionId}.${signSessionId(sessionId)}`;
+  return createSignedPayload({
+    type: 'admin_session',
+    email,
+    expiresAt
+  });
 }
 
 function getSession(req) {
   const cookie = parseCookies(req)[SESSION_COOKIE];
-  if (!cookie || !cookie.includes('.')) return null;
-
-  const dotIndex = cookie.lastIndexOf('.');
-  const sessionId = cookie.slice(0, dotIndex);
-  const signature = cookie.slice(dotIndex + 1);
-  if (!safeEqual(signature, signSessionId(sessionId))) return null;
-
-  const session = sessions.get(sessionId);
-  if (!session) return null;
-  if (session.expiresAt <= Date.now()) {
-    sessions.delete(sessionId);
-    return null;
-  }
-  return { id: sessionId, ...session };
+  const session = readSignedPayload(cookie);
+  if (!session || session.type !== 'admin_session') return null;
+  if (!session.email || session.expiresAt <= Date.now()) return null;
+  return {
+    id: cookie,
+    email: String(session.email).toLowerCase(),
+    expiresAt: session.expiresAt
+  };
 }
 
-function destroySession(req) {
-  const cookie = parseCookies(req)[SESSION_COOKIE];
-  if (!cookie || !cookie.includes('.')) return;
-  sessions.delete(cookie.slice(0, cookie.lastIndexOf('.')));
+function createOauthState(next) {
+  const safeNext = getSafeAdminNext(next);
+  const state = crypto.randomBytes(32).toString('base64url');
+  const expiresAt = Date.now() + OAUTH_STATE_MAX_AGE_SECONDS * 1000;
+  return {
+    state,
+    next: safeNext,
+    expiresAt,
+    token: createSignedPayload({
+      type: 'oauth_state',
+      state,
+      next: safeNext,
+      expiresAt
+    })
+  };
 }
 
-function cleanupSessions() {
-  const now = Date.now();
-  for (const [sessionId, session] of sessions.entries()) {
-    if (session.expiresAt <= now) sessions.delete(sessionId);
-  }
-  for (const [state, oauthState] of oauthStates.entries()) {
-    if (oauthState.expiresAt <= now) oauthStates.delete(state);
-  }
+function getOauthState(req, callbackState) {
+  const payload = readSignedPayload(parseCookies(req)[OAUTH_STATE_COOKIE]);
+  if (!payload || payload.type !== 'oauth_state') return null;
+  if (!payload.state || !safeEqual(payload.state, callbackState)) return null;
+  if (!payload.expiresAt || payload.expiresAt <= Date.now()) return null;
+  return {
+    state: payload.state,
+    next: getSafeAdminNext(payload.next),
+    expiresAt: payload.expiresAt
+  };
 }
 
 function isHttps(req) {
@@ -3952,22 +3979,18 @@ function getSafeAdminNext(next) {
 }
 
 function buildGoogleAuthUrl(req, next) {
-  const state = crypto.randomBytes(32).toString('base64url');
-  oauthStates.set(state, {
-    next: getSafeAdminNext(next),
-    expiresAt: Date.now() + OAUTH_STATE_MAX_AGE_SECONDS * 1000
-  });
+  const oauthState = createOauthState(next);
 
   const authUrl = new URL('https://accounts.google.com/o/oauth2/v2/auth');
   authUrl.searchParams.set('client_id', GOOGLE_CLIENT_ID);
   authUrl.searchParams.set('redirect_uri', `${getBaseUrl(req)}/admin/oauth/google/callback`);
   authUrl.searchParams.set('response_type', 'code');
   authUrl.searchParams.set('scope', 'openid email profile');
-  authUrl.searchParams.set('state', state);
+  authUrl.searchParams.set('state', oauthState.state);
   authUrl.searchParams.set('prompt', 'select_account');
   if (GOOGLE_ALLOWED_EMAIL) authUrl.searchParams.set('login_hint', GOOGLE_ALLOWED_EMAIL);
 
-  return { state, url: authUrl.toString() };
+  return { ...oauthState, url: authUrl.toString() };
 }
 
 async function requestGoogleToken(req, code) {
@@ -5754,18 +5777,16 @@ async function handleAdmin(req, res, url) {
 
     const auth = buildGoogleAuthUrl(req, next);
     redirect(res, auth.url, {
-      'Set-Cookie': oauthStateCookie(auth.state, req)
+      'Set-Cookie': oauthStateCookie(auth.token, req)
     });
     return;
   }
 
   if (url.pathname === '/admin/oauth/google/callback' && req.method === 'GET') {
     const callbackState = url.searchParams.get('state') || '';
-    const cookieState = parseCookies(req)[OAUTH_STATE_COOKIE] || '';
-    const storedState = oauthStates.get(callbackState);
-    oauthStates.delete(callbackState);
+    const storedState = getOauthState(req, callbackState);
 
-    if (!callbackState || !cookieState || !storedState || !safeEqual(callbackState, cookieState)) {
+    if (!callbackState || !storedState) {
       send(res, 400, loginPage({ error: 'Přihlášení vypršelo. Zkuste to znovu.' }), {
         'Cache-Control': 'no-store',
         'Set-Cookie': expiredOauthStateCookie()
@@ -5822,7 +5843,6 @@ async function handleAdmin(req, res, url) {
   }
 
   if (url.pathname === '/admin/logout' && req.method === 'POST') {
-    destroySession(req);
     redirect(res, '/admin/login', {
       'Set-Cookie': expiredSessionCookie()
     });
@@ -6248,8 +6268,7 @@ async function handleAdmin(req, res, url) {
   });
 }
 
-const server = http.createServer((req, res) => {
-  cleanupSessions();
+function handleRequest(req, res) {
   const url = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
 
   if (url.pathname === '/api/media-targets' && req.method === 'GET') {
@@ -6302,15 +6321,21 @@ const server = http.createServer((req, res) => {
   }
 
   serveStatic(req, res, url.pathname);
-});
+}
 
-server.listen(PORT, () => {
-  console.log(`Drevito site running at http://localhost:${PORT}`);
-  console.log(`Admin login: http://localhost:${PORT}/admin/login`);
-  if (!isAuthConfigured()) {
-    console.warn('Google admin login is disabled until GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, and GOOGLE_ALLOWED_EMAIL are set.');
-  }
-  if (!process.env.SESSION_SECRET) {
-    console.warn('SESSION_SECRET is not set. A temporary secret was generated for this process.');
-  }
-});
+if (require.main === module) {
+  const server = http.createServer(handleRequest);
+
+  server.listen(PORT, () => {
+    console.log(`Drevito site running at http://localhost:${PORT}`);
+    console.log(`Admin login: http://localhost:${PORT}/admin/login`);
+    if (!isAuthConfigured()) {
+      console.warn('Google admin login is disabled until GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, and GOOGLE_ALLOWED_EMAIL are set.');
+    }
+    if (!process.env.SESSION_SECRET) {
+      console.warn('SESSION_SECRET is not set. A temporary secret was generated for this process.');
+    }
+  });
+}
+
+module.exports = handleRequest;

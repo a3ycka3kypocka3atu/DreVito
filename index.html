@@ -347,7 +347,14 @@
         /* PRODUCTS */
         .products { padding: 6rem 2rem; background: var(--color-bg); }
         .products__container { max-width: 1200px; margin: 0 auto; }
-        .products__title { text-align: center; margin-bottom: 2.5rem; }
+        .products__title { text-align: center; margin-bottom: 1rem; }
+        .products__intro {
+            max-width: 720px;
+            margin: 0 auto 2.5rem;
+            text-align: center;
+            color: var(--color-text-muted);
+            line-height: 1.8;
+        }
         .products__tabs { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.5rem; margin-bottom: 3rem; }
         .products__tab {
             padding: 0.625rem 1.25rem;
@@ -430,6 +437,129 @@
         }
         @media (max-width: 900px) { .products__grid { grid-template-columns: repeat(2, 1fr); } }
         @media (max-width: 600px) { .products__grid { grid-template-columns: 1fr; } }
+
+        /* BLOG AND DETAIL PANELS */
+        .blog { padding: 6rem 2rem; background: #FDFCFA; }
+        .blog__container { max-width: 1200px; margin: 0 auto; }
+        .blog__title { text-align: center; margin-bottom: 1rem; }
+        .blog__intro {
+            max-width: 720px;
+            margin: 0 auto 2.5rem;
+            text-align: center;
+            color: var(--color-text-muted);
+            line-height: 1.8;
+        }
+        .blog__tabs { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.5rem; margin-bottom: 3rem; }
+        .blog__tab {
+            padding: 0.625rem 1.25rem;
+            border: 1.5px solid var(--color-accent);
+            background: transparent;
+            color: var(--color-primary);
+            font-family: var(--font-body);
+            font-size: 0.875rem;
+            font-weight: 500;
+            border-radius: 100px;
+            cursor: pointer;
+            transition: all var(--transition-smooth);
+        }
+        .blog__tab:hover { background: rgba(201, 169, 110, 0.1); }
+        .blog__tab.active { background: var(--color-accent); color: var(--color-card); }
+        .blog__grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; }
+        .blog-card {
+            background: var(--color-bg);
+            border-radius: var(--radius-card);
+            overflow: hidden;
+            box-shadow: var(--shadow-card);
+            transition: all var(--transition-smooth);
+            text-decoration: none;
+            display: block;
+        }
+        .blog-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-card-hover); }
+        .blog-card__image {
+            aspect-ratio: 4 / 3;
+            background: linear-gradient(145deg, #E8DFD0 0%, #D4C4B0 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--color-text-muted);
+            font-size: 0.75rem;
+            overflow: hidden;
+        }
+        .blog-card__body { padding: 1.25rem; }
+        .blog-card__meta {
+            color: var(--color-accent);
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+        }
+        .blog-card__title {
+            font-family: var(--font-display);
+            font-size: 1.25rem;
+            font-weight: 500;
+            color: var(--color-primary);
+            line-height: 1.25;
+            margin-bottom: 0.625rem;
+        }
+        .blog-card__excerpt {
+            color: var(--color-text-muted);
+            font-size: 0.875rem;
+            line-height: 1.6;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .content-detail {
+            display: none;
+            margin-top: 3rem;
+            background: var(--color-card);
+            border-radius: var(--radius-card);
+            box-shadow: var(--shadow-card);
+            overflow: hidden;
+        }
+        .content-detail.open { display: grid; grid-template-columns: minmax(0, 0.8fr) minmax(0, 1fr); }
+        .content-detail__image {
+            min-height: 360px;
+            background: linear-gradient(145deg, #E8DFD0 0%, #D4C4B0 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--color-text-muted);
+            overflow: hidden;
+        }
+        .content-detail__image img { width: 100%; height: 100%; object-fit: cover; }
+        .content-detail__body { padding: 2rem; }
+        .content-detail__meta {
+            color: var(--color-accent);
+            font-size: 0.8125rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+        }
+        .content-detail__title {
+            font-family: var(--font-display);
+            font-size: 2rem;
+            font-weight: 500;
+            line-height: 1.15;
+            margin-bottom: 1rem;
+        }
+        .content-detail__text { color: var(--color-text-muted); line-height: 1.8; margin-bottom: 1rem; }
+        .content-detail__close {
+            border: 1.5px solid var(--color-accent);
+            background: transparent;
+            color: var(--color-primary);
+            border-radius: 100px;
+            cursor: pointer;
+            font-family: var(--font-body);
+            font-weight: 600;
+            margin-top: 1rem;
+            padding: 0.625rem 1.25rem;
+        }
+        @media (max-width: 900px) {
+            .blog__grid { grid-template-columns: repeat(2, 1fr); }
+            .content-detail.open { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 600px) { .blog__grid { grid-template-columns: 1fr; } }
 
         /* AUTHOR */
         .author { padding: 6rem 2rem; background: var(--color-primary); }
@@ -618,6 +748,7 @@
                     </div>
                 </div>
                 <a href="#author" class="nav__link">Autor</a>
+                <a href="#blog" class="nav__link">Blog</a>
                 <a href="#custom" class="nav__link">Zakázková výroba</a>
                 <a href="#contact" class="nav__link">Kontakt</a>
             </div>
@@ -670,6 +801,7 @@
                         <a href="#products" class="nav__dropdown-sub-item" data-cat="engraving-items">Další nejen dřevěné výrobky</a>
                     </div>
                     <a href="#author" class="nav__dropdown-item">Autor</a>
+                    <a href="#blog" class="nav__dropdown-item">Blog</a>
                     <a href="#custom" class="nav__dropdown-item">Zakázková výroba</a>
                     <a href="#contact" class="nav__dropdown-item">Kontakt</a>
                 </div>
@@ -713,6 +845,7 @@
     <section class="products" id="products">
         <div class="products__container">
             <h2 class="section-title products__title">Naše výrobky</h2>
+            <p class="products__intro" id="products-intro" hidden></p>
             <div class="products__tabs" role="tablist">
                 <button class="products__tab active" data-category="all" role="tab">Vše</button>
                 <button class="products__tab" data-category="engraved-furniture" role="tab">Gravírovaný nábytek</button>
@@ -724,6 +857,18 @@
                 <button class="products__tab" data-category="engraving-items" role="tab">Gravírování vašich předmětů</button>
             </div>
             <div class="products__grid" id="products-grid"></div>
+            <article class="content-detail" id="product-detail" aria-live="polite"></article>
+        </div>
+    </section>
+
+    <!-- BLOG -->
+    <section class="blog" id="blog">
+        <div class="blog__container">
+            <h2 class="section-title blog__title">Z dílny</h2>
+            <p class="blog__intro" id="blog-intro">Poznámky o dřevě, řemesle a novinkách z dílny Dřevito.</p>
+            <div class="blog__tabs" id="blog-tabs" role="tablist" hidden></div>
+            <div class="blog__grid" id="blog-grid"></div>
+            <article class="content-detail" id="blog-detail" aria-live="polite"></article>
         </div>
     </section>
 
@@ -763,9 +908,9 @@
                     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 7l10 7 10-7"/></svg>
                     <span>info@drevito.cz</span>
                 </a>
-                <a href="tel:+420773948112" class="custom__contact-item">
+                <a href="tel:+420777482242" class="custom__contact-item">
                     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z"/></svg>
-                    <span>+420 773 948 112</span>
+                    <span>+420 777 482 242</span>
                 </a>
             </div>
             <a href="mailto:info@drevito.cz" class="btn btn--primary">Napište nám</a>
@@ -781,7 +926,7 @@
             </div>
             <div class="footer__contact">
                 <a href="mailto:info@drevito.cz">info@drevito.cz</a>
-                <a href="tel:+420773948112">+420 773 948 112</a>
+                <a href="tel:+420777482242">+420 777 482 242</a>
             </div>
             <div class="footer__address">
                 <p>Nad Hřištěm 87, 53375 Dolní Ředice</p>
@@ -799,21 +944,123 @@
 <script>
 (function() {
     var products = [
-        { id: 'P00002', name: 'Čajné stolicky', desc: 'Dřevěný čajový stoleček s vyřezávaným motivem.', price: 1790, category: 'engraved-furniture', url: 'https://drevito.t2.upgates.shop/p/stolecek-strom-zivota-slunecni-kruh', image: 'cajne-stolicky.JPG' },
-        { id: 'P00016', name: 'Dekorační tabulka', desc: 'Dekorační tabulka s vyřezávaným motivem.', price: 1555, category: 'shadow-light', url: 'https://drevito.t2.upgates.shop/p/svicelenka-osta', image: 'dekoracni-tabulka.JPG' },
-        { id: 'P00004', name: 'Krabička', desc: 'Zasouvací krabička z masivního dřeva.', price: 1111, category: 'small-wood', url: 'https://drevito.t2.upgates.shop/p/krabicka-jin-jang', image: 'krabicka.JPG' },
-        { id: 'P00020', name: 'Kůň', desc: 'Dřevěná dekorace koně.', price: 0, category: 'decorations', url: 'https://drevito.t2.upgates.shop/p/kun', image: 'kun-dekorace.JPG' },
-        { id: 'P00023', name: 'Dekorace žena', desc: 'Dřevěná dekorace ženy.', price: 0, category: 'decorations', url: 'https://drevito.t2.upgates.shop/p/bohyne', image: 'dekorace-zena.JPG' },
-        { id: 'P00018', name: 'Stojan na telefon', desc: 'Stojan na telefon z masivního dřeva.', price: 2000, category: 'small-wood', url: 'https://drevito.t2.upgates.shop/p/vlk', image: 'stojan-na-telefon.JPG' },
-        { id: 'P00022', name: 'Hračka autíčko', desc: 'Dřevěná hračka autíčko.', price: 0, category: 'small-wood', url: 'https://drevito.t2.upgates.shop/p/lev-kvetinovych-ornamentech', image: 'hracka-auticko.JPG' }
+        { id: 'P00002', slug: 'cajne-stolicky', name: 'Čajné stolicky', desc: 'Dřevěný čajový stoleček s vyřezávaným motivem.', description: 'Dřevěný čajový stoleček s vyřezávaným motivem.', price: 1790, category: 'engraved-furniture', url: 'https://drevito.t2.upgates.shop/p/stolecek-strom-zivota-slunecni-kruh', image: 'cajne-stolicky.JPG' },
+        { id: 'P00016', slug: 'dekoracni-tabulka', name: 'Dekorační tabulka', desc: 'Dekorační tabulka s vyřezávaným motivem.', description: 'Dekorační tabulka s vyřezávaným motivem.', price: 1555, category: 'shadow-light', url: 'https://drevito.t2.upgates.shop/p/svicelenka-osta', image: 'dekoracni-tabulka.JPG' },
+        { id: 'P00004', slug: 'krabicka', name: 'Krabička', desc: 'Zasouvací krabička z masivního dřeva.', description: 'Zasouvací krabička z masivního dřeva.', price: 1111, category: 'small-wood', url: 'https://drevito.t2.upgates.shop/p/krabicka-jin-jang', image: 'krabicka.JPG' },
+        { id: 'P00020', slug: 'kun', name: 'Kůň', desc: 'Dřevěná dekorace koně.', description: 'Dřevěná dekorace koně.', price: 0, category: 'decorations', url: 'https://drevito.t2.upgates.shop/p/kun', image: 'kun-dekorace.JPG' },
+        { id: 'P00023', slug: 'dekorace-zena', name: 'Dekorace žena', desc: 'Dřevěná dekorace ženy.', description: 'Dřevěná dekorace ženy.', price: 0, category: 'decorations', url: 'https://drevito.t2.upgates.shop/p/bohyne', image: 'dekorace-zena.JPG' },
+        { id: 'P00018', slug: 'stojan-na-telefon', name: 'Stojan na telefon', desc: 'Stojan na telefon z masivního dřeva.', description: 'Stojan na telefon z masivního dřeva.', price: 2000, category: 'small-wood', url: 'https://drevito.t2.upgates.shop/p/vlk', image: 'stojan-na-telefon.JPG' },
+        { id: 'P00022', slug: 'hracka-auticko', name: 'Hračka autíčko', desc: 'Dřevěná hračka autíčko.', description: 'Dřevěná hračka autíčko.', price: 0, category: 'small-wood', url: 'https://drevito.t2.upgates.shop/p/lev-kvetinovych-ornamentech', image: 'hracka-auticko.JPG' }
     ];
+
+    var currentCategory = 'all';
+    var productCategories = [];
+    var blogPosts = [];
+    var blogCategories = [];
+    var currentBlogCategory = 'all';
+    var productsCmsBacked = false;
+
+    function escapeHtml(value) {
+        return String(value == null ? '' : value)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+    }
+
+    function stripHtml(value) {
+        var raw = String(value || '');
+        if (!raw) return '';
+        var element = document.createElement('div');
+        element.innerHTML = raw;
+        return (element.textContent || element.innerText || '').trim();
+    }
+
+    function textParagraphs(value) {
+        return String(value || '')
+            .split(/\n{2,}|\r?\n/)
+            .map(function(part) { return part.trim(); })
+            .filter(Boolean);
+    }
+
+    function contentText(entry) {
+        if (!entry || !entry.value) return '';
+        if (entry.content_type === 'rich_text') return stripHtml(entry.value.html || entry.value.text || '');
+        if (entry.content_type === 'text') return String(entry.value.text || '').trim();
+        return '';
+    }
+
+    function contentParagraphs(entry) {
+        return textParagraphs(contentText(entry));
+    }
+
+    function setText(selector, value) {
+        var element = document.querySelector(selector);
+        if (element && value) element.textContent = value;
+    }
+
+    function setIntro(selector, value) {
+        var element = document.querySelector(selector);
+        if (!element || !value) return;
+        element.textContent = value;
+        element.hidden = false;
+    }
+
+    function productName(product) {
+        return product.title || product.name || '';
+    }
+
+    function productDescription(product) {
+        return product.short_description || product.desc || product.description || '';
+    }
+
+    function productImage(product) {
+        return (product.featured_image && product.featured_image.url) || product.image || '';
+    }
+
+    function productImageAlt(product) {
+        return (product.featured_image && product.featured_image.alt) || productName(product);
+    }
+
+    function productCategorySlugs(product) {
+        if (Array.isArray(product.categories) && product.categories.length) {
+            return product.categories.map(function(category) { return category.slug; }).filter(Boolean);
+        }
+        return product.category ? [product.category] : [];
+    }
+
+    function productCategoryNames(product) {
+        if (Array.isArray(product.categories) && product.categories.length) {
+            return product.categories.map(function(category) { return category.title; }).filter(Boolean);
+        }
+        var category = productCategories.find(function(item) { return item.slug === product.category; });
+        return category ? [category.title] : [];
+    }
+
+    function productMatchesCategory(product, categorySlug) {
+        return categorySlug === 'all' || productCategorySlugs(product).indexOf(categorySlug) !== -1;
+    }
+
+    function renderProductTabs() {
+        if (!productsCmsBacked) return;
+        var root = document.querySelector('.products__tabs');
+        if (!root) return;
+        var html = '<button class="products__tab active" data-category="all" role="tab">Vše</button>';
+        for (var i = 0; i < productCategories.length; i++) {
+            html += '<button class="products__tab" data-category="' + escapeHtml(productCategories[i].slug) + '" role="tab">' + escapeHtml(productCategories[i].title) + '</button>';
+        }
+        root.innerHTML = html;
+        bindProductTabs();
+    }
 
     function renderProducts(cat) {
         cat = cat || 'all';
+        currentCategory = cat;
         var grid = document.getElementById('products-grid');
-        var filtered = (cat === 'all') ? products : [];
+        var filtered = [];
         for (var i = 0; i < products.length; i++) {
-            if (products[i].category === cat) filtered.push(products[i]);
+            if (productMatchesCategory(products[i], cat)) filtered.push(products[i]);
         }
         if (!filtered.length) {
             grid.innerHTML = '<p class="products__empty">V této kategorii teď připravujeme ukázky. Rádi vám ale podobný výrobek navrhneme na míru.</p>';
@@ -822,26 +1069,30 @@
         var html = '';
         for (var j = 0; j < filtered.length; j++) {
             var p = filtered[j];
+            var name = productName(p);
+            var desc = productDescription(p);
+            var image = productImage(p);
+            var href = p.url || '#product-detail';
+            var detailAttrs = p.url ? ' target="_blank" rel="noopener"' : ' data-product-slug="' + escapeHtml(p.slug || p.id) + '"';
             var priceStr = (p.price > 0) ? p.price.toLocaleString('cs-CZ') + ' Kč' : 'Na dotaz';
-            var imgHtml = p.image
-                ? '<img src="' + p.image + '" alt="' + p.name + '" style="width:100%;height:100%;object-fit:cover;">'
-                : '<span>' + p.name + '</span>';
-            html += '<a href="' + p.url + '" target="_blank" rel="noopener" class="product-card">' +
+            var imgHtml = image
+                ? '<img src="' + escapeHtml(image) + '" alt="' + escapeHtml(productImageAlt(p)) + '" style="width:100%;height:100%;object-fit:cover;">'
+                : '<span>' + escapeHtml(name) + '</span>';
+            html += '<a href="' + escapeHtml(href) + '"' + detailAttrs + ' class="product-card">' +
                 '<div class="product-card__image">' + imgHtml + '</div>' +
                 '<div class="product-card__body">' +
-                '<h3 class="product-card__name">' + p.name + '</h3>' +
-                '<p class="product-card__desc">' + p.desc + '</p>' +
+                '<h3 class="product-card__name">' + escapeHtml(name) + '</h3>' +
+                '<p class="product-card__desc">' + escapeHtml(desc) + '</p>' +
                 '<div class="product-card__footer">' +
-                '<span class="product-card__price">' + priceStr + '</span>' +
+                '<span class="product-card__price">' + escapeHtml(priceStr) + '</span>' +
                 '<span class="product-card__link">Zobrazit <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>' +
                 '</div></div></a>';
         }
         grid.innerHTML = html;
     }
 
-    // Tab clicks
-    var tabs = document.querySelectorAll('.products__tab');
     function activateCategory(cat) {
+        var tabs = document.querySelectorAll('.products__tab');
         for (var k = 0; k < tabs.length; k++) tabs[k].classList.remove('active');
         for (var i = 0; i < tabs.length; i++) {
             if (tabs[i].getAttribute('data-category') === cat) {
@@ -851,11 +1102,293 @@
         }
         renderProducts(cat);
     }
-    for (var t = 0; t < tabs.length; t++) {
-        tabs[t].onclick = function() {
-            activateCategory(this.getAttribute('data-category'));
-        };
+
+    function bindProductTabs() {
+        var tabs = document.querySelectorAll('.products__tab');
+        for (var t = 0; t < tabs.length; t++) {
+            tabs[t].onclick = function() {
+                activateCategory(this.getAttribute('data-category'));
+            };
+        }
     }
+
+    function renderProductDetail(product) {
+        var detail = document.getElementById('product-detail');
+        if (!detail) return;
+        var name = productName(product);
+        var image = productImage(product);
+        var categories = productCategoryNames(product).join(' / ');
+        var text = product.description || productDescription(product);
+        var paragraphs = textParagraphs(text);
+        var body = paragraphs.length
+            ? paragraphs.map(function(part) { return '<p class="content-detail__text">' + escapeHtml(part) + '</p>'; }).join('')
+            : '<p class="content-detail__text">K tomuto výrobku brzy doplníme podrobnosti.</p>';
+        var imgHtml = image
+            ? '<img src="' + escapeHtml(image) + '" alt="' + escapeHtml(productImageAlt(product)) + '">'
+            : '<span>' + escapeHtml(name) + '</span>';
+        detail.innerHTML =
+            '<div class="content-detail__image">' + imgHtml + '</div>' +
+            '<div class="content-detail__body">' +
+            '<div class="content-detail__meta">' + escapeHtml(categories || 'Výrobek Dřevito') + '</div>' +
+            '<h3 class="content-detail__title">' + escapeHtml(name) + '</h3>' +
+            body +
+            '<button class="content-detail__close" type="button" data-close-detail="product">Zavřít detail</button>' +
+            '</div>';
+        detail.classList.add('open');
+        detail.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function openProductDetail(slug) {
+        var product = products.find(function(item) { return String(item.slug || item.id) === String(slug); });
+        if (product) renderProductDetail(product);
+    }
+
+    function blogCategorySlugs(post) {
+        return Array.isArray(post.categories)
+            ? post.categories.map(function(category) { return category.slug; }).filter(Boolean)
+            : [];
+    }
+
+    function renderBlogTabs() {
+        var root = document.getElementById('blog-tabs');
+        if (!root) return;
+        if (!blogCategories.length) {
+            root.hidden = true;
+            root.innerHTML = '';
+            return;
+        }
+        var html = '<button class="blog__tab active" data-blog-category="all" role="tab">Vše</button>';
+        for (var i = 0; i < blogCategories.length; i++) {
+            html += '<button class="blog__tab" data-blog-category="' + escapeHtml(blogCategories[i].slug) + '" role="tab">' + escapeHtml(blogCategories[i].title) + '</button>';
+        }
+        root.innerHTML = html;
+        root.hidden = false;
+        bindBlogTabs();
+    }
+
+    function renderBlogPosts(categorySlug) {
+        categorySlug = categorySlug || 'all';
+        currentBlogCategory = categorySlug;
+        var root = document.getElementById('blog-grid');
+        if (!root) return;
+        var filtered = blogPosts.filter(function(post) {
+            return categorySlug === 'all' || blogCategorySlugs(post).indexOf(categorySlug) !== -1;
+        });
+        if (!filtered.length) {
+            root.innerHTML = '<p class="products__empty">Články z dílny teprve připravujeme.</p>';
+            return;
+        }
+        root.innerHTML = filtered.map(function(post) {
+            var image = (post.featured_image && post.featured_image.url) || '';
+            var imageAlt = (post.featured_image && post.featured_image.alt) || post.title;
+            var categoryNames = Array.isArray(post.categories) ? post.categories.map(function(category) { return category.title; }).filter(Boolean) : [];
+            var meta = categoryNames.join(' / ') || formatDate(post.published_at) || 'Blog';
+            var imgHtml = image
+                ? '<img src="' + escapeHtml(image) + '" alt="' + escapeHtml(imageAlt) + '" style="width:100%;height:100%;object-fit:cover;">'
+                : '<span>' + escapeHtml(post.title) + '</span>';
+            return '<a href="#blog-detail" class="blog-card" data-blog-slug="' + escapeHtml(post.slug || post.id) + '">' +
+                '<div class="blog-card__image">' + imgHtml + '</div>' +
+                '<div class="blog-card__body">' +
+                '<div class="blog-card__meta">' + escapeHtml(meta) + '</div>' +
+                '<h3 class="blog-card__title">' + escapeHtml(post.title) + '</h3>' +
+                '<p class="blog-card__excerpt">' + escapeHtml(post.excerpt || stripHtml(post.main_content) || 'Brzy doplníme celý článek.') + '</p>' +
+                '</div></a>';
+        }).join('');
+    }
+
+    function activateBlogCategory(categorySlug) {
+        var tabs = document.querySelectorAll('.blog__tab');
+        for (var i = 0; i < tabs.length; i++) {
+            tabs[i].classList.toggle('active', tabs[i].getAttribute('data-blog-category') === categorySlug);
+        }
+        renderBlogPosts(categorySlug);
+    }
+
+    function bindBlogTabs() {
+        var tabs = document.querySelectorAll('.blog__tab');
+        for (var i = 0; i < tabs.length; i++) {
+            tabs[i].onclick = function() {
+                activateBlogCategory(this.getAttribute('data-blog-category'));
+            };
+        }
+    }
+
+    function formatDate(value) {
+        if (!value) return '';
+        var date = new Date(value);
+        if (Number.isNaN(date.getTime())) return '';
+        return date.toLocaleDateString('cs-CZ', { year: 'numeric', month: 'long', day: 'numeric' });
+    }
+
+    function renderBlogDetail(post) {
+        var detail = document.getElementById('blog-detail');
+        if (!detail) return;
+        var image = (post.featured_image && post.featured_image.url) || '';
+        var imageAlt = (post.featured_image && post.featured_image.alt) || post.title;
+        var imgHtml = image
+            ? '<img src="' + escapeHtml(image) + '" alt="' + escapeHtml(imageAlt) + '">'
+            : '<span>' + escapeHtml(post.title) + '</span>';
+        var paragraphs = textParagraphs(stripHtml(post.main_content || post.excerpt || ''));
+        var body = paragraphs.length
+            ? paragraphs.map(function(part) { return '<p class="content-detail__text">' + escapeHtml(part) + '</p>'; }).join('')
+            : '<p class="content-detail__text">K tomuto článku brzy doplníme text.</p>';
+        var metaParts = [];
+        if (post.author_name) metaParts.push(post.author_name);
+        if (formatDate(post.published_at)) metaParts.push(formatDate(post.published_at));
+        detail.innerHTML =
+            '<div class="content-detail__image">' + imgHtml + '</div>' +
+            '<div class="content-detail__body">' +
+            '<div class="content-detail__meta">' + escapeHtml(metaParts.join(' / ') || 'Blog Dřevito') + '</div>' +
+            '<h3 class="content-detail__title">' + escapeHtml(post.title) + '</h3>' +
+            body +
+            '<button class="content-detail__close" type="button" data-close-detail="blog">Zavřít článek</button>' +
+            '</div>';
+        detail.classList.add('open');
+        detail.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function openBlogDetail(slug) {
+        var post = blogPosts.find(function(item) { return String(item.slug || item.id) === String(slug); });
+        if (post) renderBlogDetail(post);
+    }
+
+    function firstManagedImage(targets, type, key) {
+        if (!targets || !targets[type] || !targets[type][key]) return null;
+        var images = targets[type][key].images;
+        return images && images.length ? images[0] : null;
+    }
+
+    function setImageSrc(selector, image) {
+        var element = document.querySelector(selector);
+        if (!element || !image || !image.url) return;
+        element.src = image.url;
+        if (image.alt) element.alt = image.alt;
+    }
+
+    function applyManagedImages(targets) {
+        var hero = firstManagedImage(targets, 'site_sections', 'hero');
+        if (hero && hero.url) {
+            var heroElement = document.querySelector('.hero__bg');
+            if (heroElement) heroElement.style.backgroundImage = 'url("' + hero.url + '")';
+        }
+
+        setImageSrc('.about__image-placeholder img', firstManagedImage(targets, 'site_sections', 'about'));
+        setImageSrc('.author__image-placeholder img', firstManagedImage(targets, 'site_sections', 'author'));
+        setImageSrc('.custom__images .custom__image:nth-child(1) img', firstManagedImage(targets, 'site_sections', 'custom_primary'));
+        setImageSrc('.custom__images .custom__image:nth-child(2) img', firstManagedImage(targets, 'site_sections', 'custom_secondary'));
+
+        var logo = firstManagedImage(targets, 'site_sections', 'brand_logo');
+        setImageSrc('.nav__logo img', logo);
+        setImageSrc('.footer__brand img', logo);
+
+        for (var i = 0; i < products.length; i++) {
+            var image = firstManagedImage(targets, 'products', products[i].id) || firstManagedImage(targets, 'products', products[i].slug);
+            if (image && image.url) products[i].image = image.url;
+        }
+        renderProducts(currentCategory);
+    }
+
+    function loadManagedImages() {
+        if (!window.fetch) return Promise.resolve();
+        return fetch('/api/media-targets', { headers: { Accept: 'application/json' } })
+            .then(function(response) {
+                if (!response.ok) throw new Error('Media API unavailable');
+                return response.json();
+            })
+            .then(applyManagedImages)
+            .catch(function() {});
+    }
+
+    function applySiteImage(selector, image) {
+        if (!image || !image.url) return;
+        setImageSrc(selector, image);
+    }
+
+    function applySiteContent(siteContent) {
+        siteContent = siteContent || {};
+        var heroText = contentParagraphs(siteContent['homepage.hero']);
+        if (heroText[0]) setText('.hero__title', heroText[0]);
+        if (heroText[1]) setText('.hero__tagline', heroText.slice(1).join(' '));
+
+        var heroImage = siteContent['homepage.hero.image'] && siteContent['homepage.hero.image'].value;
+        if (heroImage && heroImage.url) {
+            var heroElement = document.querySelector('.hero__bg');
+            if (heroElement) heroElement.style.backgroundImage = 'url("' + heroImage.url + '")';
+        }
+
+        var aboutText = contentParagraphs(siteContent['about.text']);
+        if (aboutText[0]) setText('.about__lead', aboutText[0]);
+        if (aboutText[1]) setText('.about__body', aboutText.slice(1).join(' '));
+
+        var craftText = contentParagraphs(siteContent['craft.philosophy']);
+        if (craftText[0]) setText('.author__lead', craftText[0]);
+        if (craftText[1]) setText('.author__body', craftText.slice(1).join(' '));
+
+        var contactText = contentParagraphs(siteContent['contact.text']);
+        if (contactText[0]) setText('.custom__text', contactText[0]);
+        if (contactText[1]) setText('.custom__subtext', contactText.slice(1).join(' '));
+
+        setIntro('#products-intro', contentText(siteContent['products.intro']));
+        setIntro('#blog-intro', contentText(siteContent['blog.intro']));
+
+        applySiteImage('.about__image-placeholder img', siteContent['about.image'] && siteContent['about.image'].value);
+        applySiteImage('.author__image-placeholder img', siteContent['author.image'] && siteContent['author.image'].value);
+    }
+
+    function applyPublicContent(payload) {
+        if (!payload || payload.ok === false || !payload.configured) return;
+        applySiteContent(payload.site_content || {});
+        productsCmsBacked = true;
+        products = Array.isArray(payload.products) ? payload.products : [];
+        productCategories = Array.isArray(payload.product_categories) ? payload.product_categories : [];
+        blogPosts = Array.isArray(payload.blog_posts) ? payload.blog_posts : [];
+        blogCategories = Array.isArray(payload.blog_categories) ? payload.blog_categories : [];
+        currentCategory = 'all';
+        currentBlogCategory = 'all';
+        renderProductTabs();
+        renderProducts(currentCategory);
+        renderBlogTabs();
+        renderBlogPosts(currentBlogCategory);
+    }
+
+    function loadPublicContent() {
+        if (!window.fetch) return Promise.resolve();
+        return fetch('/api/public-content?locale=cs', { headers: { Accept: 'application/json' } })
+            .then(function(response) {
+                if (!response.ok) throw new Error('Public CMS API unavailable');
+                return response.json();
+            })
+            .then(applyPublicContent)
+            .catch(function() {});
+    }
+
+    var productGrid = document.getElementById('products-grid');
+    if (productGrid) {
+        productGrid.addEventListener('click', function(event) {
+            var link = event.target.closest('[data-product-slug]');
+            if (!link) return;
+            event.preventDefault();
+            openProductDetail(link.getAttribute('data-product-slug'));
+        });
+    }
+
+    var blogGrid = document.getElementById('blog-grid');
+    if (blogGrid) {
+        blogGrid.addEventListener('click', function(event) {
+            var link = event.target.closest('[data-blog-slug]');
+            if (!link) return;
+            event.preventDefault();
+            openBlogDetail(link.getAttribute('data-blog-slug'));
+        });
+    }
+
+    document.addEventListener('click', function(event) {
+        var closeButton = event.target.closest('[data-close-detail]');
+        if (!closeButton) return;
+        var type = closeButton.getAttribute('data-close-detail');
+        var detail = document.getElementById(type + '-detail');
+        if (detail) detail.classList.remove('open');
+    });
 
     // Desktop Výrobky dropdown
     var itemWithDropdown = document.querySelector('.nav__item-with-dropdown');
@@ -934,7 +1467,10 @@
         };
     }
 
+    bindProductTabs();
     renderProducts('all');
+    renderBlogPosts('all');
+    loadManagedImages().then(loadPublicContent);
 })();
 </script>
 

@@ -1,3 +1,6 @@
 .DS_Store
 *.csv
-docs/
+docs/*
+!docs/*.md
+.data/
+uploads/

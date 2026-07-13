@@ -12,7 +12,11 @@ const MEDIA_DB_PATH = path.join(DATA_DIR, 'media-db.json');
 const MAX_UPLOAD_BYTES = Number(process.env.MAX_UPLOAD_BYTES || 10 * 1024 * 1024);
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID || '';
 const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET || '';
-const GOOGLE_ALLOWED_EMAIL = (process.env.GOOGLE_ALLOWED_EMAIL || '').toLowerCase();
+const GOOGLE_ALLOWED_EMAILS = (process.env.GOOGLE_ALLOWED_EMAIL || '')
+  .split(/[,\s;]+/)
+  .map((email) => email.trim().toLowerCase())
+  .filter(Boolean);
+const GOOGLE_ALLOWED_EMAIL = GOOGLE_ALLOWED_EMAILS[0] || '';
 const PUBLIC_URL = process.env.PUBLIC_URL || '';
 const SUPABASE_URL = (process.env.SUPABASE_URL || '').replace(/\/+$/, '');
 const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
@@ -6154,7 +6158,7 @@ async function handleAdmin(req, res, url) {
       const email = String(user.email || '').toLowerCase();
       const emailVerified = user.email_verified === true || user.email_verified === 'true';
 
-      if (!emailVerified || !safeEqual(email, GOOGLE_ALLOWED_EMAIL)) {
+      if (!emailVerified || !GOOGLE_ALLOWED_EMAILS.some((allowedEmail) => safeEqual(email, allowedEmail))) {
         send(res, 403, loginPage({ error: 'Tento Google účet nemá přístup do administrace.', next: storedState.next }), {
           'Cache-Control': 'no-store',
           'Set-Cookie': expiredOauthStateCookie()

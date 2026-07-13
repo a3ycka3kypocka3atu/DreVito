@@ -12,7 +12,13 @@ const MEDIA_DB_PATH = path.join(DATA_DIR, 'media-db.json');
 const MAX_UPLOAD_BYTES = Number(process.env.MAX_UPLOAD_BYTES || 10 * 1024 * 1024);
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID || '';
 const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET || '';
-const GOOGLE_ALLOWED_EMAILS = (process.env.GOOGLE_ALLOWED_EMAIL || '')
+const GOOGLE_ALLOWED_EMAILS = [
+  'Thorio.vit@gmail.com',
+  'andrijhsavcin@gmail.com',
+  process.env.GOOGLE_ALLOWED_EMAIL || '',
+  process.env.GOOGLE_ALLOWED_EMAILS || ''
+]
+  .join(',')
   .split(/[,\s;]+/)
   .map((email) => email.trim().toLowerCase())
   .filter(Boolean);

@@ -110,6 +110,17 @@
             transition: color var(--transition-smooth);
         }
         .nav__link:hover { color: #1E160F; }
+        .nav__link--login {
+            padding: 0.625rem 1rem;
+            border: 1px solid rgba(61, 43, 31, 0.42);
+            border-radius: 999px;
+            color: var(--color-primary);
+            white-space: nowrap;
+        }
+        .nav__link--login:hover {
+            color: var(--color-card);
+            background: var(--color-primary);
+        }
         .nav__item-with-dropdown { position: relative; }
         .nav__link--dropdown {
             display: flex;
@@ -714,10 +725,10 @@
                 <img src="drevito-logo-transparent-black.png" alt="Dřevito">
             </a>
             <div class="nav__links">
-                <a href="#about" class="nav__link">O nás</a>
+                <a href="#about" class="nav__link" data-copy-key="nav.about">O nás</a>
                 <div class="nav__item-with-dropdown">
                     <a href="#products" class="nav__link nav__link--dropdown">
-                        Výrobky
+                        <span data-copy-key="nav.products">Výrobky</span>
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
                     </a>
                     <div class="nav__dropdown-panel">
@@ -770,10 +781,11 @@
                         </div>
                     </div>
                 </div>
-                <a href="#author" class="nav__link">Autor</a>
-                <a href="#blog" class="nav__link">Blog</a>
-                <a href="#custom" class="nav__link">Zakázková výroba</a>
-                <a href="#contact" class="nav__link">Kontakt</a>
+                <a href="#author" class="nav__link" data-copy-key="nav.author">Autor</a>
+                <a href="#blog" class="nav__link" data-copy-key="nav.blog">Blog</a>
+                <a href="#custom" class="nav__link" data-copy-key="nav.custom">Zakázková výroba</a>
+                <a href="#contact" class="nav__link" data-copy-key="nav.contact">Kontakt</a>
+                <a href="/admin/login" class="nav__link nav__link--login">Přihlášení</a>
             </div>
             <div class="nav__dropdown">
                 <button class="nav__dropdown-toggle" aria-expanded="false">
@@ -781,8 +793,8 @@
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
                 </button>
                 <div class="nav__dropdown-menu">
-                    <a href="#about" class="nav__dropdown-item">O nás</a>
-                    <a href="#products" class="nav__dropdown-item has-sub">Výrobky</a>
+                    <a href="#about" class="nav__dropdown-item" data-copy-key="nav.about">O nás</a>
+                    <a href="#products" class="nav__dropdown-item has-sub" data-copy-key="nav.products">Výrobky</a>
                     <div class="nav__dropdown-sub">
                         <button class="nav__dropdown-sub-back">
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
@@ -823,10 +835,11 @@
                         <a href="#products" class="nav__dropdown-sub-item" data-cat="engraving-items">Kytary a hudební nástroje</a>
                         <a href="#products" class="nav__dropdown-sub-item" data-cat="engraving-items">Další nejen dřevěné výrobky</a>
                     </div>
-                    <a href="#author" class="nav__dropdown-item">Autor</a>
-                    <a href="#blog" class="nav__dropdown-item">Blog</a>
-                    <a href="#custom" class="nav__dropdown-item">Zakázková výroba</a>
-                    <a href="#contact" class="nav__dropdown-item">Kontakt</a>
+                    <a href="#author" class="nav__dropdown-item" data-copy-key="nav.author">Autor</a>
+                    <a href="#blog" class="nav__dropdown-item" data-copy-key="nav.blog">Blog</a>
+                    <a href="#custom" class="nav__dropdown-item" data-copy-key="nav.custom">Zakázková výroba</a>
+                    <a href="#contact" class="nav__dropdown-item" data-copy-key="nav.contact">Kontakt</a>
+                    <a href="/admin/login" class="nav__dropdown-item">Přihlášení</a>
                 </div>
             </div>
         </div>
@@ -1003,6 +1016,7 @@
     var blogCategories = [];
     var currentBlogCategory = 'all';
     var productsCmsBacked = false;
+    var siteCopy = {};
 
     function escapeHtml(value) {
         return String(value == null ? '' : value)
@@ -1044,11 +1058,21 @@
         if (element && value) element.textContent = value;
     }
 
+    function setAllText(selector, value) {
+        if (!value) return;
+        var elements = document.querySelectorAll(selector);
+        for (var i = 0; i < elements.length; i++) elements[i].textContent = value;
+    }
+
     function setIntro(selector, value) {
         var element = document.querySelector(selector);
         if (!element || !value) return;
         element.textContent = value;
         element.hidden = false;
+    }
+
+    function siteCopyText(key, fallback) {
+        return contentText(siteCopy[key]) || fallback;
     }
 
     function productName(product) {
@@ -1090,9 +1114,13 @@
         if (!productsCmsBacked) return;
         var root = document.querySelector('.products__tabs');
         if (!root) return;
-        var html = '<button class="products__tab active" data-category="all" role="tab">Vše</button>';
+        var html = '<button class="products__tab active" data-category="all" role="tab">' + escapeHtml(siteCopyText('products.tabs.all', 'Vše')) + '</button>';
+        var categoryById = {};
+        for (var c = 0; c < productCategories.length; c++) categoryById[productCategories[c].id] = productCategories[c];
         for (var i = 0; i < productCategories.length; i++) {
-            html += '<button class="products__tab" data-category="' + escapeHtml(productCategories[i].slug) + '" role="tab">' + escapeHtml(productCategories[i].title) + '</button>';
+            var category = productCategories[i];
+            var parent = category.parent_id && categoryById[category.parent_id] ? categoryById[category.parent_id].title + ' / ' : '';
+            html += '<button class="products__tab" data-category="' + escapeHtml(category.slug) + '" role="tab">' + escapeHtml(parent + category.title) + '</button>';
         }
         root.innerHTML = html;
         bindProductTabs();
@@ -1107,7 +1135,7 @@
             if (productMatchesCategory(products[i], cat)) filtered.push(products[i]);
         }
         if (!filtered.length) {
-            grid.innerHTML = '<p class="products__empty">V této kategorii teď připravujeme ukázky. Rádi vám ale podobný výrobek navrhneme na míru.</p>';
+            grid.innerHTML = '<p class="products__empty">' + escapeHtml(siteCopyText('products.empty', 'V této kategorii teď připravujeme ukázky. Rádi vám ale podobný výrobek navrhneme na míru.')) + '</p>';
             return;
         }
         var html = '';
@@ -1129,7 +1157,7 @@
                 '<p class="product-card__desc">' + escapeHtml(desc) + '</p>' +
                 '<div class="product-card__footer">' +
                 '<span class="product-card__price">' + escapeHtml(priceStr) + '</span>' +
-                '<span class="product-card__link">Zobrazit <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>' +
+                '<span class="product-card__link">' + escapeHtml(siteCopyText('products.card.cta', 'Zobrazit')) + ' <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>' +
                 '</div></div></a>';
         }
         grid.innerHTML = html;
@@ -1166,7 +1194,7 @@
         var paragraphs = textParagraphs(text);
         var body = paragraphs.length
             ? paragraphs.map(function(part) { return '<p class="content-detail__text">' + escapeHtml(part) + '</p>'; }).join('')
-            : '<p class="content-detail__text">K tomuto výrobku brzy doplníme podrobnosti.</p>';
+            : '<p class="content-detail__text">' + escapeHtml(siteCopyText('products.detail.empty', 'K tomuto výrobku brzy doplníme podrobnosti.')) + '</p>';
         var imgHtml = image
             ? '<img src="' + escapeHtml(image) + '" alt="' + escapeHtml(productImageAlt(product)) + '">'
             : '<span>' + escapeHtml(name) + '</span>';
@@ -1176,7 +1204,7 @@
             '<div class="content-detail__meta">' + escapeHtml(categories || 'Výrobek Dřevito') + '</div>' +
             '<h3 class="content-detail__title">' + escapeHtml(name) + '</h3>' +
             body +
-            '<button class="content-detail__close" type="button" data-close-detail="product">Zavřít detail</button>' +
+            '<button class="content-detail__close" type="button" data-close-detail="product">' + escapeHtml(siteCopyText('products.detail.close', 'Zavřít detail')) + '</button>' +
             '</div>';
         detail.classList.add('open');
         detail.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -1201,7 +1229,7 @@
             root.innerHTML = '';
             return;
         }
-        var html = '<button class="blog__tab active" data-blog-category="all" role="tab">Vše</button>';
+        var html = '<button class="blog__tab active" data-blog-category="all" role="tab">' + escapeHtml(siteCopyText('blog.tabs.all', 'Vše')) + '</button>';
         for (var i = 0; i < blogCategories.length; i++) {
             html += '<button class="blog__tab" data-blog-category="' + escapeHtml(blogCategories[i].slug) + '" role="tab">' + escapeHtml(blogCategories[i].title) + '</button>';
         }
@@ -1219,7 +1247,7 @@
             return categorySlug === 'all' || blogCategorySlugs(post).indexOf(categorySlug) !== -1;
         });
         if (!filtered.length) {
-            root.innerHTML = '<p class="products__empty">Články z dílny teprve připravujeme.</p>';
+            root.innerHTML = '<p class="products__empty">' + escapeHtml(siteCopyText('blog.empty', 'Články z dílny teprve připravujeme.')) + '</p>';
             return;
         }
         root.innerHTML = filtered.map(function(post) {
@@ -1235,7 +1263,7 @@
                 '<div class="blog-card__body">' +
                 '<div class="blog-card__meta">' + escapeHtml(meta) + '</div>' +
                 '<h3 class="blog-card__title">' + escapeHtml(post.title) + '</h3>' +
-                '<p class="blog-card__excerpt">' + escapeHtml(post.excerpt || stripHtml(post.main_content) || 'Brzy doplníme celý článek.') + '</p>' +
+                '<p class="blog-card__excerpt">' + escapeHtml(post.excerpt || stripHtml(post.main_content) || siteCopyText('blog.card.empty', 'Brzy doplníme celý článek.')) + '</p>' +
                 '</div></a>';
         }).join('');
     }
@@ -1275,7 +1303,7 @@
         var paragraphs = textParagraphs(stripHtml(post.main_content || post.excerpt || ''));
         var body = paragraphs.length
             ? paragraphs.map(function(part) { return '<p class="content-detail__text">' + escapeHtml(part) + '</p>'; }).join('')
-            : '<p class="content-detail__text">K tomuto článku brzy doplníme text.</p>';
+            : '<p class="content-detail__text">' + escapeHtml(siteCopyText('blog.detail.empty', 'K tomuto článku brzy doplníme text.')) + '</p>';
         var metaParts = [];
         if (post.author_name) metaParts.push(post.author_name);
         if (formatDate(post.published_at)) metaParts.push(formatDate(post.published_at));
@@ -1285,7 +1313,7 @@
             '<div class="content-detail__meta">' + escapeHtml(metaParts.join(' / ') || 'Blog Dřevito') + '</div>' +
             '<h3 class="content-detail__title">' + escapeHtml(post.title) + '</h3>' +
             body +
-            '<button class="content-detail__close" type="button" data-close-detail="blog">Zavřít článek</button>' +
+            '<button class="content-detail__close" type="button" data-close-detail="blog">' + escapeHtml(siteCopyText('blog.detail.close', 'Zavřít článek')) + '</button>' +
             '</div>';
         detail.classList.add('open');
         detail.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -1358,6 +1386,7 @@
 
     function applySiteContent(siteContent) {
         siteContent = siteContent || {};
+        siteCopy = siteContent;
         var heroText = contentParagraphs(siteContent['homepage.hero']);
         if (heroText[0]) setText('.hero__title', heroText[0]);
         if (heroText[1]) setText('.hero__tagline', heroText.slice(1).join(' '));
@@ -1382,6 +1411,16 @@
 
         setIntro('#products-intro', contentText(siteContent['products.intro']));
         setIntro('#blog-intro', contentText(siteContent['blog.intro']));
+        setText('.products__title', contentText(siteContent['products.title']));
+        setText('.blog__title', contentText(siteContent['blog.title']));
+        setText('.footer__tagline', contentText(siteContent['footer.tagline']));
+        setText('.footer__bottom p', contentText(siteContent['footer.copyright']));
+        setAllText('[data-copy-key="nav.about"]', contentText(siteContent['nav.about']));
+        setAllText('[data-copy-key="nav.products"]', contentText(siteContent['nav.products']));
+        setAllText('[data-copy-key="nav.author"]', contentText(siteContent['nav.author']));
+        setAllText('[data-copy-key="nav.blog"]', contentText(siteContent['nav.blog']));
+        setAllText('[data-copy-key="nav.custom"]', contentText(siteContent['nav.custom']));
+        setAllText('[data-copy-key="nav.contact"]', contentText(siteContent['nav.contact']));
 
         applySiteImage('.about__image-placeholder img', siteContent['about.image'] && siteContent['about.image'].value);
         applySiteImage('.author__image-placeholder img', siteContent['author.image'] && siteContent['author.image'].value);

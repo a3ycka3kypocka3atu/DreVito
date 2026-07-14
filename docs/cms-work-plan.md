@@ -77,12 +77,12 @@ Schema covers:
 
 Remote setup:
 
-- Tables and RLS were verified on project `uaaszmcfancqxrhkoamc`.
+- Tables and RLS were verified on project `xsofrdtzswyhuzevikln`.
 - Public Storage buckets were created/verified:
   - `site-media`
   - `product-images`
   - `blog-images`
-- See the 2026-07-11 Supabase setup record under Step 10 for exact migration and access-control details.
+- See the 2026-07-13 Supabase setup record under Step 10 for exact migration and access-control details.
 
 ### Step 3: Media uploads
 
@@ -454,12 +454,12 @@ Implemented required features:
 
 Status: in progress. Media upload production conversion is done in code; real Supabase upload/delete verification still requires project credentials in the app environment.
 
-Real Supabase setup status as of 2026-07-11:
+Real Supabase setup status as of 2026-07-13:
 
 - Supabase connector access is fixed.
-- The real Drevito project is `uaaszmcfancqxrhkoamc`, in `eu-central-1`, running Postgres `17.6.1.141`.
-- Local `supabase/config.toml` still says `project_id = "drevito"`; use the real remote ref `uaaszmcfancqxrhkoamc` for connector actions.
-- Remote setup was applied directly to project `uaaszmcfancqxrhkoamc`.
+- The real Drevito project is `xsofrdtzswyhuzevikln`, in `eu-west-1`, running Postgres `17.6.1.121`.
+- Local `supabase/config.toml` points to `project_id = "xsofrdtzswyhuzevikln"`.
+- Remote setup was applied directly to project `xsofrdtzswyhuzevikln`.
 
 Remote migrations applied:
 
@@ -469,6 +469,7 @@ Remote migrations applied:
 - `20260708190000_add_blog_category_admin_fields.sql`
 - `20260711141000_tighten_public_cms_grants.sql`
 - `20260711142000_tighten_product_link_public_policy.sql`
+- `20260711163000_seed_qr_blog_posts.sql`
 
 Remote objects verified:
 
@@ -491,9 +492,10 @@ Remote objects verified:
 
 Remote data status:
 
-- Existing content tables were empty before setup.
+- Existing DreVito content tables were empty before setup.
 - The blog category migration inserted the six starter categories (`craft`, `place`, `author`, `philosophy`, `products`, `news`) with `ON CONFLICT DO NOTHING`.
-- No products, product categories, blog posts, site content, media rows, or link rows were added.
+- The QR blog seed inserted two starter posts (`o-tvurci`, `pribeh-teto-lavice-a-stolu`) and three category links.
+- No products, product categories, site content, or media rows were added.
 
 Remote access model verified:
 
@@ -513,11 +515,14 @@ Remote access model verified:
 Supabase advisor notes:
 
 - Security advisor reports `public.users` has RLS enabled with no policies. This is expected because the table is intentionally service-role-only.
-- Performance advisor reports unindexed foreign keys on `created_by`, `updated_by`, and `uploaded_by`, plus unused indexes. Leave these alone until real usage patterns or performance work justify changes.
+- Performance advisor reports unindexed foreign keys on `created_by`, `updated_by`, and `uploaded_by`, plus unused indexes on the fresh project. Leave these alone until real usage patterns or performance work justify changes.
 
 Still needed outside schema/storage setup:
 
 - Fill real production `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY`, and server-only `SUPABASE_SERVICE_ROLE_KEY`.
+  - `SUPABASE_URL=https://xsofrdtzswyhuzevikln.supabase.co`
+  - `SUPABASE_PUBLISHABLE_KEY` is available from the Supabase connector or Dashboard API settings.
+  - `SUPABASE_SERVICE_ROLE_KEY` must be copied from the Supabase Dashboard and kept server-only.
 - Confirm `/api/public-content?locale=cs` against real published content after content is entered.
 - Confirm real Supabase upload/replace/delete flows from `/admin/media`, `/admin/products`, and `/admin/blog-posts` after production credentials are configured.
 - Add real products, product categories, blog posts, site content, and media through the admin UI or a future approved content-import step.

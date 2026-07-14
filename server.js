@@ -9,6 +9,7 @@ const PORT = Number(process.env.PORT || 8000);
 const DATA_DIR = path.join(ROOT_DIR, '.data');
 const UPLOAD_DIR = path.join(ROOT_DIR, 'uploads');
 const MEDIA_DB_PATH = path.join(DATA_DIR, 'media-db.json');
+const CMS_DB_PATH = path.join(DATA_DIR, 'cms-db.json');
 const MAX_UPLOAD_BYTES = Number(process.env.MAX_UPLOAD_BYTES || 10 * 1024 * 1024);
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID || '';
 const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET || '';
@@ -72,6 +73,134 @@ const DEFAULT_PRODUCT_IMAGE_TARGETS = [
   { key: 'P00023', label: 'Dekorace žena', url: '/dekorace-zena.JPG', alt: 'Dekorace žena' },
   { key: 'P00018', label: 'Stojan na telefon', url: '/stojan-na-telefon.JPG', alt: 'Stojan na telefon' },
   { key: 'P00022', label: 'Hračka autíčko', url: '/hracka-auticko.JPG', alt: 'Hračka autíčko' }
+];
+
+const DEFAULT_CMS_PRODUCT_CATEGORIES = [
+  { id: '11111111-1111-4111-8111-111111111111', slug: 'engraved-furniture', title: 'Gravírovaný nábytek', sort_order: 10 },
+  { id: '22222222-2222-4222-8222-222222222222', slug: 'small-wood', title: 'Malé dřevěné radosti', sort_order: 20 },
+  { id: '33333333-3333-4333-8333-333333333333', slug: 'shadow-light', title: 'Stínohry a světlo', sort_order: 30 },
+  { id: '44444444-4444-4444-8444-444444444444', slug: 'decorations', title: 'Dekorace', sort_order: 40 },
+  { id: '55555555-5555-4555-8555-555555555555', slug: 'promotion', title: 'Propagační a informační materiály', sort_order: 50 },
+  { id: '66666666-6666-4666-8666-666666666666', slug: 'custom-graphics', title: 'Výrobky s vaší grafikou', sort_order: 60 },
+  { id: '77777777-7777-4777-8777-777777777777', slug: 'engraving-items', title: 'Gravírování vašich předmětů', sort_order: 70 }
+];
+
+const DEFAULT_CMS_BLOG_CATEGORIES = [
+  {
+    id: '81111111-1111-4111-8111-111111111111',
+    slug: 'products',
+    title: 'Výrobky',
+    description: 'Příběhy konkrétních výrobků, novinky a detaily jejich vzniku.',
+    sort_order: 10
+  },
+  {
+    id: '82222222-2222-4222-8222-222222222222',
+    slug: 'philosophy',
+    title: 'Filozofie značky',
+    description: 'Hodnoty Dřevito, vztah ke dřevu a přístup k tvorbě.',
+    sort_order: 20
+  },
+  {
+    id: '83333333-3333-4333-8333-333333333333',
+    slug: 'author',
+    title: 'O autorovi',
+    description: 'Osobní příběhy autora, inspirace a cesta k řemeslu.',
+    sort_order: 30
+  },
+  {
+    id: '84444444-4444-4444-8444-444444444444',
+    slug: 'craft',
+    title: 'Z dílny',
+    description: 'Řemeslné postupy, materiály a pohled do zákulisí dílny.',
+    sort_order: 40
+  }
+];
+
+const DEFAULT_CMS_PRODUCTS = [
+  {
+    id: '00000002-0000-4000-8000-000000000002',
+    legacy_id: 'P00002',
+    slug: 'cajne-stolicky',
+    title: 'Čajné stolicky',
+    short_description: 'Dřevěný čajový stoleček s vyřezávaným motivem.',
+    description: 'Dřevěný čajový stoleček s vyřezávaným motivem.',
+    price: 1790,
+    category_slug: 'engraved-furniture',
+    external_url: 'https://drevito.t2.upgates.shop/p/stolecek-strom-zivota-slunecni-kruh',
+    image: '/cajne-stolicky.JPG'
+  },
+  {
+    id: '00000016-0000-4000-8000-000000000016',
+    legacy_id: 'P00016',
+    slug: 'dekoracni-tabulka',
+    title: 'Dekorační tabulka',
+    short_description: 'Dekorační tabulka s vyřezávaným motivem.',
+    description: 'Dekorační tabulka s vyřezávaným motivem.',
+    price: 1555,
+    category_slug: 'shadow-light',
+    external_url: 'https://drevito.t2.upgates.shop/p/svicelenka-osta',
+    image: '/dekoracni-tabulka.JPG'
+  },
+  {
+    id: '00000004-0000-4000-8000-000000000004',
+    legacy_id: 'P00004',
+    slug: 'krabicka',
+    title: 'Krabička',
+    short_description: 'Zasouvací krabička z masivního dřeva.',
+    description: 'Zasouvací krabička z masivního dřeva.',
+    price: 1111,
+    category_slug: 'small-wood',
+    external_url: 'https://drevito.t2.upgates.shop/p/krabicka-jin-jang',
+    image: '/krabicka.JPG'
+  },
+  {
+    id: '00000020-0000-4000-8000-000000000020',
+    legacy_id: 'P00020',
+    slug: 'kun',
+    title: 'Kůň',
+    short_description: 'Dřevěná dekorace koně.',
+    description: 'Dřevěná dekorace koně.',
+    price: 0,
+    category_slug: 'decorations',
+    external_url: 'https://drevito.t2.upgates.shop/p/kun',
+    image: '/kun-dekorace.JPG'
+  },
+  {
+    id: '00000023-0000-4000-8000-000000000023',
+    legacy_id: 'P00023',
+    slug: 'dekorace-zena',
+    title: 'Dekorace žena',
+    short_description: 'Dřevěná dekorace ženy.',
+    description: 'Dřevěná dekorace ženy.',
+    price: 0,
+    category_slug: 'decorations',
+    external_url: 'https://drevito.t2.upgates.shop/p/bohyne',
+    image: '/dekorace-zena.JPG'
+  },
+  {
+    id: '00000018-0000-4000-8000-000000000018',
+    legacy_id: 'P00018',
+    slug: 'stojan-na-telefon',
+    title: 'Stojan na telefon',
+    short_description: 'Stojan na telefon z masivního dřeva.',
+    description: 'Stojan na telefon z masivního dřeva.',
+    price: 2000,
+    category_slug: 'small-wood',
+    external_url: 'https://drevito.t2.upgates.shop/p/vlk',
+    image: '/stojan-na-telefon.JPG'
+  },
+  {
+    id: '00000022-0000-4000-8000-000000000022',
+    legacy_id: 'P00022',
+    slug: 'hracka-auticko',
+    title: 'Hračka autíčko',
+    short_description: 'Dřevěná hračka autíčko.',
+    description: 'Dřevěná hračka autíčko.',
+    price: 0,
+    category_slug: 'small-wood',
+    external_url: 'https://drevito.t2.upgates.shop/p/lev-kvetinovych-ornamentech',
+    image: '/hracka-auticko.JPG'
+  }
 ];
 
 const DEFAULT_BLOG_POSTS = [
@@ -241,6 +370,20 @@ function getBaseUrl(req) {
 
 function isAuthConfigured() {
   return Boolean(GOOGLE_CLIENT_ID && GOOGLE_CLIENT_SECRET && GOOGLE_ALLOWED_EMAIL);
+}
+
+function isLocalDevRequest(req) {
+  if (process.env.NODE_ENV === 'production') return false;
+  const host = String(req.headers.host || '').split(':')[0].toLowerCase();
+  const remote = String(req.socket && req.socket.remoteAddress || '').toLowerCase();
+  return ['localhost', '127.0.0.1', '::1'].includes(host)
+    || remote === '127.0.0.1'
+    || remote === '::1'
+    || remote === '::ffff:127.0.0.1';
+}
+
+function isDevLoginAvailable(req) {
+  return !isAuthConfigured() && isLocalDevRequest(req);
 }
 
 function isSupabaseConfigured() {
@@ -456,6 +599,166 @@ function readMediaDb() {
 function writeMediaDb(db) {
   ensureStorage();
   fs.writeFileSync(MEDIA_DB_PATH, `${JSON.stringify(normalizeMediaDb(db), null, 2)}\n`);
+}
+
+function createEmptyCmsDb() {
+  return {
+    version: 1,
+    seeded_defaults_at: null,
+    site_content: [],
+    product_categories: [],
+    products: [],
+    product_category_links: [],
+    blog_categories: [],
+    blog_posts: [],
+    blog_category_links: []
+  };
+}
+
+function shouldSeedDefaultCmsContent(db) {
+  return !db.seeded_defaults_at
+    && db.site_content.length === 0
+    && db.product_categories.length === 0
+    && db.products.length === 0
+    && db.product_category_links.length === 0
+    && db.blog_categories.length === 0
+    && db.blog_posts.length === 0
+    && db.blog_category_links.length === 0;
+}
+
+function seedDefaultCmsContent(db) {
+  if (!shouldSeedDefaultCmsContent(db)) return db;
+  const timestamp = nowIso();
+  const categoryBySlug = new Map(DEFAULT_CMS_PRODUCT_CATEGORIES.map((category) => [category.slug, category]));
+
+  db.seeded_defaults_at = timestamp;
+  db.product_categories = DEFAULT_CMS_PRODUCT_CATEGORIES.map((category) => ({
+    id: category.id,
+    title: category.title,
+    slug: category.slug,
+    description: null,
+    image: null,
+    parent_id: null,
+    sort_order: category.sort_order,
+    is_visible: true,
+    archived_at: null,
+    created_at: timestamp,
+    updated_at: timestamp
+  }));
+  db.products = DEFAULT_CMS_PRODUCTS.map((product, index) => ({
+    id: product.id,
+    legacy_id: product.legacy_id,
+    title: product.title,
+    slug: product.slug,
+    short_description: product.short_description,
+    description: product.description,
+    photos: [{
+      media_id: '',
+      url: product.image,
+      alt: product.title,
+      caption: '',
+      sort_order: 0,
+      is_featured: true
+    }],
+    price: product.price,
+    external_url: product.external_url,
+    sort_order: (index + 1) * 10,
+    is_visible: true,
+    is_published: true,
+    published_at: timestamp,
+    archived_at: null,
+    created_at: timestamp,
+    updated_at: timestamp
+  }));
+  db.product_category_links = DEFAULT_CMS_PRODUCTS
+    .map((product) => {
+      const category = categoryBySlug.get(product.category_slug);
+      if (!category) return null;
+      return {
+        product_id: product.id,
+        category_id: category.id,
+        sort_order: 0,
+        created_at: timestamp
+      };
+    })
+    .filter(Boolean);
+
+  db.blog_categories = createDefaultBlogCategories(timestamp);
+
+  return db;
+}
+
+function createDefaultBlogCategories(timestamp = nowIso()) {
+  return DEFAULT_CMS_BLOG_CATEGORIES.map((category) => ({
+    id: category.id,
+    title: category.title,
+    slug: category.slug,
+    description: category.description,
+    image: null,
+    sort_order: category.sort_order,
+    is_visible: true,
+    archived_at: null,
+    created_at: timestamp,
+    updated_at: timestamp
+  }));
+}
+
+function normalizeCmsDb(db) {
+  const normalized = db && typeof db === 'object' ? db : createEmptyCmsDb();
+  normalized.version = 1;
+  normalized.seeded_defaults_at = normalized.seeded_defaults_at || null;
+  normalized.site_content = Array.isArray(normalized.site_content) ? normalized.site_content : [];
+  normalized.product_categories = Array.isArray(normalized.product_categories) ? normalized.product_categories : [];
+  normalized.products = Array.isArray(normalized.products) ? normalized.products : [];
+  normalized.product_category_links = Array.isArray(normalized.product_category_links) ? normalized.product_category_links : [];
+  normalized.blog_categories = Array.isArray(normalized.blog_categories) ? normalized.blog_categories : [];
+  normalized.blog_posts = Array.isArray(normalized.blog_posts) ? normalized.blog_posts : [];
+  normalized.blog_category_links = Array.isArray(normalized.blog_category_links) ? normalized.blog_category_links : [];
+  const seeded = seedDefaultCmsContent(normalized);
+  if (seeded.blog_categories.length === 0) {
+    seeded.blog_categories = createDefaultBlogCategories();
+  }
+  return seeded;
+}
+
+function readCmsDb() {
+  ensureStorage();
+  try {
+    const raw = fs.readFileSync(CMS_DB_PATH, 'utf8');
+    const parsed = JSON.parse(raw);
+    const hadSeededDefaults = Boolean(parsed.seeded_defaults_at);
+    const hadBlogCategories = Array.isArray(parsed.blog_categories) && parsed.blog_categories.length > 0;
+    const normalized = normalizeCmsDb(parsed);
+    if ((!hadSeededDefaults && normalized.seeded_defaults_at) || (!hadBlogCategories && normalized.blog_categories.length)) {
+      writeCmsDb(normalized);
+    }
+    return normalized;
+  } catch (error) {
+    if (error.code !== 'ENOENT') console.error('Failed to read CMS database:', error);
+    const db = normalizeCmsDb(createEmptyCmsDb());
+    writeCmsDb(db);
+    return db;
+  }
+}
+
+function writeCmsDb(db) {
+  ensureStorage();
+  fs.writeFileSync(CMS_DB_PATH, `${JSON.stringify(normalizeCmsDb(db), null, 2)}\n`);
+}
+
+function createLocalRow(input) {
+  const timestamp = nowIso();
+  return {
+    ...input,
+    id: crypto.randomUUID(),
+    created_at: timestamp,
+    updated_at: timestamp
+  };
+}
+
+function updateLocalRow(row, input) {
+  Object.assign(row, input, { updated_at: nowIso() });
+  return row;
 }
 
 async function readSupabaseMediaDb() {
@@ -888,6 +1191,51 @@ function adminLayout(title, content) {
       color: var(--muted);
     }
     .admin-list b { color: var(--ink); }
+    .admin-hero {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      padding: 22px;
+      margin-top: 24px;
+    }
+    .admin-hero h2 {
+      margin: 0 0 8px;
+      font-family: var(--font-display);
+      font-size: 1.7rem;
+      line-height: 1.1;
+    }
+    .admin-tools {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+      margin-top: 22px;
+    }
+    .admin-tool {
+      display: grid;
+      gap: 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      padding: 18px;
+      text-decoration: none;
+    }
+    .admin-tool:hover {
+      border-color: rgba(201, 169, 110, 0.7);
+      box-shadow: 0 10px 24px rgba(61, 43, 31, 0.08);
+    }
+    .admin-tool span {
+      color: var(--accent-dark);
+      font-size: 0.78rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .admin-tool strong {
+      font-family: var(--font-display);
+      font-size: 1.45rem;
+      line-height: 1.1;
+    }
+    .admin-tool p { font-size: 0.94rem; }
     .toolbar {
       display: flex;
       align-items: center;
@@ -1240,6 +1588,7 @@ function adminLayout(title, content) {
       .masthead { align-items: flex-start; flex-direction: column; padding: 20px; }
       .content { padding: 24px 20px; }
       .grid { grid-template-columns: 1fr; }
+      .admin-tools { grid-template-columns: 1fr; }
       .admin-list li { display: block; }
       .media-layout { grid-template-columns: 1fr; }
       .media-target__head { align-items: flex-start; flex-direction: column; }
@@ -1269,16 +1618,21 @@ function adminLayout(title, content) {
     </section>
   </main>
 </body>
-</html>`;
+</html>`.replace('<strong>Dřevito</strong>', '<strong>Dřevito admin panel</strong>');
 }
 
-function loginPage({ error = '', next = '/admin' } = {}) {
+function loginPage({ error = '', next = '/admin', devLogin = false } = {}) {
   const configError = isAuthConfigured()
     ? ''
     : '<div class="alert">Google přihlášení není nastavené. Přidejte GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GOOGLE_ALLOWED_EMAIL a SESSION_SECRET.</div>';
   const errorHtml = error ? `<div class="alert">${escapeHtml(error)}</div>` : '';
   const googleHref = `/admin/auth/google?next=${encodeURIComponent(next)}`;
-  return adminLayout('Admin login', `
+  const devLoginHtml = devLogin
+    ? `<form method="post" action="/admin/dev-login?next=${encodeURIComponent(next)}">
+        <button class="button button--secondary" type="submit">Pokračovat v lokálním testu</button>
+      </form>`
+    : '';
+  return adminLayout('Přihlášení', `
     <div class="masthead">
       <div class="brand">
         <img src="/logo.jpg" alt="Dřevito">
@@ -1296,62 +1650,14 @@ function loginPage({ error = '', next = '/admin' } = {}) {
       ${errorHtml}
       <div class="actions">
         <a class="button" href="${escapeHtml(googleHref)}">Přihlásit přes Google</a>
+        ${devLoginHtml}
       </div>
     </div>
   `);
 }
 
-function dashboardPage(session) {
-  return adminLayout('Admin dashboard', `
-    <div class="masthead">
-      <div class="brand">
-        <img src="/logo.jpg" alt="Dřevito">
-        <div>
-          <strong>Dřevito</strong>
-          <span>Přihlášen: ${escapeHtml(session.email)}</span>
-        </div>
-      </div>
-      <form method="post" action="/admin/logout" style="margin:0;">
-        <button class="button button--ghost" type="submit">Odhlásit</button>
-      </form>
-    </div>
-    <div class="content">
-      <h1>Admin dashboard</h1>
-      <p>Chráněná oblast je připravená pro správu obsahu a další editorské nástroje.</p>
-      <div class="grid">
-        <div class="card">
-          <span>Režim účtů</span>
-          <strong>Jeden Google účet</strong>
-          <p>Přístup má jen adresa nastavená v GOOGLE_ALLOWED_EMAIL.</p>
-        </div>
-        <div class="card">
-          <span>Zabezpečení</span>
-          <strong>Session cookie</strong>
-          <p>Přihlášení používá podepsanou HTTP-only cookie platnou 12 hodin.</p>
-        </div>
-        <div class="card">
-          <span>Web</span>
-          <strong>Veřejná část</strong>
-          <p>Hlavní stránka zůstává dostupná bez přihlášení.</p>
-        </div>
-      </div>
-      <ul class="admin-list">
-        <li><b>Veřejný web</b><a href="/">Otevřít hlavní stránku</a></li>
-        <li><b>Fotky</b><a href="/admin/media">Nahrát, nahradit nebo smazat obrázky</a></li>
-        <li><b>Texty webu</b><a href="/admin/site-content">Upravit texty, fotky a galerie webu</a></li>
-        <li><b>Kategorie výrobků</b><a href="/admin/product-categories">Spravovat kategorie, pořadí a viditelnost</a></li>
-        <li><b>Výrobky</b><a href="/admin/products">Spravovat výrobky, fotky, kategorie a publikaci</a></li>
-        <li><b>Kategorie blogu</b><a href="/admin/blog-categories">Spravovat témata blogu, pořadí a viditelnost</a></li>
-        <li><b>Články blogu</b><a href="/admin/blog-posts">Spravovat články, fotky, kategorie a publikaci</a></li>
-        <li><b>Konfigurace přístupu</b><span>GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GOOGLE_ALLOWED_EMAIL</span></li>
-        <li><b>Úložiště</b><span>${isSupabaseConfigured() ? 'Supabase Storage a tabulka media' : 'Lokální soubory v /uploads a metadata v .data/media-db.json'}</span></li>
-      </ul>
-    </div>
-  `);
-}
-
-function mediaAdminPage(session) {
-  return adminLayout('Správa fotek', `
+function adminMasthead(session) {
+  return `
     <div class="masthead">
       <div class="brand">
         <img src="/logo.jpg" alt="Dřevito">
@@ -1361,12 +1667,153 @@ function mediaAdminPage(session) {
         </div>
       </div>
       <div class="actions" style="margin:0;">
-        <a class="button button--ghost" href="/admin">Dashboard</a>
+        <a class="button button--ghost" href="/admin/products">Výrobky</a>
+        <a class="button button--ghost" href="/admin/product-categories">Kategorie výrobků</a>
+        <a class="button button--ghost" href="/admin/blog-posts">Články blogu</a>
+        <a class="button button--ghost" href="/admin/blog-categories">Kategorie blogu</a>
+        <a class="button button--ghost" href="/admin/archive">Archiv</a>
+        <a class="button button--ghost" href="/" target="_blank" rel="noopener">Otevřít web</a>
         <form method="post" action="/admin/logout" style="margin:0;">
-          <button class="button button--ghost" type="submit">Odhlásit</button>
+          <button class="button button--ghost" type="submit">Odhlásit se</button>
         </form>
       </div>
+    </div>`;
+}
+
+function dashboardPage(session) {
+  return adminLayout('Administrace', `
+    ${adminMasthead(session)}
+    <div class="content">
+      <h1>Administrace obsahu</h1>
+      <p>Správa výrobků, kategorií a blogu.</p>
+      <div class="admin-hero">
+        <h2>Hlavní práce klienta</h2>
+        <p>Tady může klient přidávat výrobky, publikovat je, psát články a udržovat kategorie.</p>
+        <div class="admin-tools">
+          <a class="admin-tool" href="/admin/products">
+            <span>Katalog</span>
+            <strong>Výrobky</strong>
+            <p>Přidat nový výrobek, upravit jeho detail, více fotek, kategorie a publikaci.</p>
+          </a>
+          <a class="admin-tool" href="/admin/product-categories">
+            <span>Produkty</span>
+            <strong>Kategorie výrobků</strong>
+            <p>Spravovat hlavní kategorie, podkategorie a viditelnost v katalogu.</p>
+          </a>
+          <a class="admin-tool" href="/admin/blog-posts">
+            <span>Blog</span>
+            <strong>Články blogu</strong>
+            <p>Napsat článek, přidat perex, celý text, fotky, témata a nastavit publikaci.</p>
+          </a>
+          <a class="admin-tool" href="/admin/blog-categories">
+            <span>Blog</span>
+            <strong>Kategorie blogu</strong>
+            <p>Spravovat témata článků, jejich obrázky a viditelnost.</p>
+          </a>
+        </div>
+      </div>
     </div>
+  `);
+}
+
+function archiveAdminPage(session) {
+  return adminLayout('Archiv', `
+    ${adminMasthead(session)}
+    <div class="content">
+      <h1>Archiv</h1>
+      <p>Rozpracované výrobky najdete v Uložených. Skrytý obsah zůstává bezpečně v archivu a můžete ho znovu obnovit.</p>
+      <div id="archive-message" hidden></div>
+      <div class="admin-tools" style="margin-top:24px;">
+        <section class="category-panel">
+          <h2>Uložené</h2>
+          <h3>Výrobky</h3>
+          <div id="archive-saved-products" class="empty-state">Načítám…</div>
+          <h3 style="margin-top:20px;">Články blogu</h3>
+          <div id="archive-saved-blog-posts" class="empty-state">Načítám…</div>
+        </section>
+        <section class="category-panel"><h2>Výrobky</h2><div id="archive-products" class="empty-state">Načítám…</div></section>
+        <section class="category-panel"><h2>Kategorie výrobků</h2><div id="archive-product-categories" class="empty-state">Načítám…</div></section>
+        <section class="category-panel"><h2>Články blogu</h2><div id="archive-blog-posts" class="empty-state">Načítám…</div></section>
+        <section class="category-panel"><h2>Kategorie blogu</h2><div id="archive-blog-categories" class="empty-state">Načítám…</div></section>
+      </div>
+    </div>
+    <script>
+    (function() {
+      var message = document.getElementById('archive-message');
+      var groups = [
+        { root: 'archive-saved-products', source: '/admin/api/products', key: 'products', matches: function(item) { return !item.archived_at && !item.is_published; }, edit: '/admin/products?edit=', label: 'Uložené' },
+        { root: 'archive-saved-blog-posts', source: '/admin/api/blog-posts', key: 'posts', matches: function(item) { return item.status === 'draft'; }, edit: '/admin/blog-posts?edit=', label: 'Uložené' },
+        { root: 'archive-products', source: '/admin/api/products', key: 'products', matches: function(item) { return Boolean(item.archived_at); }, restore: '/admin/api/products/', label: 'Archiv' },
+        { root: 'archive-product-categories', source: '/admin/api/product-categories', key: 'categories', matches: function(item) { return Boolean(item.archived_at); }, restore: '/admin/api/product-categories/', label: 'Archiv' },
+        { root: 'archive-blog-posts', source: '/admin/api/blog-posts', key: 'posts', matches: function(item) { return item.status === 'archived'; }, restore: '/admin/api/blog-posts/', label: 'Archiv' },
+        { root: 'archive-blog-categories', source: '/admin/api/blog-categories', key: 'categories', matches: function(item) { return Boolean(item.archived_at); }, restore: '/admin/api/blog-categories/', label: 'Archiv' }
+      ];
+
+      function escapeHtml(value) {
+        return String(value || '').replace(/[&<>"']/g, function(char) {
+          return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char];
+        });
+      }
+
+      async function requestJson(url, options) {
+        var response = await fetch(url, Object.assign({ headers: { 'Content-Type': 'application/json', Accept: 'application/json' } }, options || {}));
+        var data = await response.json();
+        if (!response.ok) throw new Error(data.error || 'Požadavek se nepodařil.');
+        return data;
+      }
+
+      function renderGroup(group, items) {
+        var root = document.getElementById(group.root);
+        if (!items.length) {
+          root.className = 'empty-state';
+          root.textContent = 'Archiv je prázdný.';
+          return;
+        }
+        root.className = '';
+        root.innerHTML = items.map(function(item) {
+          var action = group.edit
+            ? '<a class="button button--secondary button--small" href="' + escapeHtml(group.edit + encodeURIComponent(item.id)) + '">Upravit</a>'
+            : '<button class="button button--secondary button--small" type="button" data-restore="' + escapeHtml(group.restore + item.id + '/restore') + '">Obnovit</button>';
+          return '<article class="category-row" style="grid-template-columns:1fr;">' +
+            '<div class="category-main"><div class="category-titleline"><strong>' + escapeHtml(item.title) + '</strong><span class="badge badge--archived">' + escapeHtml(group.label) + '</span></div>' +
+            '<div class="category-actions">' + action + '</div></div>' +
+          '</article>';
+        }).join('');
+      }
+
+      async function loadArchive() {
+        message.hidden = true;
+        await Promise.all(groups.map(async function(group) {
+          var data = await requestJson(group.source);
+          renderGroup(group, (data[group.key] || []).filter(group.matches));
+        }));
+      }
+
+      document.addEventListener('click', function(event) {
+        var button = event.target.closest('[data-restore]');
+        if (!button) return;
+        button.disabled = true;
+        requestJson(button.dataset.restore, { method: 'POST', body: '{}' }).then(loadArchive).catch(function(error) {
+          button.disabled = false;
+          message.hidden = false;
+          message.className = 'alert';
+          message.textContent = error.message;
+        });
+      });
+
+      loadArchive().catch(function(error) {
+        message.hidden = false;
+        message.className = 'alert';
+        message.textContent = error.message;
+      });
+    })();
+    </script>
+  `);
+}
+
+function mediaAdminPage(session) {
+  return adminLayout('Správa fotek', `
+    ${adminMasthead(session)}
     <div class="content">
       <h1>Správa fotek</h1>
       <p>${isSupabaseConfigured() ? 'Nahrané obrázky se ukládají do Supabase Storage a jejich metadata do tabulky media.' : 'Nahrané obrázky se ukládají do lokálního úložiště a jejich URL do databáze médií.'}</p>
@@ -1401,7 +1848,7 @@ function mediaAdminPage(session) {
           </label>
           <div class="preview-box" id="upload-preview"></div>
           <label>
-            Alt text
+            Popis fotky
             <input name="alt" placeholder="Popis obrázku pro přístupnost">
           </label>
           <label>
@@ -1502,7 +1949,7 @@ function mediaAdminPage(session) {
                   '<input type="hidden" name="targetLabel" value="' + escapeHtml(target.label || key) + '">' +
                   '<input type="hidden" name="replaceMediaId" value="' + escapeHtml(image.media_id) + '">' +
                   '<input type="file" name="image" accept="image/jpeg,image/png,image/webp,image/gif" required>' +
-                  '<input name="alt" value="' + escapeHtml(image.alt || '') + '" placeholder="Alt text">' +
+                  '<input name="alt" value="' + escapeHtml(image.alt || '') + '" placeholder="Popis fotky">' +
                   '<button class="button button--secondary button--small" type="submit">Nahradit</button>' +
                 '</form>' +
                 '<button class="button button--danger button--small" type="button" data-delete="' + escapeHtml(image.media_id) + '" data-target-type="' + escapeHtml(activeType) + '" data-target-key="' + escapeHtml(key) + '">Smazat</button>' +
@@ -1619,22 +2066,7 @@ function mediaAdminPage(session) {
 
 function siteContentAdminPage(session) {
   return adminLayout('Texty a fotky webu', `
-    <div class="masthead">
-      <div class="brand">
-        <img src="/logo.jpg" alt="Dřevito">
-        <div>
-          <strong>Dřevito</strong>
-          <span>Přihlášen: ${escapeHtml(session.email)}</span>
-        </div>
-      </div>
-      <div class="actions" style="margin:0;">
-        <a class="button button--ghost" href="/admin">Dashboard</a>
-        <a class="button button--ghost" href="/admin/media">Fotky</a>
-        <form method="post" action="/admin/logout" style="margin:0;">
-          <button class="button button--ghost" type="submit">Odhlásit</button>
-        </form>
-      </div>
-    </div>
+    ${adminMasthead(session)}
     <div class="content">
       <h1>Texty a fotky webu</h1>
       <p>Editor obecných sekcí webu ukládá obsah do tabulky site_content.</p>
@@ -1651,12 +2083,25 @@ function siteContentAdminPage(session) {
                 <option value="">Vybrat šablonu...</option>
                 <option value="hero">Homepage hero</option>
                 <option value="hero_image">Homepage hero obrázek</option>
+                <option value="nav_about">Menu: O nás</option>
+                <option value="nav_products">Menu: Výrobky</option>
+                <option value="nav_author">Menu: Autor</option>
+                <option value="nav_blog">Menu: Blog</option>
+                <option value="nav_custom">Menu: Zakázková výroba</option>
+                <option value="nav_contact">Menu: Kontakt</option>
                 <option value="about">O nás</option>
                 <option value="craft">Řemeslo / filozofie</option>
                 <option value="contact">Kontakt</option>
                 <option value="gallery">Galerie</option>
+                <option value="products_title">Nadpis výrobků</option>
                 <option value="products_intro">Úvod výrobků</option>
+                <option value="products_empty">Prázdná kategorie výrobků</option>
+                <option value="product_detail">Texty detailu výrobku</option>
+                <option value="blog_title">Nadpis blogu</option>
                 <option value="blog_intro">Úvod blogu</option>
+                <option value="blog_empty">Prázdný blog</option>
+                <option value="blog_detail">Texty detailu článku</option>
+                <option value="footer">Patička</option>
               </select>
             </label>
             <div class="form-row">
@@ -1739,7 +2184,7 @@ function siteContentAdminPage(session) {
               </label>
               <div class="form-row">
                 <label>
-                  Alt text
+                  Popis fotky
                   <input id="site-content-image-alt">
                 </label>
                 <label>
@@ -1765,7 +2210,7 @@ function siteContentAdminPage(session) {
               </label>
               <div class="form-row">
                 <label>
-                  Alt text
+                  Popis fotky
                   <input id="site-content-gallery-alt">
                 </label>
                 <label>
@@ -1826,12 +2271,25 @@ function siteContentAdminPage(session) {
       var presets = {
         hero: { section: 'homepage', key: 'homepage.hero', label: 'Homepage hero text', type: 'rich_text', sort: 10, text: 'Hlavní nadpis a úvodní text homepage.' },
         hero_image: { section: 'homepage', key: 'homepage.hero.image', label: 'Homepage hero obrázek', type: 'image', sort: 11 },
+        nav_about: { section: 'global', key: 'nav.about', label: 'Menu: O nás', type: 'text', sort: 12, text: 'O nás' },
+        nav_products: { section: 'global', key: 'nav.products', label: 'Menu: Výrobky', type: 'text', sort: 13, text: 'Výrobky' },
+        nav_author: { section: 'global', key: 'nav.author', label: 'Menu: Autor', type: 'text', sort: 14, text: 'Autor' },
+        nav_blog: { section: 'global', key: 'nav.blog', label: 'Menu: Blog', type: 'text', sort: 15, text: 'Blog' },
+        nav_custom: { section: 'global', key: 'nav.custom', label: 'Menu: Zakázková výroba', type: 'text', sort: 16, text: 'Zakázková výroba' },
+        nav_contact: { section: 'global', key: 'nav.contact', label: 'Menu: Kontakt', type: 'text', sort: 17, text: 'Kontakt' },
         about: { section: 'about', key: 'about.text', label: 'O nás text', type: 'rich_text', sort: 20, text: 'Text o značce a autorovi.' },
         craft: { section: 'craft', key: 'craft.philosophy', label: 'Řemeslo a filozofie', type: 'rich_text', sort: 30, text: 'Text o práci se dřevem a hodnotách.' },
         contact: { section: 'contact', key: 'contact.text', label: 'Kontakt text', type: 'rich_text', sort: 40, text: 'Text v kontaktní sekci.' },
         gallery: { section: 'gallery', key: 'gallery.images', label: 'Galerie obrázků', type: 'gallery', sort: 50 },
+        products_title: { section: 'products', key: 'products.title', label: 'Nadpis sekce výrobků', type: 'text', sort: 58, text: 'Naše výrobky' },
         products_intro: { section: 'products', key: 'products.intro', label: 'Úvod k výrobkům', type: 'rich_text', sort: 60, text: 'Krátký text nad výpisem výrobků.' },
-        blog_intro: { section: 'blog', key: 'blog.intro', label: 'Úvod blogu', type: 'rich_text', sort: 70, text: 'Krátký text nad blogem.' }
+        products_empty: { section: 'products', key: 'products.empty', label: 'Text prázdné kategorie výrobků', type: 'text', sort: 62, text: 'V této kategorii teď připravujeme ukázky. Rádi vám ale podobný výrobek navrhneme na míru.' },
+        product_detail: { section: 'products', key: 'products.detail.empty', label: 'Výrobek bez detailního textu', type: 'text', sort: 64, text: 'K tomuto výrobku brzy doplníme podrobnosti.' },
+        blog_title: { section: 'blog', key: 'blog.title', label: 'Nadpis blogu', type: 'text', sort: 68, text: 'Z dílny' },
+        blog_intro: { section: 'blog', key: 'blog.intro', label: 'Úvod blogu', type: 'rich_text', sort: 70, text: 'Krátký text nad blogem.' },
+        blog_empty: { section: 'blog', key: 'blog.empty', label: 'Text prázdného blogu', type: 'text', sort: 72, text: 'Články z dílny teprve připravujeme.' },
+        blog_detail: { section: 'blog', key: 'blog.detail.empty', label: 'Článek bez textu', type: 'text', sort: 74, text: 'K tomuto článku brzy doplníme text.' },
+        footer: { section: 'global', key: 'footer.tagline', label: 'Text v patičce', type: 'text', sort: 90, text: 'Dřevěné výrobky zhotovené srdcem' }
       };
 
       var form = document.getElementById('site-content-form');
@@ -1914,10 +2372,10 @@ function siteContentAdminPage(session) {
           return '<article class="photo-row" data-index="' + index + '">' +
             thumb +
             '<div class="photo-row__fields">' +
-              '<input data-photo-field="url" value="' + escapeHtml(photo.url || '') + '" placeholder="URL">' +
-              '<input data-photo-field="alt" value="' + escapeHtml(photo.alt || '') + '" placeholder="Alt text">' +
-              '<input data-photo-field="caption" value="' + escapeHtml(photo.caption || '') + '" placeholder="Popisek">' +
-              '<input data-photo-field="media_id" value="' + escapeHtml(photo.media_id || '') + '" placeholder="Media ID">' +
+              '<input data-photo-field="url" type="hidden" value="' + escapeHtml(photo.url || '') + '">' +
+              '<input data-photo-field="alt" type="hidden" value="' + escapeHtml(photo.alt || '') + '">' +
+              '<label>Popisek fotky<input data-photo-field="caption" value="' + escapeHtml(photo.caption || '') + '" placeholder="Volitelné"></label>' +
+              '<input data-photo-field="media_id" type="hidden" value="' + escapeHtml(photo.media_id || '') + '">' +
               '<div class="photo-row__buttons">' +
                 '<button class="button button--secondary button--small" type="button" data-photo-action="up">Nahoru</button>' +
                 '<button class="button button--secondary button--small" type="button" data-photo-action="down">Dolů</button>' +
@@ -2224,7 +2682,7 @@ function siteContentAdminPage(session) {
         var url = galleryUrlInput.value.trim();
         var mediaId = galleryMediaIdInput.value.trim();
         if (!url && !mediaId) {
-          setMessage('Zadejte URL fotky nebo Media ID.', 'error');
+          setMessage('Vyberte fotku k nahrání.', 'error');
           return;
         }
         galleryImages.push({
@@ -2326,23 +2784,7 @@ function siteContentAdminPage(session) {
 
 function productCategoriesAdminPage(session) {
   return adminLayout('Kategorie výrobků', `
-    <div class="masthead">
-      <div class="brand">
-        <img src="/logo.jpg" alt="Dřevito">
-        <div>
-          <strong>Dřevito</strong>
-          <span>Přihlášen: ${escapeHtml(session.email)}</span>
-        </div>
-      </div>
-      <div class="actions" style="margin:0;">
-        <a class="button button--ghost" href="/admin">Dashboard</a>
-        <a class="button button--ghost" href="/admin/media">Fotky</a>
-        <a class="button button--ghost" href="/admin/products">Výrobky</a>
-        <form method="post" action="/admin/logout" style="margin:0;">
-          <button class="button button--ghost" type="submit">Odhlásit</button>
-        </form>
-      </div>
-    </div>
+    ${adminMasthead(session)}
     <div class="content">
       <h1>Kategorie výrobků</h1>
       <p>Správa skupin výrobků pro pozdější filtrování a přiřazení produktů.</p>
@@ -2357,41 +2799,28 @@ function productCategoriesAdminPage(session) {
               Název
               <input id="category-title" name="title" required autocomplete="off">
             </label>
+            <input id="category-slug" name="slug" type="hidden" required autocomplete="off" pattern="[a-z0-9][a-z0-9-]*">
             <label>
-              Slug
-              <input id="category-slug" name="slug" required autocomplete="off" pattern="[a-z0-9][a-z0-9-]*">
+              Patří pod
+              <select id="category-parent-id" name="parent_id">
+                <option value="">Hlavní kategorie</option>
+              </select>
             </label>
             <label>
               Popis
               <textarea id="category-description" name="description"></textarea>
             </label>
-            <div class="form-row">
-              <label>
-                Pořadí
-                <input id="category-sort-order" name="sort_order" type="number" step="1" value="0">
-              </label>
-              <label>
-                Viditelnost
-                <span class="check-label">
-                  <input id="category-visible" name="is_visible" type="checkbox" checked>
-                  Zobrazit
-                </span>
-              </label>
-            </div>
+            <input id="category-sort-order" name="sort_order" type="hidden" value="0">
             <label>
-              Obrázek URL
-              <input id="category-image-url" name="image_url" placeholder="/uploads/products/kategorie.jpg">
+              Zobrazení
+              <span class="check-label">
+                <input id="category-visible" name="is_visible" type="checkbox" checked>
+                Zobrazit
+              </span>
             </label>
-            <div class="form-row">
-              <label>
-                Alt text
-                <input id="category-image-alt" name="image_alt">
-              </label>
-              <label>
-                Media ID
-                <input id="category-image-media-id" name="image_media_id">
-              </label>
-            </div>
+            <input id="category-image-url" name="image_url" type="hidden">
+            <input id="category-image-alt" name="image_alt" type="hidden">
+            <input id="category-image-media-id" name="image_media_id" type="hidden">
             <div class="actions">
               <button class="button" type="submit">Uložit</button>
               <button class="button button--secondary" id="category-reset" type="button">Nová</button>
@@ -2402,7 +2831,7 @@ function productCategoriesAdminPage(session) {
         <section class="category-list">
           <div class="toolbar" style="margin-top:0;">
             <h2>Seznam kategorií</h2>
-            <button class="button button--secondary button--small" id="category-reload" type="button">Obnovit</button>
+            <button class="button button--secondary button--small" id="category-reload" type="button">Načíst znovu</button>
           </div>
           <div id="categories-root" class="empty-state">Načítám kategorie...</div>
         </section>
@@ -2421,6 +2850,7 @@ function productCategoriesAdminPage(session) {
       var idInput = document.getElementById('category-id');
       var titleInput = document.getElementById('category-title');
       var slugInput = document.getElementById('category-slug');
+      var parentInput = document.getElementById('category-parent-id');
       var descriptionInput = document.getElementById('category-description');
       var sortOrderInput = document.getElementById('category-sort-order');
       var visibleInput = document.getElementById('category-visible');
@@ -2458,6 +2888,7 @@ function productCategoriesAdminPage(session) {
         return Object.assign({
           title: category.title || '',
           slug: category.slug || '',
+          parent_id: category.parent_id || '',
           description: category.description || '',
           sort_order: category.sort_order || 0,
           is_visible: category.is_visible === true,
@@ -2471,6 +2902,7 @@ function productCategoriesAdminPage(session) {
         return {
           title: titleInput.value.trim(),
           slug: slugInput.value.trim().toLowerCase(),
+          parent_id: parentInput.value,
           description: descriptionInput.value.trim(),
           sort_order: sortOrderInput.value,
           is_visible: visibleInput.checked,
@@ -2488,7 +2920,22 @@ function productCategoriesAdminPage(session) {
         form.reset();
         sortOrderInput.value = '0';
         visibleInput.checked = true;
+        renderParentOptions('');
         titleInput.focus();
+      }
+
+      function renderParentOptions(selectedId) {
+        var options = '<option value="">Hlavní kategorie</option>';
+        categories.forEach(function(category) {
+          if (category.id === editedId || category.parent_id) return;
+          options += '<option value="' + escapeHtml(category.id) + '"' + (category.id === selectedId ? ' selected' : '') + '>' + escapeHtml(category.title) + '</option>';
+        });
+        parentInput.innerHTML = options;
+      }
+
+      function categoryTitle(categoryId) {
+        var category = categories.find(function(item) { return item.id === categoryId; });
+        return category ? category.title : '';
       }
 
       function editCategory(category) {
@@ -2499,6 +2946,7 @@ function productCategoriesAdminPage(session) {
         idInput.value = category.id;
         titleInput.value = category.title || '';
         slugInput.value = category.slug || '';
+        renderParentOptions(category.parent_id || '');
         descriptionInput.value = category.description || '';
         sortOrderInput.value = category.sort_order || 0;
         visibleInput.checked = category.is_visible === true;
@@ -2517,7 +2965,6 @@ function productCategoriesAdminPage(session) {
         } else {
           badges.push('<span class="badge badge--muted">Skrytá</span>');
         }
-        badges.push('<span class="badge">Pořadí ' + escapeHtml(category.sort_order || 0) + '</span>');
         return '<div class="badges">' + badges.join('') + '</div>';
       }
 
@@ -2534,18 +2981,15 @@ function productCategoriesAdminPage(session) {
           var thumb = image.url
             ? '<img class="category-thumb" src="' + escapeHtml(image.url) + '" alt="' + escapeHtml(image.alt || category.title) + '">'
             : '<div class="category-thumb category-thumb--empty">Bez obrázku</div>';
-          var archived = Boolean(category.archived_at);
           var toggleLabel = category.is_visible ? 'Skrýt' : 'Zobrazit';
-          var actionHtml = archived
-            ? '<button class="button button--secondary button--small" type="button" data-action="restore" data-id="' + escapeHtml(category.id) + '">Obnovit</button>'
-            : '<button class="button button--secondary button--small" type="button" data-action="toggle" data-id="' + escapeHtml(category.id) + '">' + toggleLabel + '</button>' +
-              '<button class="button button--danger button--small" type="button" data-action="archive" data-id="' + escapeHtml(category.id) + '">Archivovat</button>';
+          var parentTitle = category.parent_id ? categoryTitle(category.parent_id) : '';
+          var actionHtml = '<button class="button button--secondary button--small" type="button" data-action="toggle" data-id="' + escapeHtml(category.id) + '">' + toggleLabel + '</button>';
 
           return '<article class="category-row">' +
             thumb +
             '<div class="category-main">' +
               '<div class="category-titleline"><strong>' + escapeHtml(category.title) + '</strong>' + statusBadges(category) + '</div>' +
-              '<div class="category-meta">/' + escapeHtml(category.slug) + '</div>' +
+              '<div class="category-meta">' + (parentTitle ? 'Podkategorie v: ' + escapeHtml(parentTitle) : 'Hlavní kategorie') + '</div>' +
               (category.description ? '<p>' + escapeHtml(category.description) + '</p>' : '') +
               '<div class="category-actions">' +
                 '<button class="button button--small" type="button" data-action="edit" data-id="' + escapeHtml(category.id) + '">Upravit</button>' +
@@ -2569,7 +3013,8 @@ function productCategoriesAdminPage(session) {
         root.className = 'empty-state';
         root.textContent = 'Načítám kategorie...';
         var data = await requestJson('/admin/api/product-categories');
-        categories = data.categories || [];
+        categories = (data.categories || []).filter(function(category) { return !category.archived_at; });
+        renderParentOptions(parentInput.value);
         render();
       }
 
@@ -2584,9 +3029,9 @@ function productCategoriesAdminPage(session) {
       }
 
       async function archiveCategory(id) {
-        if (!window.confirm('Archivovat tuto kategorii? U produktů zůstane zachovaná, ale nebude veřejně viditelná.')) return;
+        if (!window.confirm('Skrýt tuto kategorii a přesunout ji do archivu? U produktů zůstane zachovaná.')) return;
         await requestJson('/admin/api/product-categories/' + encodeURIComponent(id) + '/archive', { method: 'POST', body: '{}' });
-        setMessage('Kategorie byla archivována.', 'success');
+        setMessage('Kategorie byla skryta a přesunuta do archivu.', 'success');
         await loadCategories();
         if (editedId === id) resetForm();
       }
@@ -2635,12 +3080,12 @@ function productCategoriesAdminPage(session) {
         if (button.dataset.action === 'edit') {
           editCategory(category);
         } else if (button.dataset.action === 'toggle') {
-          saveCategory(payloadFromCategory(category, { is_visible: !category.is_visible }), id)
-            .catch(function(error) { setMessage(error.message, 'error'); });
-        } else if (button.dataset.action === 'archive') {
-          archiveCategory(id).catch(function(error) { setMessage(error.message, 'error'); });
-        } else if (button.dataset.action === 'restore') {
-          restoreCategory(id).catch(function(error) { setMessage(error.message, 'error'); });
+          if (category.is_visible) {
+            archiveCategory(id).catch(function(error) { setMessage(error.message, 'error'); });
+          } else {
+            saveCategory(payloadFromCategory(category, { is_visible: true }), id)
+              .catch(function(error) { setMessage(error.message, 'error'); });
+          }
         }
       });
 
@@ -2656,25 +3101,7 @@ function productCategoriesAdminPage(session) {
 
 function blogCategoriesAdminPage(session) {
   return adminLayout('Kategorie blogu', `
-    <div class="masthead">
-      <div class="brand">
-        <img src="/logo.jpg" alt="Dřevito">
-        <div>
-          <strong>Dřevito</strong>
-          <span>Přihlášen: ${escapeHtml(session.email)}</span>
-        </div>
-      </div>
-      <div class="actions" style="margin:0;">
-        <a class="button button--ghost" href="/admin">Dashboard</a>
-        <a class="button button--ghost" href="/admin/media">Fotky</a>
-        <a class="button button--ghost" href="/admin/product-categories">Kategorie výrobků</a>
-        <a class="button button--ghost" href="/admin/products">Výrobky</a>
-        <a class="button button--ghost" href="/admin/blog-posts">Články</a>
-        <form method="post" action="/admin/logout" style="margin:0;">
-          <button class="button button--ghost" type="submit">Odhlásit</button>
-        </form>
-      </div>
-    </div>
+    ${adminMasthead(session)}
     <div class="content">
       <h1>Kategorie blogu</h1>
       <p>Správa témat blogu pro pozdější filtrování a přiřazení článků.</p>
@@ -2689,41 +3116,22 @@ function blogCategoriesAdminPage(session) {
               Název
               <input id="category-title" name="title" required autocomplete="off">
             </label>
-            <label>
-              Slug
-              <input id="category-slug" name="slug" required autocomplete="off" pattern="[a-z0-9][a-z0-9-]*">
-            </label>
+            <input id="category-slug" name="slug" type="hidden" required autocomplete="off" pattern="[a-z0-9][a-z0-9-]*">
             <label>
               Popis
               <textarea id="category-description" name="description"></textarea>
             </label>
-            <div class="form-row">
-              <label>
-                Pořadí
-                <input id="category-sort-order" name="sort_order" type="number" step="1" value="0">
-              </label>
-              <label>
-                Viditelnost
-                <span class="check-label">
-                  <input id="category-visible" name="is_visible" type="checkbox" checked>
-                  Zobrazit
-                </span>
-              </label>
-            </div>
+            <input id="category-sort-order" name="sort_order" type="hidden" value="0">
             <label>
-              Obrázek URL
-              <input id="category-image-url" name="image_url" placeholder="/uploads/blog/kategorie.jpg">
+              Zobrazení
+              <span class="check-label">
+                <input id="category-visible" name="is_visible" type="checkbox" checked>
+                Zobrazit
+              </span>
             </label>
-            <div class="form-row">
-              <label>
-                Alt text
-                <input id="category-image-alt" name="image_alt">
-              </label>
-              <label>
-                Media ID
-                <input id="category-image-media-id" name="image_media_id">
-              </label>
-            </div>
+            <input id="category-image-url" name="image_url" type="hidden">
+            <input id="category-image-alt" name="image_alt" type="hidden">
+            <input id="category-image-media-id" name="image_media_id" type="hidden">
             <div class="actions">
               <button class="button" type="submit">Uložit</button>
               <button class="button button--secondary" id="category-reset" type="button">Nová</button>
@@ -2734,7 +3142,7 @@ function blogCategoriesAdminPage(session) {
         <section class="category-list">
           <div class="toolbar" style="margin-top:0;">
             <h2>Seznam kategorií</h2>
-            <button class="button button--secondary button--small" id="category-reload" type="button">Obnovit</button>
+            <button class="button button--secondary button--small" id="category-reload" type="button">Načíst znovu</button>
           </div>
           <div id="categories-root" class="empty-state">Načítám kategorie...</div>
         </section>
@@ -2849,7 +3257,6 @@ function blogCategoriesAdminPage(session) {
         } else {
           badges.push('<span class="badge badge--muted">Skrytá</span>');
         }
-        badges.push('<span class="badge">Pořadí ' + escapeHtml(category.sort_order || 0) + '</span>');
         return '<div class="badges">' + badges.join('') + '</div>';
       }
 
@@ -2866,18 +3273,14 @@ function blogCategoriesAdminPage(session) {
           var thumb = image.url
             ? '<img class="category-thumb" src="' + escapeHtml(image.url) + '" alt="' + escapeHtml(image.alt || category.title) + '">'
             : '<div class="category-thumb category-thumb--empty">Bez obrázku</div>';
-          var archived = Boolean(category.archived_at);
           var toggleLabel = category.is_visible ? 'Skrýt' : 'Zobrazit';
-          var actionHtml = archived
-            ? '<button class="button button--secondary button--small" type="button" data-action="restore" data-id="' + escapeHtml(category.id) + '">Obnovit</button>'
-            : '<button class="button button--secondary button--small" type="button" data-action="toggle" data-id="' + escapeHtml(category.id) + '">' + toggleLabel + '</button>' +
-              '<button class="button button--danger button--small" type="button" data-action="archive" data-id="' + escapeHtml(category.id) + '">Archivovat</button>';
+          var actionHtml = '<button class="button button--secondary button--small" type="button" data-action="toggle" data-id="' + escapeHtml(category.id) + '">' + toggleLabel + '</button>';
 
           return '<article class="category-row">' +
             thumb +
             '<div class="category-main">' +
               '<div class="category-titleline"><strong>' + escapeHtml(category.title) + '</strong>' + statusBadges(category) + '</div>' +
-              '<div class="category-meta">/' + escapeHtml(category.slug) + '</div>' +
+              '<div class="category-meta">Téma blogu</div>' +
               (category.description ? '<p>' + escapeHtml(category.description) + '</p>' : '') +
               '<div class="category-actions">' +
                 '<button class="button button--small" type="button" data-action="edit" data-id="' + escapeHtml(category.id) + '">Upravit</button>' +
@@ -2901,7 +3304,7 @@ function blogCategoriesAdminPage(session) {
         root.className = 'empty-state';
         root.textContent = 'Načítám kategorie...';
         var data = await requestJson('/admin/api/blog-categories');
-        categories = data.categories || [];
+        categories = (data.categories || []).filter(function(category) { return !category.archived_at; });
         render();
       }
 
@@ -2916,9 +3319,9 @@ function blogCategoriesAdminPage(session) {
       }
 
       async function archiveCategory(id) {
-        if (!window.confirm('Archivovat tuto kategorii blogu? U článků zůstane zachovaná, ale nebude veřejně viditelná.')) return;
+        if (!window.confirm('Skrýt tuto kategorii blogu a přesunout ji do archivu? U článků zůstane zachovaná.')) return;
         await requestJson('/admin/api/blog-categories/' + encodeURIComponent(id) + '/archive', { method: 'POST', body: '{}' });
-        setMessage('Kategorie blogu byla archivována.', 'success');
+        setMessage('Kategorie blogu byla skryta a přesunuta do archivu.', 'success');
         await loadCategories();
         if (editedId === id) resetForm();
       }
@@ -2967,12 +3370,12 @@ function blogCategoriesAdminPage(session) {
         if (button.dataset.action === 'edit') {
           editCategory(category);
         } else if (button.dataset.action === 'toggle') {
-          saveCategory(payloadFromCategory(category, { is_visible: !category.is_visible }), id)
-            .catch(function(error) { setMessage(error.message, 'error'); });
-        } else if (button.dataset.action === 'archive') {
-          archiveCategory(id).catch(function(error) { setMessage(error.message, 'error'); });
-        } else if (button.dataset.action === 'restore') {
-          restoreCategory(id).catch(function(error) { setMessage(error.message, 'error'); });
+          if (category.is_visible) {
+            archiveCategory(id).catch(function(error) { setMessage(error.message, 'error'); });
+          } else {
+            saveCategory(payloadFromCategory(category, { is_visible: true }), id)
+              .catch(function(error) { setMessage(error.message, 'error'); });
+          }
         }
       });
 
@@ -2988,26 +3391,10 @@ function blogCategoriesAdminPage(session) {
 
 function productsAdminPage(session) {
   return adminLayout('Výrobky', `
-    <div class="masthead">
-      <div class="brand">
-        <img src="/logo.jpg" alt="Dřevito">
-        <div>
-          <strong>Dřevito</strong>
-          <span>Přihlášen: ${escapeHtml(session.email)}</span>
-        </div>
-      </div>
-      <div class="actions" style="margin:0;">
-        <a class="button button--ghost" href="/admin">Dashboard</a>
-        <a class="button button--ghost" href="/admin/media">Fotky</a>
-        <a class="button button--ghost" href="/admin/product-categories">Kategorie</a>
-        <form method="post" action="/admin/logout" style="margin:0;">
-          <button class="button button--ghost" type="submit">Odhlásit</button>
-        </form>
-      </div>
-    </div>
+    ${adminMasthead(session)}
     <div class="content">
       <h1>Výrobky</h1>
-      <p>Správa výrobků, kategorií, fotek, pořadí a publikace pro veřejný web.</p>
+      <p>Správa výrobků, kategorií, více fotek a publikace pro veřejný web.</p>
       <div id="product-message" hidden></div>
 
       <div class="product-layout" id="product-app">
@@ -3019,10 +3406,7 @@ function productsAdminPage(session) {
               Název
               <input id="product-title" name="title" required autocomplete="off">
             </label>
-            <label>
-              Slug
-              <input id="product-slug" name="slug" required autocomplete="off" pattern="[a-z0-9][a-z0-9-]*">
-            </label>
+            <input id="product-slug" name="slug" type="hidden" required autocomplete="off" pattern="[a-z0-9][a-z0-9-]*">
             <label>
               Krátký popis
               <textarea id="product-short-description" name="short_description"></textarea>
@@ -3031,32 +3415,8 @@ function productsAdminPage(session) {
               Celý popis
               <textarea id="product-description" name="description"></textarea>
             </label>
-            <div class="form-row">
-              <label>
-                Pořadí
-                <input id="product-sort-order" name="sort_order" type="number" step="1" value="0">
-              </label>
-              <label>
-                Datum publikace
-                <input id="product-published-at" name="published_at" type="datetime-local">
-              </label>
-            </div>
-            <div class="form-row">
-              <label>
-                Viditelnost
-                <span class="check-label">
-                  <input id="product-visible" name="is_visible" type="checkbox" checked>
-                  Zobrazit
-                </span>
-              </label>
-              <label>
-                Publikace
-                <span class="check-label">
-                  <input id="product-published" name="is_published" type="checkbox">
-                  Publikovat
-                </span>
-              </label>
-            </div>
+            <input id="product-sort-order" name="sort_order" type="hidden" value="0">
+            <input id="product-published-at" name="published_at" type="hidden">
             <label>
               Kategorie
               <div class="category-checks" id="product-category-checks">
@@ -3064,33 +3424,20 @@ function productsAdminPage(session) {
               </div>
             </label>
 
-            <label>
-              Přidat fotku URL
-              <input id="product-photo-url" placeholder="/uploads/products/fotka.jpg">
-            </label>
-            <div class="form-row">
-              <label>
-                Alt text
-                <input id="product-photo-alt" placeholder="Popis fotky">
-              </label>
-              <label>
-                Media ID
-                <input id="product-photo-media-id" placeholder="Volitelné">
-              </label>
-            </div>
-            <button class="button button--secondary button--small" id="product-add-photo" type="button">Přidat URL fotku</button>
+            <input id="product-photo-url" type="hidden">
+            <input id="product-photo-alt" type="hidden">
+            <input id="product-photo-media-id" type="hidden">
+            <button class="button button--secondary button--small" id="product-add-photo" type="button" hidden>Přidat fotku</button>
 
-            <label>
-              Nahrát fotku
-              <input id="product-upload" type="file" accept="image/jpeg,image/png,image/webp,image/gif">
-            </label>
-            <button class="button button--secondary button--small" id="product-upload-button" type="button">Nahrát a přidat</button>
+            <label>Fotky</label>
+            <input id="product-upload" type="file" accept="image/jpeg,image/png,image/webp,image/gif" multiple hidden>
+            <button class="button button--secondary button--small" id="product-upload-button" type="button">Nahrát fotku</button>
 
             <div class="photo-list" id="product-photos"></div>
 
             <div class="actions">
-              <button class="button" type="submit">Uložit</button>
-              <button class="button button--secondary" id="product-reset" type="button">Nový</button>
+              <button class="button" type="submit" value="save">Uložit</button>
+              <button class="button button--secondary" type="submit" value="publish">Publikovat</button>
             </div>
           </form>
         </section>
@@ -3098,7 +3445,7 @@ function productsAdminPage(session) {
         <section class="product-list">
           <div class="toolbar" style="margin-top:0;">
             <h2>Seznam výrobků</h2>
-            <button class="button button--secondary button--small" id="product-reload" type="button">Obnovit</button>
+            <button class="button button--secondary button--small" id="product-reload" type="button">Načíst znovu</button>
           </div>
           <div id="products-root" class="empty-state">Načítám výrobky...</div>
         </section>
@@ -3112,6 +3459,7 @@ function productsAdminPage(session) {
       var photos = [];
       var editedId = '';
       var slugTouched = false;
+      var requestedEditId = new URLSearchParams(window.location.search).get('edit') || '';
       var form = document.getElementById('product-form');
       var formTitle = document.getElementById('product-form-title');
       var message = document.getElementById('product-message');
@@ -3122,8 +3470,6 @@ function productsAdminPage(session) {
       var shortDescriptionInput = document.getElementById('product-short-description');
       var descriptionInput = document.getElementById('product-description');
       var sortOrderInput = document.getElementById('product-sort-order');
-      var visibleInput = document.getElementById('product-visible');
-      var publishedInput = document.getElementById('product-published');
       var publishedAtInput = document.getElementById('product-published-at');
       var categoryChecks = document.getElementById('product-category-checks');
       var photoUrlInput = document.getElementById('product-photo-url');
@@ -3170,7 +3516,7 @@ function productsAdminPage(session) {
           .map(function(input) { return input.value; });
       }
 
-      function currentPayload() {
+      function currentPayload(publish) {
         return {
           title: titleInput.value.trim(),
           slug: slugInput.value.trim().toLowerCase(),
@@ -3179,8 +3525,8 @@ function productsAdminPage(session) {
           photos: photos,
           category_ids: selectedCategoryIds(),
           sort_order: sortOrderInput.value,
-          is_visible: visibleInput.checked,
-          is_published: publishedInput.checked,
+          is_visible: publish === true,
+          is_published: publish === true,
           published_at: publishedAtInput.value
         };
       }
@@ -3193,8 +3539,6 @@ function productsAdminPage(session) {
         idInput.value = '';
         form.reset();
         sortOrderInput.value = '0';
-        visibleInput.checked = true;
-        publishedInput.checked = false;
         renderCategoryChecks([]);
         renderPhotos();
         titleInput.focus();
@@ -3211,8 +3555,6 @@ function productsAdminPage(session) {
         shortDescriptionInput.value = product.short_description || '';
         descriptionInput.value = product.description || '';
         sortOrderInput.value = product.sort_order || 0;
-        visibleInput.checked = product.is_visible === true;
-        publishedInput.checked = product.is_published === true;
         publishedAtInput.value = formatDateForInput(product.published_at);
         renderCategoryChecks(product.category_ids || []);
         renderPhotos();
@@ -3224,12 +3566,15 @@ function productsAdminPage(session) {
           categoryChecks.innerHTML = '<span class="product-meta">Nejdřív vytvořte kategorii výrobků.</span>';
           return;
         }
+        var categoryById = {};
+        categories.forEach(function(category) { categoryById[category.id] = category; });
         categoryChecks.innerHTML = categories.map(function(category) {
           var checked = selectedIds.indexOf(category.id) !== -1 ? ' checked' : '';
           var muted = category.archived_at ? ' (archiv)' : category.is_visible ? '' : ' (skrytá)';
+          var parent = category.parent_id && categoryById[category.parent_id] ? categoryById[category.parent_id].title + ' / ' : '';
           return '<label class="check-label">' +
             '<input type="checkbox" value="' + escapeHtml(category.id) + '"' + checked + '>' +
-            escapeHtml(category.title + muted) +
+            escapeHtml(parent + category.title + muted) +
           '</label>';
         }).join('');
       }
@@ -3256,10 +3601,10 @@ function productsAdminPage(session) {
           return '<article class="photo-row" data-index="' + index + '">' +
             thumb +
             '<div class="photo-row__fields">' +
-              '<input data-photo-field="url" value="' + escapeHtml(photo.url || '') + '" placeholder="URL">' +
-              '<input data-photo-field="alt" value="' + escapeHtml(photo.alt || '') + '" placeholder="Alt text">' +
-              '<input data-photo-field="caption" value="' + escapeHtml(photo.caption || '') + '" placeholder="Popisek">' +
-              '<input data-photo-field="media_id" value="' + escapeHtml(photo.media_id || '') + '" placeholder="Media ID">' +
+              '<input data-photo-field="url" type="hidden" value="' + escapeHtml(photo.url || '') + '">' +
+              '<input data-photo-field="alt" type="hidden" value="' + escapeHtml(photo.alt || '') + '">' +
+              '<label>Popisek fotky<input data-photo-field="caption" value="' + escapeHtml(photo.caption || '') + '" placeholder="Volitelné"></label>' +
+              '<input data-photo-field="media_id" type="hidden" value="' + escapeHtml(photo.media_id || '') + '">' +
               '<div class="photo-row__buttons">' +
                 '<button class="button button--secondary button--small" type="button" data-photo-action="up">Nahoru</button>' +
                 '<button class="button button--secondary button--small" type="button" data-photo-action="down">Dolů</button>' +
@@ -3274,11 +3619,7 @@ function productsAdminPage(session) {
         var badges = [];
         if (product.archived_at) {
           badges.push('<span class="badge badge--archived">Archiv</span>');
-        } else {
-          badges.push(product.is_visible ? '<span class="badge badge--ok">Viditelný</span>' : '<span class="badge badge--muted">Skrytý</span>');
-          badges.push(product.is_published ? '<span class="badge badge--ok">Publikovaný</span>' : '<span class="badge badge--muted">Koncept</span>');
         }
-        badges.push('<span class="badge">Pořadí ' + escapeHtml(product.sort_order || 0) + '</span>');
         return '<div class="badges">' + badges.join('') + '</div>';
       }
 
@@ -3295,21 +3636,16 @@ function productsAdminPage(session) {
           var thumb = photo && photo.url
             ? '<img class="product-thumb" src="' + escapeHtml(photo.url) + '" alt="' + escapeHtml(photo.alt || product.title) + '">'
             : '<div class="product-thumb product-thumb--empty">Bez fotky</div>';
-          var archived = Boolean(product.archived_at);
           var categoryText = product.categories && product.categories.length
             ? product.categories.map(function(category) { return category.title; }).join(', ')
             : 'Bez kategorie';
-          var actionHtml = archived
-            ? '<button class="button button--secondary button--small" type="button" data-action="restore" data-id="' + escapeHtml(product.id) + '">Obnovit</button>'
-            : '<button class="button button--secondary button--small" type="button" data-action="toggle-visible" data-id="' + escapeHtml(product.id) + '">' + (product.is_visible ? 'Skrýt' : 'Zobrazit') + '</button>' +
-              '<button class="button button--secondary button--small" type="button" data-action="toggle-published" data-id="' + escapeHtml(product.id) + '">' + (product.is_published ? 'Stáhnout' : 'Publikovat') + '</button>' +
-              '<button class="button button--danger button--small" type="button" data-action="archive" data-id="' + escapeHtml(product.id) + '">Archivovat</button>';
+          var actionHtml = '<button class="button button--secondary button--small" type="button" data-action="hide" data-id="' + escapeHtml(product.id) + '">Skrýt</button>';
 
           return '<article class="product-row">' +
             thumb +
             '<div class="product-main">' +
               '<div class="product-titleline"><strong>' + escapeHtml(product.title) + '</strong>' + statusBadges(product) + '</div>' +
-              '<div class="product-meta">/' + escapeHtml(product.slug) + ' · ' + escapeHtml(categoryText) + '</div>' +
+              '<div class="product-meta">Kategorie: ' + escapeHtml(categoryText) + '</div>' +
               (product.short_description ? '<p>' + escapeHtml(product.short_description) + '</p>' : '') +
               '<div class="product-actions">' +
                 '<button class="button button--small" type="button" data-action="edit" data-id="' + escapeHtml(product.id) + '">Upravit</button>' +
@@ -3333,26 +3669,37 @@ function productsAdminPage(session) {
         root.className = 'empty-state';
         root.textContent = 'Načítám výrobky...';
         var data = await requestJson('/admin/api/products');
-        products = data.products || [];
-        categories = data.categories || [];
+        var allProducts = data.products || [];
+        products = allProducts.filter(function(product) { return !product.archived_at && product.is_published; });
+        categories = (data.categories || []).filter(function(category) { return !category.archived_at; });
         renderCategoryChecks(selectedCategoryIds());
         renderProducts();
+        if (requestedEditId) {
+          var requestedProduct = allProducts.find(function(product) { return product.id === requestedEditId && !product.archived_at; });
+          requestedEditId = '';
+          window.history.replaceState({}, '', '/admin/products');
+          if (requestedProduct) editProduct(requestedProduct);
+        }
       }
 
-      async function saveProduct(payload, id) {
+      async function saveProduct(payload, id, publish) {
         var data = await requestJson(id ? '/admin/api/products/' + encodeURIComponent(id) : '/admin/api/products', {
           method: id ? 'PATCH' : 'POST',
           body: JSON.stringify(payload)
         });
-        setMessage('Výrobek byl uložen.', 'success');
+        setMessage(publish ? 'Výrobek byl publikován na webu.' : 'Výrobek byl uložen do sekce Uložené v archivu.', 'success');
         await loadData();
-        editProduct(data.product);
+        if (publish) {
+          editProduct(data.product);
+        } else {
+          resetForm();
+        }
       }
 
       async function archiveProduct(id) {
-        if (!window.confirm('Archivovat tento výrobek? Zůstane v databázi, ale nebude veřejně viditelný.')) return;
+        if (!window.confirm('Skrýt tento výrobek a přesunout ho do archivu? Zůstane bezpečně uložený.')) return;
         await requestJson('/admin/api/products/' + encodeURIComponent(id) + '/archive', { method: 'POST', body: '{}' });
-        setMessage('Výrobek byl archivován.', 'success');
+        setMessage('Výrobek byl skryt a přesunut do archivu.', 'success');
         await loadData();
         if (editedId === id) resetForm();
       }
@@ -3363,8 +3710,8 @@ function productsAdminPage(session) {
         await loadData();
       }
 
-      async function uploadPhoto() {
-        var file = uploadInput.files && uploadInput.files[0];
+      async function uploadPhoto(selectedFile) {
+        var file = selectedFile || (uploadInput.files && uploadInput.files[0]);
         if (!file) throw new Error('Vyberte fotku k nahrání.');
         var body = new FormData();
         body.append('image', file);
@@ -3386,7 +3733,8 @@ function productsAdminPage(session) {
       form.addEventListener('submit', function(event) {
         event.preventDefault();
         setMessage('', 'success');
-        saveProduct(currentPayload(), editedId).catch(function(error) {
+        var publish = Boolean(event.submitter && event.submitter.value === 'publish');
+        saveProduct(currentPayload(publish), editedId, publish).catch(function(error) {
           setMessage(error.message, 'error');
         });
       });
@@ -3400,11 +3748,6 @@ function productsAdminPage(session) {
         slugInput.value = slugify(slugInput.value);
       });
 
-      document.getElementById('product-reset').addEventListener('click', function() {
-        setMessage('', 'success');
-        resetForm();
-      });
-
       document.getElementById('product-reload').addEventListener('click', function() {
         loadData().catch(function(error) {
           setMessage(error.message, 'error');
@@ -3415,7 +3758,7 @@ function productsAdminPage(session) {
         var url = photoUrlInput.value.trim();
         var mediaId = photoMediaIdInput.value.trim();
         if (!url && !mediaId) {
-          setMessage('Zadejte URL fotky nebo Media ID.', 'error');
+          setMessage('Vyberte fotku k nahrání.', 'error');
           return;
         }
         photos.push({
@@ -3432,12 +3775,26 @@ function productsAdminPage(session) {
         renderPhotos();
       });
 
-      document.getElementById('product-upload-button').addEventListener('click', function() {
-        setMessage('Nahrávám fotku...', 'success');
-        uploadPhoto().then(function() {
-          setMessage('Fotka byla přidána. Nezapomeňte výrobek uložit.', 'success');
+      var uploadButton = document.getElementById('product-upload-button');
+      uploadButton.addEventListener('click', function() {
+        uploadInput.click();
+      });
+
+      uploadInput.addEventListener('change', function() {
+        if (!uploadInput.files || !uploadInput.files[0]) return;
+        var selectedFiles = Array.prototype.slice.call(uploadInput.files);
+        uploadButton.disabled = true;
+        uploadButton.textContent = 'Nahrávám…';
+        setMessage(selectedFiles.length > 1 ? 'Nahrávám fotky...' : 'Nahrávám fotku...', 'success');
+        selectedFiles.reduce(function(promise, file) {
+          return promise.then(function() { return uploadPhoto(file); });
+        }, Promise.resolve()).then(function() {
+          setMessage(selectedFiles.length > 1 ? 'Fotky byly přidány. Nezapomeňte výrobek uložit.' : 'Fotka byla přidána. Nezapomeňte výrobek uložit.', 'success');
         }).catch(function(error) {
           setMessage(error.message, 'error');
+        }).finally(function() {
+          uploadButton.disabled = false;
+          uploadButton.textContent = 'Nahrát fotku';
         });
       });
 
@@ -3479,16 +3836,8 @@ function productsAdminPage(session) {
 
         if (button.dataset.action === 'edit') {
           editProduct(product);
-        } else if (button.dataset.action === 'toggle-visible') {
-          saveProduct(Object.assign({}, product, { category_ids: product.category_ids || [], is_visible: !product.is_visible }), id)
-            .catch(function(error) { setMessage(error.message, 'error'); });
-        } else if (button.dataset.action === 'toggle-published') {
-          saveProduct(Object.assign({}, product, { category_ids: product.category_ids || [], is_published: !product.is_published, published_at: product.is_published ? null : product.published_at }), id)
-            .catch(function(error) { setMessage(error.message, 'error'); });
-        } else if (button.dataset.action === 'archive') {
+        } else if (button.dataset.action === 'hide') {
           archiveProduct(id).catch(function(error) { setMessage(error.message, 'error'); });
-        } else if (button.dataset.action === 'restore') {
-          restoreProduct(id).catch(function(error) { setMessage(error.message, 'error'); });
         }
       });
 
@@ -3504,26 +3853,10 @@ function productsAdminPage(session) {
 
 function blogPostsAdminPage(session) {
   return adminLayout('Články blogu', `
-    <div class="masthead">
-      <div class="brand">
-        <img src="/logo.jpg" alt="Dřevito">
-        <div>
-          <strong>Dřevito</strong>
-          <span>Přihlášen: ${escapeHtml(session.email)}</span>
-        </div>
-      </div>
-      <div class="actions" style="margin:0;">
-        <a class="button button--ghost" href="/admin">Dashboard</a>
-        <a class="button button--ghost" href="/admin/media">Fotky</a>
-        <a class="button button--ghost" href="/admin/blog-categories">Kategorie</a>
-        <form method="post" action="/admin/logout" style="margin:0;">
-          <button class="button button--ghost" type="submit">Odhlásit</button>
-        </form>
-      </div>
-    </div>
+    ${adminMasthead(session)}
     <div class="content">
       <h1>Články blogu</h1>
-      <p>Správa článků, autorů, fotek, kategorií, pořadí a publikace pro blog.</p>
+      <p>Správa článků, více fotek, kategorií a publikace pro blog.</p>
       <div id="blog-message" hidden></div>
 
       <div class="blog-layout" id="blog-app">
@@ -3535,50 +3868,21 @@ function blogPostsAdminPage(session) {
               Název
               <input id="blog-title" name="title" required autocomplete="off">
             </label>
+            <input id="blog-slug" name="slug" type="hidden" required autocomplete="off" pattern="[a-z0-9][a-z0-9-]*">
             <label>
-              Slug
-              <input id="blog-slug" name="slug" required autocomplete="off" pattern="[a-z0-9][a-z0-9-]*">
-            </label>
-            <label>
-              Úvodní perex
+              Krátký úvod
               <textarea id="blog-excerpt" name="excerpt"></textarea>
             </label>
             <label>
               Obsah článku
               <textarea id="blog-main-content" name="main_content" style="min-height:180px;"></textarea>
             </label>
-            <div class="form-row">
-              <label>
-                Autor
-                <input id="blog-author-name" name="author_name" autocomplete="off">
-              </label>
-              <label>
-                Formát obsahu
-                <select id="blog-content-format" name="content_format">
-                  <option value="html">HTML</option>
-                  <option value="markdown">Markdown</option>
-                  <option value="portable_text">Portable text</option>
-                </select>
-              </label>
-            </div>
-            <div class="form-row">
-              <label>
-                Pořadí
-                <input id="blog-sort-order" name="sort_order" type="number" step="1" value="0">
-              </label>
-              <label>
-                Datum publikace
-                <input id="blog-published-at" name="published_at" type="datetime-local">
-              </label>
-            </div>
-            <label>
-              Stav
-              <select id="blog-status" name="status">
-                <option value="draft">Koncept</option>
-                <option value="published">Publikovaný</option>
-                <option value="archived">Archiv</option>
-              </select>
-            </label>
+            <select id="blog-content-format" name="content_format" hidden>
+              <option value="html">Běžný text</option>
+            </select>
+            <input id="blog-sort-order" name="sort_order" type="hidden" value="0">
+            <input id="blog-published-at" name="published_at" type="hidden">
+            <input id="blog-status" name="status" type="hidden" value="draft">
             <label>
               Kategorie
               <div class="category-checks" id="blog-category-checks">
@@ -3586,33 +3890,20 @@ function blogPostsAdminPage(session) {
               </div>
             </label>
 
-            <label>
-              Přidat fotku URL
-              <input id="blog-photo-url" placeholder="/uploads/blog/fotka.jpg">
-            </label>
-            <div class="form-row">
-              <label>
-                Alt text
-                <input id="blog-photo-alt" placeholder="Popis fotky">
-              </label>
-              <label>
-                Media ID
-                <input id="blog-photo-media-id" placeholder="Volitelné">
-              </label>
-            </div>
-            <button class="button button--secondary button--small" id="blog-add-photo" type="button">Přidat URL fotku</button>
+            <input id="blog-photo-url" type="hidden">
+            <input id="blog-photo-alt" type="hidden">
+            <input id="blog-photo-media-id" type="hidden">
+            <button class="button button--secondary button--small" id="blog-add-photo" type="button" hidden>Přidat fotku</button>
 
-            <label>
-              Nahrát fotku
-              <input id="blog-upload" type="file" accept="image/jpeg,image/png,image/webp,image/gif">
-            </label>
-            <button class="button button--secondary button--small" id="blog-upload-button" type="button">Nahrát a přidat</button>
+            <label>Fotky</label>
+            <input id="blog-upload" type="file" accept="image/jpeg,image/png,image/webp,image/gif" multiple hidden>
+            <button class="button button--secondary button--small" id="blog-upload-button" type="button">Nahrát fotku</button>
 
             <div class="photo-list" id="blog-photos"></div>
 
             <div class="actions">
-              <button class="button" type="submit">Uložit</button>
-              <button class="button button--secondary" id="blog-reset" type="button">Nový</button>
+              <button class="button" type="submit" value="save">Uložit</button>
+              <button class="button button--secondary" type="submit" value="publish">Publikovat</button>
             </div>
           </form>
         </section>
@@ -3620,7 +3911,7 @@ function blogPostsAdminPage(session) {
         <section class="blog-list">
           <div class="toolbar" style="margin-top:0;">
             <h2>Seznam článků</h2>
-            <button class="button button--secondary button--small" id="blog-reload" type="button">Obnovit</button>
+            <button class="button button--secondary button--small" id="blog-reload" type="button">Načíst znovu</button>
           </div>
           <div id="blog-posts-root" class="empty-state">Načítám články...</div>
         </section>
@@ -3634,6 +3925,7 @@ function blogPostsAdminPage(session) {
       var photos = [];
       var editedId = '';
       var slugTouched = false;
+      var requestedEditId = new URLSearchParams(window.location.search).get('edit') || '';
       var form = document.getElementById('blog-form');
       var formTitle = document.getElementById('blog-form-title');
       var message = document.getElementById('blog-message');
@@ -3643,7 +3935,6 @@ function blogPostsAdminPage(session) {
       var slugInput = document.getElementById('blog-slug');
       var excerptInput = document.getElementById('blog-excerpt');
       var mainContentInput = document.getElementById('blog-main-content');
-      var authorNameInput = document.getElementById('blog-author-name');
       var contentFormatInput = document.getElementById('blog-content-format');
       var sortOrderInput = document.getElementById('blog-sort-order');
       var publishedAtInput = document.getElementById('blog-published-at');
@@ -3693,17 +3984,17 @@ function blogPostsAdminPage(session) {
           .map(function(input) { return input.value; });
       }
 
-      function currentPayload() {
+      function currentPayload(publish) {
         return {
           title: titleInput.value.trim(),
           slug: slugInput.value.trim().toLowerCase(),
           excerpt: excerptInput.value.trim(),
           main_content: mainContentInput.value.trim(),
           content_format: contentFormatInput.value,
-          author_name: authorNameInput.value.trim(),
+          author_name: '',
           photos: photos,
           category_ids: selectedCategoryIds(),
-          status: statusInput.value,
+          status: publish === true ? 'published' : 'draft',
           published_at: publishedAtInput.value,
           sort_order: sortOrderInput.value
         };
@@ -3734,7 +4025,6 @@ function blogPostsAdminPage(session) {
         slugInput.value = post.slug || '';
         excerptInput.value = post.excerpt || '';
         mainContentInput.value = post.main_content || '';
-        authorNameInput.value = post.author_name || '';
         contentFormatInput.value = post.content_format || 'html';
         sortOrderInput.value = post.sort_order || 0;
         publishedAtInput.value = formatDateForInput(post.published_at);
@@ -3781,10 +4071,10 @@ function blogPostsAdminPage(session) {
           return '<article class="photo-row" data-index="' + index + '">' +
             thumb +
             '<div class="photo-row__fields">' +
-              '<input data-photo-field="url" value="' + escapeHtml(photo.url || '') + '" placeholder="URL">' +
-              '<input data-photo-field="alt" value="' + escapeHtml(photo.alt || '') + '" placeholder="Alt text">' +
-              '<input data-photo-field="caption" value="' + escapeHtml(photo.caption || '') + '" placeholder="Popisek">' +
-              '<input data-photo-field="media_id" value="' + escapeHtml(photo.media_id || '') + '" placeholder="Media ID">' +
+              '<input data-photo-field="url" type="hidden" value="' + escapeHtml(photo.url || '') + '">' +
+              '<input data-photo-field="alt" type="hidden" value="' + escapeHtml(photo.alt || '') + '">' +
+              '<label>Popisek fotky<input data-photo-field="caption" value="' + escapeHtml(photo.caption || '') + '" placeholder="Volitelné"></label>' +
+              '<input data-photo-field="media_id" type="hidden" value="' + escapeHtml(photo.media_id || '') + '">' +
               '<div class="photo-row__buttons">' +
                 '<button class="button button--secondary button--small" type="button" data-photo-action="up">Nahoru</button>' +
                 '<button class="button button--secondary button--small" type="button" data-photo-action="down">Dolů</button>' +
@@ -3804,7 +4094,6 @@ function blogPostsAdminPage(session) {
         } else {
           badges.push('<span class="badge badge--muted">Koncept</span>');
         }
-        badges.push('<span class="badge">Pořadí ' + escapeHtml(post.sort_order || 0) + '</span>');
         return '<div class="badges">' + badges.join('') + '</div>';
       }
 
@@ -3824,16 +4113,13 @@ function blogPostsAdminPage(session) {
           var categoryText = post.categories && post.categories.length
             ? post.categories.map(function(category) { return category.title; }).join(', ')
             : 'Bez kategorie';
-          var actionHtml = post.status === 'archived'
-            ? '<button class="button button--secondary button--small" type="button" data-action="restore" data-id="' + escapeHtml(post.id) + '">Obnovit</button>'
-            : '<button class="button button--secondary button--small" type="button" data-action="toggle-published" data-id="' + escapeHtml(post.id) + '">' + (post.status === 'published' ? 'Stáhnout' : 'Publikovat') + '</button>' +
-              '<button class="button button--danger button--small" type="button" data-action="archive" data-id="' + escapeHtml(post.id) + '">Archivovat</button>';
+          var actionHtml = '<button class="button button--secondary button--small" type="button" data-action="hide" data-id="' + escapeHtml(post.id) + '">Skrýt</button>';
 
           return '<article class="blog-row">' +
             thumb +
             '<div class="blog-main">' +
               '<div class="blog-titleline"><strong>' + escapeHtml(post.title) + '</strong>' + statusBadges(post) + '</div>' +
-              '<div class="blog-meta">/' + escapeHtml(post.slug) + ' · ' + escapeHtml(categoryText) + (post.author_name ? ' · ' + escapeHtml(post.author_name) : '') + '</div>' +
+              '<div class="blog-meta">Kategorie: ' + escapeHtml(categoryText) + '</div>' +
               (post.excerpt ? '<p>' + escapeHtml(post.excerpt) + '</p>' : '') +
               '<div class="blog-actions">' +
                 '<button class="button button--small" type="button" data-action="edit" data-id="' + escapeHtml(post.id) + '">Upravit</button>' +
@@ -3857,26 +4143,37 @@ function blogPostsAdminPage(session) {
         root.className = 'empty-state';
         root.textContent = 'Načítám články...';
         var data = await requestJson('/admin/api/blog-posts');
-        posts = data.posts || [];
-        categories = data.categories || [];
+        var allPosts = data.posts || [];
+        posts = allPosts.filter(function(post) { return post.status === 'published'; });
+        categories = (data.categories || []).filter(function(category) { return !category.archived_at; });
         renderCategoryChecks(selectedCategoryIds());
         renderPosts();
+        if (requestedEditId) {
+          var requestedPost = allPosts.find(function(post) { return post.id === requestedEditId && post.status !== 'archived'; });
+          requestedEditId = '';
+          window.history.replaceState({}, '', '/admin/blog-posts');
+          if (requestedPost) editPost(requestedPost);
+        }
       }
 
-      async function savePost(payload, id) {
+      async function savePost(payload, id, publish) {
         var data = await requestJson(id ? '/admin/api/blog-posts/' + encodeURIComponent(id) : '/admin/api/blog-posts', {
           method: id ? 'PATCH' : 'POST',
           body: JSON.stringify(payload)
         });
-        setMessage('Článek byl uložen.', 'success');
+        setMessage(publish ? 'Článek byl publikován na webu.' : 'Článek byl uložen do sekce Uložené v archivu.', 'success');
         await loadData();
-        editPost(data.post);
+        if (publish) {
+          editPost(data.post);
+        } else {
+          resetForm();
+        }
       }
 
       async function archivePost(id) {
-        if (!window.confirm('Archivovat tento článek? Zůstane v databázi, ale nebude veřejně viditelný.')) return;
+        if (!window.confirm('Skrýt tento článek a přesunout ho do archivu? Zůstane bezpečně uložený.')) return;
         await requestJson('/admin/api/blog-posts/' + encodeURIComponent(id) + '/archive', { method: 'POST', body: '{}' });
-        setMessage('Článek byl archivován.', 'success');
+        setMessage('Článek byl skryt a přesunut do archivu.', 'success');
         await loadData();
         if (editedId === id) resetForm();
       }
@@ -3887,8 +4184,8 @@ function blogPostsAdminPage(session) {
         await loadData();
       }
 
-      async function uploadPhoto() {
-        var file = uploadInput.files && uploadInput.files[0];
+      async function uploadPhoto(selectedFile) {
+        var file = selectedFile || (uploadInput.files && uploadInput.files[0]);
         if (!file) throw new Error('Vyberte fotku k nahrání.');
         var body = new FormData();
         body.append('image', file);
@@ -3910,7 +4207,8 @@ function blogPostsAdminPage(session) {
       form.addEventListener('submit', function(event) {
         event.preventDefault();
         setMessage('', 'success');
-        savePost(currentPayload(), editedId).catch(function(error) {
+        var publish = Boolean(event.submitter && event.submitter.value === 'publish');
+        savePost(currentPayload(publish), editedId, publish).catch(function(error) {
           setMessage(error.message, 'error');
         });
       });
@@ -3924,11 +4222,6 @@ function blogPostsAdminPage(session) {
         slugInput.value = slugify(slugInput.value);
       });
 
-      document.getElementById('blog-reset').addEventListener('click', function() {
-        setMessage('', 'success');
-        resetForm();
-      });
-
       document.getElementById('blog-reload').addEventListener('click', function() {
         loadData().catch(function(error) {
           setMessage(error.message, 'error');
@@ -3939,7 +4232,7 @@ function blogPostsAdminPage(session) {
         var url = photoUrlInput.value.trim();
         var mediaId = photoMediaIdInput.value.trim();
         if (!url && !mediaId) {
-          setMessage('Zadejte URL fotky nebo Media ID.', 'error');
+          setMessage('Vyberte fotku k nahrání.', 'error');
           return;
         }
         photos.push({
@@ -3956,12 +4249,26 @@ function blogPostsAdminPage(session) {
         renderPhotos();
       });
 
-      document.getElementById('blog-upload-button').addEventListener('click', function() {
-        setMessage('Nahrávám fotku...', 'success');
-        uploadPhoto().then(function() {
-          setMessage('Fotka byla přidána. Nezapomeňte článek uložit.', 'success');
+      var uploadButton = document.getElementById('blog-upload-button');
+      uploadButton.addEventListener('click', function() {
+        uploadInput.click();
+      });
+
+      uploadInput.addEventListener('change', function() {
+        if (!uploadInput.files || !uploadInput.files[0]) return;
+        var selectedFiles = Array.prototype.slice.call(uploadInput.files);
+        uploadButton.disabled = true;
+        uploadButton.textContent = 'Nahrávám…';
+        setMessage(selectedFiles.length > 1 ? 'Nahrávám fotky...' : 'Nahrávám fotku...', 'success');
+        selectedFiles.reduce(function(promise, file) {
+          return promise.then(function() { return uploadPhoto(file); });
+        }, Promise.resolve()).then(function() {
+          setMessage(selectedFiles.length > 1 ? 'Fotky byly přidány. Nezapomeňte článek uložit.' : 'Fotka byla přidána. Nezapomeňte článek uložit.', 'success');
         }).catch(function(error) {
           setMessage(error.message, 'error');
+        }).finally(function() {
+          uploadButton.disabled = false;
+          uploadButton.textContent = 'Nahrát fotku';
         });
       });
 
@@ -4003,13 +4310,8 @@ function blogPostsAdminPage(session) {
 
         if (button.dataset.action === 'edit') {
           editPost(post);
-        } else if (button.dataset.action === 'toggle-published') {
-          savePost(Object.assign({}, post, { category_ids: post.category_ids || [], status: post.status === 'published' ? 'draft' : 'published', published_at: post.status === 'published' ? null : post.published_at }), id)
-            .catch(function(error) { setMessage(error.message, 'error'); });
-        } else if (button.dataset.action === 'archive') {
+        } else if (button.dataset.action === 'hide') {
           archivePost(id).catch(function(error) { setMessage(error.message, 'error'); });
-        } else if (button.dataset.action === 'restore') {
-          restorePost(id).catch(function(error) { setMessage(error.message, 'error'); });
         }
       });
 
@@ -4083,7 +4385,7 @@ async function parseJsonBody(req) {
 }
 
 function normalizeSupabaseError(error) {
-  if (error && error.code === '23505') return 'Slug už používá jiná položka.';
+  if (error && error.code === '23505') return 'Tento název už používá jiná položka.';
   if (error && error.message) return error.message;
   return 'Požadavek na Supabase se nepodařil.';
 }
@@ -4206,6 +4508,14 @@ function normalizeOptionalImageUrl(value) {
   return imageUrl;
 }
 
+function normalizeOptionalCategoryParentId(input) {
+  const raw = input.parent_id === undefined ? input.parentId : input.parent_id;
+  const parentId = String(raw || '').trim();
+  if (!parentId) return null;
+  assertUuid(parentId);
+  return parentId;
+}
+
 function normalizeProductCategoryInput(input) {
   const title = String(input.title || '').trim();
   const slug = String(input.slug || '').trim().toLowerCase();
@@ -4219,9 +4529,9 @@ function normalizeProductCategoryInput(input) {
   const imageMediaId = String(input.image_media_id || existingImage.media_id || '').trim();
 
   if (!title) throw new Error('Název kategorie je povinný.');
-  if (!slug) throw new Error('Slug je povinný.');
+  if (!slug) throw new Error('Název je povinný.');
   if (!/^[a-z0-9][a-z0-9-]*$/.test(slug)) {
-    throw new Error('Slug může obsahovat jen malá písmena bez diakritiky, čísla a pomlčky.');
+    throw new Error('Název vytvořil neplatnou adresu. Upravte prosím název.');
   }
   if (!Number.isFinite(sortOrder)) throw new Error('Pořadí musí být číslo.');
 
@@ -4241,6 +4551,7 @@ function normalizeProductCategoryInput(input) {
     slug,
     description: description || null,
     image,
+    parent_id: normalizeOptionalCategoryParentId(input),
     sort_order: sortOrder,
     is_visible: isVisible
   };
@@ -4257,15 +4568,29 @@ function sortProductCategories(categories) {
     const aArchived = a.archived_at ? 1 : 0;
     const bArchived = b.archived_at ? 1 : 0;
     if (aArchived !== bArchived) return aArchived - bArchived;
+    const aChild = a.parent_id ? 1 : 0;
+    const bChild = b.parent_id ? 1 : 0;
+    if (aChild !== bChild) return aChild - bChild;
     if ((a.sort_order || 0) !== (b.sort_order || 0)) return (a.sort_order || 0) - (b.sort_order || 0);
     return String(a.title || '').localeCompare(String(b.title || ''), 'cs');
   });
 }
 
+function ensureProductCategoryParentIsValid(categories, parentId, ownId = '') {
+  if (!parentId) return;
+  if (ownId && parentId === ownId) throw new Error('Kategorie nemůže být sama sobě nadřazená.');
+  const parent = categories.find((category) => category.id === parentId);
+  if (!parent) throw new Error('Nadřazená kategorie nebyla nalezena.');
+  if (parent.parent_id && (!ownId || parent.parent_id !== ownId)) {
+    throw new Error('Podkategorie může mít jen hlavní kategorii jako rodiče.');
+  }
+}
+
 async function listProductCategories() {
+  if (!isSupabaseConfigured()) return sortProductCategories(readCmsDb().product_categories);
   const rows = await supabaseRequest('product_categories', {
     query: {
-      select: 'id,title,slug,description,image,sort_order,is_visible,archived_at,created_at,updated_at',
+      select: 'id,title,slug,description,image,parent_id,sort_order,is_visible,archived_at,created_at,updated_at',
       order: 'sort_order.asc,title.asc'
     }
   });
@@ -4273,6 +4598,11 @@ async function listProductCategories() {
 }
 
 async function assertProductCategorySlugUnique(slug, excludeId = '') {
+  if (!isSupabaseConfigured()) {
+    const exists = readCmsDb().product_categories.some((category) => category.slug === slug && category.id !== excludeId);
+    if (exists) throw new Error('Tento název už používá jiná kategorie.');
+    return;
+  }
   const query = {
     select: 'id',
     slug: `eq.${slug}`,
@@ -4280,17 +4610,26 @@ async function assertProductCategorySlugUnique(slug, excludeId = '') {
   };
   if (excludeId) query.id = `neq.${excludeId}`;
   const rows = await supabaseRequest('product_categories', { query });
-  if (Array.isArray(rows) && rows.length) throw new Error('Slug už používá jiná kategorie.');
+  if (Array.isArray(rows) && rows.length) throw new Error('Tento název už používá jiná kategorie.');
 }
 
 async function createProductCategory(input) {
   const category = normalizeProductCategoryInput(input);
   await assertProductCategorySlugUnique(category.slug);
+  if (!isSupabaseConfigured()) {
+    const db = readCmsDb();
+    ensureProductCategoryParentIsValid(db.product_categories, category.parent_id);
+    const created = createLocalRow(category);
+    db.product_categories.push(created);
+    writeCmsDb(db);
+    return created;
+  }
+  ensureProductCategoryParentIsValid(await listProductCategories(), category.parent_id);
   const rows = await supabaseRequest('product_categories', {
     method: 'POST',
     body: category,
     prefer: 'return=representation',
-    query: { select: 'id,title,slug,description,image,sort_order,is_visible,archived_at,created_at,updated_at' }
+    query: { select: 'id,title,slug,description,image,parent_id,sort_order,is_visible,archived_at,created_at,updated_at' }
   });
   return Array.isArray(rows) ? rows[0] : rows;
 }
@@ -4299,11 +4638,24 @@ async function updateProductCategory(id, input) {
   assertUuid(id);
   const category = normalizeProductCategoryInput(input);
   await assertProductCategorySlugUnique(category.slug, id);
+  if (!isSupabaseConfigured()) {
+    const db = readCmsDb();
+    ensureProductCategoryParentIsValid(db.product_categories, category.parent_id, id);
+    const row = db.product_categories.find((item) => item.id === id);
+    if (!row) throw new Error('Kategorie nebyla nalezena.');
+    updateLocalRow(row, category);
+    db.product_categories.forEach((item) => {
+      if (item.parent_id === id && category.parent_id) item.parent_id = null;
+    });
+    writeCmsDb(db);
+    return row;
+  }
+  ensureProductCategoryParentIsValid(await listProductCategories(), category.parent_id, id);
   const rows = await supabaseRequest('product_categories', {
     method: 'PATCH',
     query: {
       id: `eq.${id}`,
-      select: 'id,title,slug,description,image,sort_order,is_visible,archived_at,created_at,updated_at'
+      select: 'id,title,slug,description,image,parent_id,sort_order,is_visible,archived_at,created_at,updated_at'
     },
     body: category,
     prefer: 'return=representation'
@@ -4314,11 +4666,19 @@ async function updateProductCategory(id, input) {
 
 async function archiveProductCategory(id) {
   assertUuid(id);
+  if (!isSupabaseConfigured()) {
+    const db = readCmsDb();
+    const row = db.product_categories.find((item) => item.id === id);
+    if (!row) throw new Error('Kategorie nebyla nalezena.');
+    updateLocalRow(row, { is_visible: false, archived_at: nowIso() });
+    writeCmsDb(db);
+    return row;
+  }
   const rows = await supabaseRequest('product_categories', {
     method: 'PATCH',
     query: {
       id: `eq.${id}`,
-      select: 'id,title,slug,description,image,sort_order,is_visible,archived_at,created_at,updated_at'
+      select: 'id,title,slug,description,image,parent_id,sort_order,is_visible,archived_at,created_at,updated_at'
     },
     body: {
       is_visible: false,
@@ -4332,11 +4692,19 @@ async function archiveProductCategory(id) {
 
 async function restoreProductCategory(id) {
   assertUuid(id);
+  if (!isSupabaseConfigured()) {
+    const db = readCmsDb();
+    const row = db.product_categories.find((item) => item.id === id);
+    if (!row) throw new Error('Kategorie nebyla nalezena.');
+    updateLocalRow(row, { archived_at: null });
+    writeCmsDb(db);
+    return row;
+  }
   const rows = await supabaseRequest('product_categories', {
     method: 'PATCH',
     query: {
       id: `eq.${id}`,
-      select: 'id,title,slug,description,image,sort_order,is_visible,archived_at,created_at,updated_at'
+      select: 'id,title,slug,description,image,parent_id,sort_order,is_visible,archived_at,created_at,updated_at'
     },
     body: {
       archived_at: null
@@ -4360,9 +4728,9 @@ function normalizeBlogCategoryInput(input) {
   const imageMediaId = String(input.image_media_id || existingImage.media_id || '').trim();
 
   if (!title) throw new Error('Název kategorie je povinný.');
-  if (!slug) throw new Error('Slug je povinný.');
+  if (!slug) throw new Error('Název je povinný.');
   if (!/^[a-z0-9][a-z0-9-]*$/.test(slug)) {
-    throw new Error('Slug může obsahovat jen malá písmena bez diakritiky, čísla a pomlčky.');
+    throw new Error('Název vytvořil neplatnou adresu. Upravte prosím název.');
   }
   if (!Number.isFinite(sortOrder)) throw new Error('Pořadí musí být číslo.');
 
@@ -4398,6 +4766,7 @@ function sortBlogCategories(categories) {
 }
 
 async function listBlogCategories() {
+  if (!isSupabaseConfigured()) return sortBlogCategories(readCmsDb().blog_categories);
   const rows = await supabaseRequest('blog_categories', {
     query: {
       select: 'id,title,slug,description,image,sort_order,is_visible,archived_at,created_at,updated_at',
@@ -4408,6 +4777,11 @@ async function listBlogCategories() {
 }
 
 async function assertBlogCategorySlugUnique(slug, excludeId = '') {
+  if (!isSupabaseConfigured()) {
+    const exists = readCmsDb().blog_categories.some((category) => category.slug === slug && category.id !== excludeId);
+    if (exists) throw new Error('Tento název už používá jiná kategorie blogu.');
+    return;
+  }
   const query = {
     select: 'id',
     slug: `eq.${slug}`,
@@ -4415,12 +4789,19 @@ async function assertBlogCategorySlugUnique(slug, excludeId = '') {
   };
   if (excludeId) query.id = `neq.${excludeId}`;
   const rows = await supabaseRequest('blog_categories', { query });
-  if (Array.isArray(rows) && rows.length) throw new Error('Slug už používá jiná kategorie blogu.');
+  if (Array.isArray(rows) && rows.length) throw new Error('Tento název už používá jiná kategorie blogu.');
 }
 
 async function createBlogCategory(input) {
   const category = normalizeBlogCategoryInput(input);
   await assertBlogCategorySlugUnique(category.slug);
+  if (!isSupabaseConfigured()) {
+    const db = readCmsDb();
+    const created = createLocalRow(category);
+    db.blog_categories.push(created);
+    writeCmsDb(db);
+    return created;
+  }
   const rows = await supabaseRequest('blog_categories', {
     method: 'POST',
     body: category,
@@ -4434,6 +4815,14 @@ async function updateBlogCategory(id, input) {
   assertUuid(id);
   const category = normalizeBlogCategoryInput(input);
   await assertBlogCategorySlugUnique(category.slug, id);
+  if (!isSupabaseConfigured()) {
+    const db = readCmsDb();
+    const row = db.blog_categories.find((item) => item.id === id);
+    if (!row) throw new Error('Kategorie blogu nebyla nalezena.');
+    updateLocalRow(row, category);
+    writeCmsDb(db);
+    return row;
+  }
   const rows = await supabaseRequest('blog_categories', {
     method: 'PATCH',
     query: {
@@ -4449,6 +4838,14 @@ async function updateBlogCategory(id, input) {
 
 async function archiveBlogCategory(id) {
   assertUuid(id);
+  if (!isSupabaseConfigured()) {
+    const db = readCmsDb();
+    const row = db.blog_categories.find((item) => item.id === id);
+    if (!row) throw new Error('Kategorie blogu nebyla nalezena.');
+    updateLocalRow(row, { is_visible: false, archived_at: nowIso() });
+    writeCmsDb(db);
+    return row;
+  }
   const rows = await supabaseRequest('blog_categories', {
     method: 'PATCH',
     query: {
@@ -4467,6 +4864,14 @@ async function archiveBlogCategory(id) {
 
 async function restoreBlogCategory(id) {
   assertUuid(id);
+  if (!isSupabaseConfigured()) {
+    const db = readCmsDb();
+    const row = db.blog_categories.find((item) => item.id === id);
+    if (!row) throw new Error('Kategorie blogu nebyla nalezena.');
+    updateLocalRow(row, { archived_at: null });
+    writeCmsDb(db);
+    return row;
+  }
   const rows = await supabaseRequest('blog_categories', {
     method: 'PATCH',
     query: {
@@ -4544,9 +4949,9 @@ function normalizeProductInput(input) {
   const isPublished = input.is_published === true || input.is_published === 'true' || input.is_published === 'on';
 
   if (!title) throw new Error('Název výrobku je povinný.');
-  if (!slug) throw new Error('Slug je povinný.');
+  if (!slug) throw new Error('Název je povinný.');
   if (!/^[a-z0-9][a-z0-9-]*$/.test(slug)) {
-    throw new Error('Slug může obsahovat jen malá písmena bez diakritiky, čísla a pomlčky.');
+    throw new Error('Název vytvořil neplatnou adresu. Upravte prosím název.');
   }
   if (!Number.isFinite(sortOrder)) throw new Error('Pořadí musí být číslo.');
 
@@ -4599,6 +5004,13 @@ function attachProductCategories(products, categories, links) {
 }
 
 async function listProducts() {
+  if (!isSupabaseConfigured()) {
+    const db = readCmsDb();
+    return {
+      products: sortProducts(attachProductCategories(db.products, db.product_categories, db.product_category_links)),
+      categories: sortProductCategories(db.product_categories)
+    };
+  }
   const [products, categories, links] = await Promise.all([
     supabaseRequest('products', {
       query: {
@@ -4608,7 +5020,7 @@ async function listProducts() {
     }),
     supabaseRequest('product_categories', {
       query: {
-        select: 'id,title,slug,sort_order,is_visible,archived_at',
+        select: 'id,title,slug,parent_id,sort_order,is_visible,archived_at',
         order: 'sort_order.asc,title.asc'
       }
     }),
@@ -4630,6 +5042,11 @@ async function listProducts() {
 }
 
 async function assertProductSlugUnique(slug, excludeId = '') {
+  if (!isSupabaseConfigured()) {
+    const exists = readCmsDb().products.some((product) => product.slug === slug && product.id !== excludeId);
+    if (exists) throw new Error('Tento název už používá jiný výrobek.');
+    return;
+  }
   const query = {
     select: 'id',
     slug: `eq.${slug}`,
@@ -4637,11 +5054,12 @@ async function assertProductSlugUnique(slug, excludeId = '') {
   };
   if (excludeId) query.id = `neq.${excludeId}`;
   const rows = await supabaseRequest('products', { query });
-  if (Array.isArray(rows) && rows.length) throw new Error('Slug už používá jiný výrobek.');
+  if (Array.isArray(rows) && rows.length) throw new Error('Tento název už používá jiný výrobek.');
 }
 
 async function replaceProductCategoryLinks(productId, categoryIds) {
   assertUuid(productId);
+  if (!isSupabaseConfigured()) return;
   await supabaseRequest('product_category_links', {
     method: 'DELETE',
     query: { product_id: `eq.${productId}` }
@@ -4669,6 +5087,26 @@ async function getProductById(id) {
 async function createProduct(input) {
   const { product, categoryIds } = normalizeProductInput(input);
   await assertProductSlugUnique(product.slug);
+  if (!isSupabaseConfigured()) {
+    const db = readCmsDb();
+    categoryIds.forEach((categoryId) => {
+      if (!db.product_categories.some((category) => category.id === categoryId)) {
+        throw new Error('Vybraná kategorie nebyla nalezena.');
+      }
+    });
+    const created = createLocalRow(product);
+    db.products.push(created);
+    db.product_category_links = db.product_category_links
+      .filter((link) => link.product_id !== created.id)
+      .concat(categoryIds.map((categoryId, index) => ({
+        product_id: created.id,
+        category_id: categoryId,
+        sort_order: index,
+        created_at: nowIso()
+      })));
+    writeCmsDb(db);
+    return getProductById(created.id);
+  }
   const rows = await supabaseRequest('products', {
     method: 'POST',
     body: product,
@@ -4685,6 +5123,27 @@ async function updateProduct(id, input) {
   assertUuid(id);
   const { product, categoryIds } = normalizeProductInput(input);
   await assertProductSlugUnique(product.slug, id);
+  if (!isSupabaseConfigured()) {
+    const db = readCmsDb();
+    const row = db.products.find((item) => item.id === id);
+    if (!row) throw new Error('Výrobek nebyl nalezen.');
+    categoryIds.forEach((categoryId) => {
+      if (!db.product_categories.some((category) => category.id === categoryId)) {
+        throw new Error('Vybraná kategorie nebyla nalezena.');
+      }
+    });
+    updateLocalRow(row, product);
+    db.product_category_links = db.product_category_links
+      .filter((link) => link.product_id !== id)
+      .concat(categoryIds.map((categoryId, index) => ({
+        product_id: id,
+        category_id: categoryId,
+        sort_order: index,
+        created_at: nowIso()
+      })));
+    writeCmsDb(db);
+    return getProductById(id);
+  }
   const rows = await supabaseRequest('products', {
     method: 'PATCH',
     query: {
@@ -4701,6 +5160,14 @@ async function updateProduct(id, input) {
 
 async function archiveProduct(id) {
   assertUuid(id);
+  if (!isSupabaseConfigured()) {
+    const db = readCmsDb();
+    const row = db.products.find((item) => item.id === id);
+    if (!row) throw new Error('Výrobek nebyl nalezen.');
+    updateLocalRow(row, { is_visible: false, is_published: false, published_at: null, archived_at: nowIso() });
+    writeCmsDb(db);
+    return getProductById(id);
+  }
   const rows = await supabaseRequest('products', {
     method: 'PATCH',
     query: {
@@ -4721,6 +5188,14 @@ async function archiveProduct(id) {
 
 async function restoreProduct(id) {
   assertUuid(id);
+  if (!isSupabaseConfigured()) {
+    const db = readCmsDb();
+    const row = db.products.find((item) => item.id === id);
+    if (!row) throw new Error('Výrobek nebyl nalezen.');
+    updateLocalRow(row, { archived_at: null });
+    writeCmsDb(db);
+    return getProductById(id);
+  }
   const rows = await supabaseRequest('products', {
     method: 'PATCH',
     query: {
@@ -4757,12 +5232,12 @@ function normalizeBlogPostInput(input) {
   const sortOrder = Number.parseInt(sortOrderRaw === undefined || sortOrderRaw === '' ? '0' : String(sortOrderRaw), 10);
 
   if (!title) throw new Error('Název článku je povinný.');
-  if (!slug) throw new Error('Slug je povinný.');
+  if (!slug) throw new Error('Název je povinný.');
   if (!/^[a-z0-9][a-z0-9-]*$/.test(slug)) {
-    throw new Error('Slug může obsahovat jen malá písmena bez diakritiky, čísla a pomlčky.');
+    throw new Error('Název vytvořil neplatnou adresu. Upravte prosím název.');
   }
   if (!['html', 'markdown', 'portable_text'].includes(contentFormat)) {
-    throw new Error('Formát obsahu není platný.');
+    throw new Error('Text článku není v platném formátu.');
   }
   if (!['draft', 'published', 'archived'].includes(status)) {
     throw new Error('Stav článku není platný.');
@@ -4822,6 +5297,13 @@ function attachBlogCategories(posts, categories, links) {
 }
 
 async function listBlogPosts() {
+  if (!isSupabaseConfigured()) {
+    const db = readCmsDb();
+    return {
+      posts: sortBlogPosts(attachBlogCategories(db.blog_posts, db.blog_categories, db.blog_category_links)),
+      categories: sortBlogCategories(db.blog_categories)
+    };
+  }
   const [posts, categories, links] = await Promise.all([
     supabaseRequest('blog_posts', {
       query: {
@@ -4853,6 +5335,11 @@ async function listBlogPosts() {
 }
 
 async function assertBlogPostSlugUnique(slug, excludeId = '') {
+  if (!isSupabaseConfigured()) {
+    const exists = readCmsDb().blog_posts.some((post) => post.slug === slug && post.id !== excludeId);
+    if (exists) throw new Error('Tento název už používá jiný článek.');
+    return;
+  }
   const query = {
     select: 'id',
     slug: `eq.${slug}`,
@@ -4860,11 +5347,12 @@ async function assertBlogPostSlugUnique(slug, excludeId = '') {
   };
   if (excludeId) query.id = `neq.${excludeId}`;
   const rows = await supabaseRequest('blog_posts', { query });
-  if (Array.isArray(rows) && rows.length) throw new Error('Slug už používá jiný článek.');
+  if (Array.isArray(rows) && rows.length) throw new Error('Tento název už používá jiný článek.');
 }
 
 async function replaceBlogCategoryLinks(blogPostId, categoryIds) {
   assertUuid(blogPostId);
+  if (!isSupabaseConfigured()) return;
   await supabaseRequest('blog_category_links', {
     method: 'DELETE',
     query: { blog_post_id: `eq.${blogPostId}` }
@@ -4892,6 +5380,26 @@ async function getBlogPostById(id) {
 async function createBlogPost(input) {
   const { post, categoryIds } = normalizeBlogPostInput(input);
   await assertBlogPostSlugUnique(post.slug);
+  if (!isSupabaseConfigured()) {
+    const db = readCmsDb();
+    categoryIds.forEach((categoryId) => {
+      if (!db.blog_categories.some((category) => category.id === categoryId)) {
+        throw new Error('Vybraná kategorie blogu nebyla nalezena.');
+      }
+    });
+    const created = createLocalRow(post);
+    db.blog_posts.push(created);
+    db.blog_category_links = db.blog_category_links
+      .filter((link) => link.blog_post_id !== created.id)
+      .concat(categoryIds.map((categoryId, index) => ({
+        blog_post_id: created.id,
+        category_id: categoryId,
+        sort_order: index,
+        created_at: nowIso()
+      })));
+    writeCmsDb(db);
+    return getBlogPostById(created.id);
+  }
   const rows = await supabaseRequest('blog_posts', {
     method: 'POST',
     body: post,
@@ -4908,6 +5416,27 @@ async function updateBlogPost(id, input) {
   assertUuid(id);
   const { post, categoryIds } = normalizeBlogPostInput(input);
   await assertBlogPostSlugUnique(post.slug, id);
+  if (!isSupabaseConfigured()) {
+    const db = readCmsDb();
+    const row = db.blog_posts.find((item) => item.id === id);
+    if (!row) throw new Error('Článek nebyl nalezen.');
+    categoryIds.forEach((categoryId) => {
+      if (!db.blog_categories.some((category) => category.id === categoryId)) {
+        throw new Error('Vybraná kategorie blogu nebyla nalezena.');
+      }
+    });
+    updateLocalRow(row, post);
+    db.blog_category_links = db.blog_category_links
+      .filter((link) => link.blog_post_id !== id)
+      .concat(categoryIds.map((categoryId, index) => ({
+        blog_post_id: id,
+        category_id: categoryId,
+        sort_order: index,
+        created_at: nowIso()
+      })));
+    writeCmsDb(db);
+    return getBlogPostById(id);
+  }
   const rows = await supabaseRequest('blog_posts', {
     method: 'PATCH',
     query: {
@@ -4924,6 +5453,14 @@ async function updateBlogPost(id, input) {
 
 async function archiveBlogPost(id) {
   assertUuid(id);
+  if (!isSupabaseConfigured()) {
+    const db = readCmsDb();
+    const row = db.blog_posts.find((item) => item.id === id);
+    if (!row) throw new Error('Článek nebyl nalezen.');
+    updateLocalRow(row, { status: 'archived', published_at: null });
+    writeCmsDb(db);
+    return getBlogPostById(id);
+  }
   const rows = await supabaseRequest('blog_posts', {
     method: 'PATCH',
     query: {
@@ -4942,6 +5479,14 @@ async function archiveBlogPost(id) {
 
 async function restoreBlogPost(id) {
   assertUuid(id);
+  if (!isSupabaseConfigured()) {
+    const db = readCmsDb();
+    const row = db.blog_posts.find((item) => item.id === id);
+    if (!row) throw new Error('Článek nebyl nalezen.');
+    updateLocalRow(row, { status: 'draft', published_at: null });
+    writeCmsDb(db);
+    return getBlogPostById(id);
+  }
   const rows = await supabaseRequest('blog_posts', {
     method: 'PATCH',
     query: {
@@ -5094,6 +5639,7 @@ function sortSiteContent(contents) {
 }
 
 async function listSiteContent() {
+  if (!isSupabaseConfigured()) return sortSiteContent(readCmsDb().site_content);
   const rows = await supabaseRequest('site_content', {
     query: {
       select: 'id,content_key,locale,section,label,content_type,value,status,sort_order,published_at,created_at,updated_at',
@@ -5225,7 +5771,25 @@ function hydratePublicSiteValue(item, mediaMap) {
 
 async function getPublicCmsPayload(locale = 'cs') {
   if (!isSupabaseConfigured()) {
-    return { ok: true, configured: false, locale, site_content: {}, products: [], product_categories: [], blog_posts: [], blog_categories: [] };
+    const db = readCmsDb();
+    const publicRows = {
+      siteContentRows: db.site_content,
+      productRows: db.products,
+      productCategoryRows: db.product_categories,
+      productLinkRows: db.product_category_links,
+      blogPostRows: db.blog_posts,
+      blogCategoryRows: db.blog_categories,
+      blogLinkRows: db.blog_category_links
+    };
+    const hasAnyContent = publicRows.siteContentRows.length
+      || publicRows.productRows.length
+      || publicRows.productCategoryRows.length
+      || publicRows.blogPostRows.length
+      || publicRows.blogCategoryRows.length;
+    if (!hasAnyContent) {
+      return { ok: true, configured: false, locale, site_content: {}, products: [], product_categories: [], blog_posts: [], blog_categories: [] };
+    }
+    return buildPublicCmsPayload(locale, publicRows, new Map());
   }
 
   const [
@@ -5251,7 +5815,7 @@ async function getPublicCmsPayload(locale = 'cs') {
     }),
     supabaseRequest('product_categories', {
       query: {
-        select: 'id,title,slug,description,image,sort_order,is_visible,archived_at,updated_at',
+        select: 'id,title,slug,description,image,parent_id,sort_order,is_visible,archived_at,updated_at',
         order: 'sort_order.asc,title.asc'
       }
     }),
@@ -5281,6 +5845,27 @@ async function getPublicCmsPayload(locale = 'cs') {
     })
   ]);
 
+  return buildPublicCmsPayload(locale, {
+    siteContentRows,
+    productRows,
+    productCategoryRows,
+    productLinkRows,
+    blogPostRows,
+    blogCategoryRows,
+    blogLinkRows
+  });
+}
+
+async function buildPublicCmsPayload(locale, rows, givenMediaMap) {
+  const {
+    siteContentRows,
+    productRows,
+    productCategoryRows,
+    productLinkRows,
+    blogPostRows,
+    blogCategoryRows,
+    blogLinkRows
+  } = rows;
   const siteContent = sortSiteContent((Array.isArray(siteContentRows) ? siteContentRows : []).filter((item) => isPublicSiteContentItem(item, locale)));
   const products = sortProducts((Array.isArray(productRows) ? productRows : []).filter(isPublicProduct));
   const productCategories = sortProductCategories((Array.isArray(productCategoryRows) ? productCategoryRows : []).filter(isPublicProductCategory));
@@ -5303,13 +5888,14 @@ async function getPublicCmsPayload(locale = 'cs') {
   products.forEach((product) => collectMediaIdsFromPhotos(mediaIds, product.photos));
   blogCategories.forEach((category) => collectMediaId(mediaIds, category.image));
   blogPosts.forEach((post) => collectMediaIdsFromPhotos(mediaIds, post.photos));
-  const mediaMap = await fetchPublicMediaMap(mediaIds);
+  const mediaMap = givenMediaMap || await fetchPublicMediaMap(mediaIds);
 
   const productCategoryMap = new Map(productCategories.map((category) => [category.id, {
     id: category.id,
     title: category.title,
     slug: category.slug,
     description: category.description || '',
+    parent_id: category.parent_id || null,
     image: hydratePublicImageRef(category.image, mediaMap),
     sort_order: category.sort_order || 0
   }]));
@@ -5345,6 +5931,8 @@ async function getPublicCmsPayload(locale = 'cs') {
       slug: product.slug,
       short_description: product.short_description || '',
       description: product.description || '',
+      price: Number.isFinite(Number(product.price)) ? Number(product.price) : 0,
+      url: product.external_url || product.url || '',
       photos,
       featured_image: photos[0] || null,
       categories,
@@ -5403,6 +5991,15 @@ async function getPublicCmsPayload(locale = 'cs') {
 }
 
 async function assertSiteContentKeyUnique(locale, contentKey, excludeId = '') {
+  if (!isSupabaseConfigured()) {
+    const exists = readCmsDb().site_content.some((item) => (
+      item.locale === locale
+      && item.content_key === contentKey
+      && item.id !== excludeId
+    ));
+    if (exists) throw new Error('Tento klíč obsahu už pro daný jazyk existuje.');
+    return;
+  }
   const query = {
     select: 'id',
     locale: `eq.${locale}`,
@@ -5417,6 +6014,13 @@ async function assertSiteContentKeyUnique(locale, contentKey, excludeId = '') {
 async function createSiteContent(input) {
   const content = normalizeSiteContentInput(input);
   await assertSiteContentKeyUnique(content.locale, content.content_key);
+  if (!isSupabaseConfigured()) {
+    const db = readCmsDb();
+    const created = createLocalRow(content);
+    db.site_content.push(created);
+    writeCmsDb(db);
+    return created;
+  }
   const rows = await supabaseRequest('site_content', {
     method: 'POST',
     body: content,
@@ -5430,6 +6034,14 @@ async function updateSiteContent(id, input) {
   assertUuid(id);
   const content = normalizeSiteContentInput(input);
   await assertSiteContentKeyUnique(content.locale, content.content_key, id);
+  if (!isSupabaseConfigured()) {
+    const db = readCmsDb();
+    const row = db.site_content.find((item) => item.id === id);
+    if (!row) throw new Error('Obsah nebyl nalezen.');
+    updateLocalRow(row, content);
+    writeCmsDb(db);
+    return row;
+  }
   const rows = await supabaseRequest('site_content', {
     method: 'PATCH',
     query: {
@@ -5445,6 +6057,14 @@ async function updateSiteContent(id, input) {
 
 async function archiveSiteContent(id) {
   assertUuid(id);
+  if (!isSupabaseConfigured()) {
+    const db = readCmsDb();
+    const row = db.site_content.find((item) => item.id === id);
+    if (!row) throw new Error('Obsah nebyl nalezen.');
+    updateLocalRow(row, { status: 'archived', published_at: null });
+    writeCmsDb(db);
+    return row;
+  }
   const rows = await supabaseRequest('site_content', {
     method: 'PATCH',
     query: {
@@ -5463,6 +6083,14 @@ async function archiveSiteContent(id) {
 
 async function restoreSiteContent(id) {
   assertUuid(id);
+  if (!isSupabaseConfigured()) {
+    const db = readCmsDb();
+    const row = db.site_content.find((item) => item.id === id);
+    if (!row) throw new Error('Obsah nebyl nalezen.');
+    updateLocalRow(row, { status: 'draft', published_at: null });
+    writeCmsDb(db);
+    return row;
+  }
   const rows = await supabaseRequest('site_content', {
     method: 'PATCH',
     query: {
@@ -6102,8 +6730,29 @@ async function handleAdmin(req, res, url) {
       redirect(res, '/admin');
       return;
     }
-    send(res, 200, loginPage({ next: url.searchParams.get('next') || '/admin' }), {
+    send(res, 200, loginPage({
+      next: url.searchParams.get('next') || '/admin',
+      devLogin: isDevLoginAvailable(req)
+    }), {
       'Cache-Control': 'no-store'
+    });
+    return;
+  }
+
+  if (url.pathname === '/admin/dev-login' && req.method === 'POST') {
+    if (!isDevLoginAvailable(req)) {
+      send(res, 403, loginPage({
+        error: 'Lokální testovací vstup je dostupný jen na localhostu, když Google přihlášení není nastavené.',
+        next: url.searchParams.get('next') || '/admin',
+        devLogin: false
+      }), {
+        'Cache-Control': 'no-store'
+      });
+      return;
+    }
+    const next = getSafeAdminNext(url.searchParams.get('next') || '/admin');
+    redirect(res, next, {
+      'Set-Cookie': sessionCookie(createSession('local-test@drevito.local'), req)
     });
     return;
   }
@@ -6116,7 +6765,11 @@ async function handleAdmin(req, res, url) {
 
     const next = getSafeAdminNext(url.searchParams.get('next') || '/admin');
     if (!isAuthConfigured()) {
-      send(res, 500, loginPage({ error: 'Google přihlášení není nakonfigurované.', next }), {
+      send(res, 500, loginPage({
+        error: 'Google přihlášení není nakonfigurované.',
+        next,
+        devLogin: isDevLoginAvailable(req)
+      }), {
         'Cache-Control': 'no-store'
       });
       return;
@@ -6553,6 +7206,13 @@ async function handleAdmin(req, res, url) {
     return;
   }
 
+  if (url.pathname === '/admin/archive' && req.method === 'GET') {
+    send(res, 200, archiveAdminPage(session), {
+      'Cache-Control': 'no-store'
+    });
+    return;
+  }
+
   if (url.pathname === '/admin/media' && req.method === 'GET') {
     send(res, 200, mediaAdminPage(session), {
       'Cache-Control': 'no-store'
@@ -6561,9 +7221,7 @@ async function handleAdmin(req, res, url) {
   }
 
   if (url.pathname === '/admin/site-content' && req.method === 'GET') {
-    send(res, 200, siteContentAdminPage(session), {
-      'Cache-Control': 'no-store'
-    });
+    redirect(res, '/admin');
     return;
   }
 
@@ -6596,16 +7254,7 @@ async function handleAdmin(req, res, url) {
   }
 
   send(res, 404, adminLayout('Nenalezeno', `
-    <div class="masthead">
-      <div class="brand">
-        <img src="/logo.jpg" alt="Dřevito">
-        <div>
-          <strong>Dřevito</strong>
-          <span>Administrace webu</span>
-        </div>
-      </div>
-      <a class="button button--ghost" href="/admin">Dashboard</a>
-    </div>
+    ${adminMasthead(session)}
     <div class="content">
       <h1>Stránka nenalezena</h1>
       <p>Tato admin stránka zatím neexistuje.</p>
@@ -6682,7 +7331,7 @@ if (require.main === module) {
 
   server.listen(PORT, () => {
     console.log(`Drevito site running at http://localhost:${PORT}`);
-    console.log(`Admin login: http://localhost:${PORT}/admin/login`);
+    console.log(`Přihlášení: http://localhost:${PORT}/admin/login`);
     if (!isAuthConfigured()) {
       console.warn('Google admin login is disabled until GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, and GOOGLE_ALLOWED_EMAIL are set.');
     }

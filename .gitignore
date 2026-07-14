@@ -1,5 +1,8 @@
 .DS_Store
 *.csv
+.env
+.env.*
+!.env.example
 docs/*
 !docs/*.md
 .data/

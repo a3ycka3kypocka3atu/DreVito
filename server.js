@@ -1663,7 +1663,6 @@ function adminMasthead(session) {
         <img src="/logo.jpg" alt="Dřevito">
         <div>
           <strong>Dřevito</strong>
-          <span>Přihlášen: ${escapeHtml(session.email)}</span>
         </div>
       </div>
       <div class="actions" style="margin:0;">

@@ -1,13 +1,17 @@
 const crypto = require('crypto');
 const fs = require('fs');
 const http = require('http');
+const os = require('os');
 const path = require('path');
 const { URL } = require('url');
 
 const ROOT_DIR = __dirname;
 const PORT = Number(process.env.PORT || 8000);
-const DATA_DIR = path.join(ROOT_DIR, '.data');
-const UPLOAD_DIR = path.join(ROOT_DIR, 'uploads');
+const RUNTIME_STORAGE_ROOT = process.env.VERCEL
+  ? path.join(os.tmpdir(), 'drevito')
+  : ROOT_DIR;
+const DATA_DIR = process.env.DREVITO_DATA_DIR || path.join(RUNTIME_STORAGE_ROOT, '.data');
+const UPLOAD_DIR = process.env.DREVITO_UPLOAD_DIR || path.join(RUNTIME_STORAGE_ROOT, 'uploads');
 const MEDIA_DB_PATH = path.join(DATA_DIR, 'media-db.json');
 const CMS_DB_PATH = path.join(DATA_DIR, 'cms-db.json');
 const MAX_UPLOAD_BYTES = Number(process.env.MAX_UPLOAD_BYTES || 10 * 1024 * 1024);
@@ -844,7 +848,8 @@ function countMediaReferences(db, mediaId) {
 
 function deleteLocalMediaFile(media) {
   if (!media || media.bucket !== 'local' || !media.storage_path) return;
-  const filePath = path.resolve(ROOT_DIR, media.storage_path);
+  const relativePath = String(media.storage_path).replace(/^uploads[\\/]/, '');
+  const filePath = path.resolve(UPLOAD_DIR, relativePath);
   if (!filePath.startsWith(UPLOAD_DIR + path.sep)) return;
   fs.unlink(filePath, (error) => {
     if (error && error.code !== 'ENOENT') console.error('Failed to delete upload:', error);
@@ -1723,17 +1728,23 @@ function archiveAdminPage(session) {
       <p>Rozpracované výrobky najdete v Uložených. Skrytý obsah zůstává bezpečně v archivu a můžete ho znovu obnovit.</p>
       <div id="archive-message" hidden></div>
       <div class="admin-tools" style="margin-top:24px;">
-        <section class="category-panel">
-          <h2>Uložené</h2>
-          <h3>Výrobky</h3>
-          <div id="archive-saved-products" class="empty-state">Načítám…</div>
-          <h3 style="margin-top:20px;">Články blogu</h3>
-          <div id="archive-saved-blog-posts" class="empty-state">Načítám…</div>
-        </section>
         <section class="category-panel"><h2>Výrobky</h2><div id="archive-products" class="empty-state">Načítám…</div></section>
         <section class="category-panel"><h2>Kategorie výrobků</h2><div id="archive-product-categories" class="empty-state">Načítám…</div></section>
         <section class="category-panel"><h2>Články blogu</h2><div id="archive-blog-posts" class="empty-state">Načítám…</div></section>
         <section class="category-panel"><h2>Kategorie blogu</h2><div id="archive-blog-categories" class="empty-state">Načítám…</div></section>
+        <section class="category-panel" style="grid-column:1/-1;">
+          <h2>Uložené</h2>
+          <div class="form-row" style="margin-top:16px; align-items:start;">
+            <div>
+              <h3>Výrobky</h3>
+              <div id="archive-saved-products" class="empty-state">Načítám…</div>
+            </div>
+            <div>
+              <h3>Články blogu</h3>
+              <div id="archive-saved-blog-posts" class="empty-state">Načítám…</div>
+            </div>
+          </div>
+        </section>
       </div>
     </div>
     <script>
@@ -6121,10 +6132,10 @@ function persistLocalUploadedImage(file, fields, session) {
   const targetSlug = slugify(targetKeySource, 'target');
   const originalName = path.basename(file.filename || `image${extension}`);
   const filename = `${Date.now()}-${crypto.randomBytes(8).toString('hex')}-${slugify(path.basename(originalName, path.extname(originalName)), 'image')}${extension}`;
-  const relativeDir = path.join('uploads', targetType, targetSlug);
-  const absoluteDir = path.join(ROOT_DIR, relativeDir);
-  const storagePath = path.join(relativeDir, filename);
-  const absolutePath = path.join(ROOT_DIR, storagePath);
+  const relativeDir = path.join(targetType, targetSlug);
+  const absoluteDir = path.join(UPLOAD_DIR, relativeDir);
+  const storagePath = path.join('uploads', relativeDir, filename);
+  const absolutePath = path.join(absoluteDir, filename);
 
   fs.mkdirSync(absoluteDir, { recursive: true });
   fs.writeFileSync(absolutePath, file.buffer);
@@ -6699,8 +6710,14 @@ async function handlePublicBlogRoute(req, res, url) {
 
 function serveStatic(req, res, pathname) {
   const requestedPath = pathname === '/' ? '/index.html' : pathname;
-  const filePath = path.resolve(ROOT_DIR, `.${decodeURIComponent(requestedPath)}`);
-  if (!filePath.startsWith(ROOT_DIR + path.sep)) {
+  const decodedPath = decodeURIComponent(requestedPath);
+  const isRuntimeUpload = decodedPath.startsWith('/uploads/');
+  const fileRoot = isRuntimeUpload ? UPLOAD_DIR : ROOT_DIR;
+  const relativePath = isRuntimeUpload
+    ? decodedPath.slice('/uploads/'.length)
+    : `.${decodedPath}`;
+  const filePath = path.resolve(fileRoot, relativePath);
+  if (!filePath.startsWith(fileRoot + path.sep)) {
     send(res, 403, 'Forbidden');
     return;
   }

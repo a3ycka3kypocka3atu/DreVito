@@ -78,12 +78,13 @@
         .nav__logo::before {
             content: '';
             position: absolute;
-            top: 0;
-            left: -1.25rem;
-            width: 190px;
-            height: 182px;
+            top: -0.75rem;
+            left: -2rem;
+            width: 214px;
+            height: 214px;
             background: rgba(218, 190, 125, 0.96);
-            border-bottom: 1px solid rgba(61, 43, 31, 0.16);
+            border: 1px solid rgba(61, 43, 31, 0.12);
+            border-radius: 50%;
             box-shadow: 0 10px 22px rgba(42, 31, 22, 0.12);
             pointer-events: none;
         }
@@ -259,7 +260,7 @@
         @media (max-width: 768px) {
             .nav__inner { padding: 0 1.25rem; }
             .nav__logo { min-width: 142px; }
-            .nav__logo::before { left: -0.75rem; width: 142px; height: 140px; }
+            .nav__logo::before { top: -0.5rem; left: -1.25rem; width: 158px; height: 158px; }
             .nav__logo img { height: 124px; margin-top: 0.5rem; }
             .nav__links { display: none; }
             .nav__dropdown { display: block; }

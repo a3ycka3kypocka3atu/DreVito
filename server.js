@@ -66,7 +66,7 @@ const DEFAULT_SITE_IMAGE_TARGETS = [
   { key: 'author', label: 'Příběh autora', url: '/autor.JPG', alt: 'Autor Dřevito' },
   { key: 'custom_primary', label: 'Zakázková výroba 1', url: '/custom-service.jpg', alt: 'Zakázková výroba dřevěných výrobků' },
   { key: 'custom_secondary', label: 'Zakázková výroba 2', url: '/custom.JPG', alt: 'Ukázka zakázkové výroby' },
-  { key: 'brand_logo', label: 'Logo', url: '/logo.jpg', alt: 'Dřevito' }
+  { key: 'brand_logo', label: 'Logo', url: '/drevito-logo-transparent.png', alt: 'Dřevito' }
 ];
 
 const DEFAULT_PRODUCT_IMAGE_TARGETS = [
@@ -1798,7 +1798,7 @@ function loginPage({ error = '', next = '/admin', devLogin = false } = {}) {
   return adminLayout('Přihlášení', `
     <div class="masthead">
       <div class="brand">
-        <img src="/logo.jpg" alt="Dřevito">
+        <img src="/drevito-logo-transparent.png" alt="Dřevito">
         <div>
           <strong>Dřevito</strong>
           <span>Administrace webu</span>
@@ -1823,7 +1823,7 @@ function adminMasthead(session) {
   return `
     <div class="masthead">
       <div class="brand">
-        <img src="/logo.jpg" alt="Dřevito">
+        <img src="/drevito-logo-transparent.png" alt="Dřevito">
         <div>
           <strong>Dřevito</strong>
         </div>
@@ -7220,7 +7220,7 @@ function renderPublicBlogPostPage(post, statusCode = 200) {
   <header class="topbar">
     <div class="topbar-inner">
       <a class="brand" href="/">
-        <img src="/logo.jpg" alt="Dřevito">
+        <img src="/drevito-logo-transparent.png" alt="Dřevito">
         <span>Dřevito</span>
       </a>
       <a class="nav-link" href="/#blog">Zpět na blog</a>

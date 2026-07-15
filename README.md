@@ -20,6 +20,7 @@ The admin login runs at `http://localhost:8000/admin/login`.
 The media manager runs at `http://localhost:8000/admin/media` after login.
 The site content manager runs at `http://localhost:8000/admin/site-content` after login.
 The product category manager runs at `http://localhost:8000/admin/product-categories` after login.
+The product filter manager runs at `http://localhost:8000/admin/product-filters` after login.
 The product manager runs at `http://localhost:8000/admin/products` after login.
 The blog category manager runs at `http://localhost:8000/admin/blog-categories` after login.
 The blog post manager runs at `http://localhost:8000/admin/blog-posts` after login.
@@ -55,14 +56,19 @@ Apply these Supabase migrations before using product/category admin:
 - `supabase/migrations/20260708170000_add_product_category_admin_fields.sql`
 - `supabase/migrations/20260708183000_add_product_admin_archive.sql`
 - `supabase/migrations/20260708190000_add_blog_category_admin_fields.sql`
+- `supabase/migrations/20260713193000_add_product_category_parent.sql`
+- `supabase/migrations/20260715164603_add_product_taxonomy_and_filters.sql`
+- `supabase/migrations/20260715170711_add_custom_product_filters.sql`
 
 Category images accept a URL/media reference shape. When a `media_id` points at a public `media` row, public rendering resolves the Supabase `media.public_url`.
 
 ## Admin products
 
-The protected product manager lets the client list, create, edit, show/hide, publish/unpublish, sort, archive, and restore products. Products can be assigned to multiple categories and save ordered photo metadata in `products.photos`.
+The protected product manager lets the client list, create, edit, show/hide, publish/unpublish, sort, archive, and restore products. Products can be assigned to multiple parent/subcategories, store a CZK price and external shop link, and expose filters for wood type, availability, and interior/exterior use. Ordered photo metadata is saved in `products.photos`.
 
 Product photos support upload or manual URL/media references. With Supabase configured, uploaded product photos go to the `product-images` Storage bucket, are saved in the `media` table, and are added to the product form as ordered JSON. Without Supabase credentials, uploads fall back to `uploads/products/...` and `.data/media-db.json`.
+
+The custom product filter manager lets the client create filter groups (for example `Styl`) and their selectable values (for example `Rustikální`). Visible custom filters are rendered automatically on the public catalog and can be assigned to products in the product editor.
 
 ## Admin blog categories
 
@@ -88,7 +94,7 @@ Site-content images support upload or manual URL/media references. With Supabase
 
 The homepage loads `/api/public-content?locale=cs` and replaces fallback content when Supabase is configured. The endpoint is read-only, server-side, and filters out drafts, hidden records, archived records, and future-dated content before returning products, product categories, blog posts, blog categories, and `site_content`.
 
-Product and blog category filters are generated from visible public categories. Product details and blog posts open in in-page detail sections. Images resolve `media_id` references to public `media.public_url` values when available, while direct `url` values remain supported for static and local fallback content.
+Product and blog category filters are generated from visible public categories. Parent product categories include products assigned to their child categories, while every category and subcategory has a direct `/vyrobky/...` address. Product filters cover wood type, availability, interior/exterior use, and price range. Product details and blog posts open in in-page detail sections. Images resolve `media_id` references to public `media.public_url` values when available, while direct `url` values remain supported for static and local fallback content.
 
 If `SUPABASE_URL` or `SUPABASE_SERVICE_ROLE_KEY` is missing, the endpoint returns `configured:false` and the homepage keeps the static fallback product list.
 

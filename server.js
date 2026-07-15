@@ -80,13 +80,41 @@ const DEFAULT_PRODUCT_IMAGE_TARGETS = [
 ];
 
 const DEFAULT_CMS_PRODUCT_CATEGORIES = [
-  { id: '11111111-1111-4111-8111-111111111111', slug: 'engraved-furniture', title: 'Gravírovaný nábytek', sort_order: 10 },
-  { id: '22222222-2222-4222-8222-222222222222', slug: 'small-wood', title: 'Malé dřevěné radosti', sort_order: 20 },
-  { id: '33333333-3333-4333-8333-333333333333', slug: 'shadow-light', title: 'Stínohry a světlo', sort_order: 30 },
-  { id: '44444444-4444-4444-8444-444444444444', slug: 'decorations', title: 'Dekorace', sort_order: 40 },
-  { id: '55555555-5555-4555-8555-555555555555', slug: 'promotion', title: 'Propagační a informační materiály', sort_order: 50 },
-  { id: '66666666-6666-4666-8666-666666666666', slug: 'custom-graphics', title: 'Výrobky s vaší grafikou', sort_order: 60 },
-  { id: '77777777-7777-4777-8777-777777777777', slug: 'engraving-items', title: 'Gravírování vašich předmětů', sort_order: 70 }
+  { id: '11111111-1111-4111-8111-111111111111', slug: 'rustikalni-nabytek', title: 'Rustikální nábytek', description: 'Originální stoly, lavice, stoličky a další solitérní kusy z masivního dřeva.', sort_order: 10 },
+  { id: '33333333-3333-4333-8333-333333333333', slug: 'dekorace-svetla-a-stinohry', title: 'Dekorace, světla a stínohry', description: 'Dřevěné dekorace a objekty, které pracují se světlem, stínem a atmosférou prostoru.', sort_order: 20 },
+  { id: '22222222-2222-4222-8222-222222222222', slug: 'darky-a-drobne-vyrobky', title: 'Dárky a drobné výrobky', description: 'Menší dřevěné radosti, dárky a praktické výrobky pro každý den.', sort_order: 30 },
+  { id: '55555555-5555-4555-8555-555555555555', slug: 'informacni-a-propagacni-materialy', title: 'Informační a propagační materiály', description: 'Loga, vizitky, informační cedule a orientační prvky zpracované osobitě ve dřevě.', sort_order: 40 },
+  { id: '66666666-6666-4666-8666-666666666666', slug: 'zakazkova-vyroba-a-gravirovani-na-miru', title: 'Zakázková výroba a gravírování na míru', description: 'Výroba podle vaší představy i gravírování vlastních předmětů, fotografií, motivů a log.', sort_order: 50 },
+  { id: '11111111-1111-4111-8111-111111111112', slug: 'stoly', title: 'Stoly', parent_id: '11111111-1111-4111-8111-111111111111', sort_order: 10 },
+  { id: '11111111-1111-4111-8111-111111111113', slug: 'lavice', title: 'Lavice', parent_id: '11111111-1111-4111-8111-111111111111', sort_order: 20 },
+  { id: '11111111-1111-4111-8111-111111111114', slug: 'cajove-stolky-a-oltarky', title: 'Čajové stolky a oltářky', parent_id: '11111111-1111-4111-8111-111111111111', sort_order: 30 },
+  { id: '11111111-1111-4111-8111-111111111115', slug: 'stolicky', title: 'Stoličky', parent_id: '11111111-1111-4111-8111-111111111111', sort_order: 40 },
+  { id: '11111111-1111-4111-8111-111111111116', slug: 'ostatni-rustikalni-nabytek', title: 'Ostatní rustikální nábytek', parent_id: '11111111-1111-4111-8111-111111111111', sort_order: 50 },
+  { id: '44444444-4444-4444-8444-444444444444', slug: 'ostatni-dekorace', title: 'Ostatní dekorace', parent_id: '33333333-3333-4333-8333-333333333333', sort_order: 10 },
+  { id: '33333333-3333-4333-8333-333333333334', slug: 'mandaly', title: 'Mandaly', parent_id: '33333333-3333-4333-8333-333333333333', sort_order: 20 },
+  { id: '33333333-3333-4333-8333-333333333335', slug: 'stromy-zivota', title: 'Stromy života', parent_id: '33333333-3333-4333-8333-333333333333', sort_order: 30 },
+  { id: '33333333-3333-4333-8333-333333333336', slug: 'zvirata-a-figuralni-motivy', title: 'Zvířata a figurální motivy', parent_id: '33333333-3333-4333-8333-333333333333', sort_order: 40 },
+  { id: '33333333-3333-4333-8333-333333333337', slug: 'sochy-a-drevene-objekty', title: 'Sochy a dřevěné objekty', parent_id: '33333333-3333-4333-8333-333333333333', sort_order: 50 },
+  { id: '33333333-3333-4333-8333-333333333338', slug: 'svicelenky-a-stinoherni-objekty', title: 'Svíčelenky a stínoherní objekty', parent_id: '33333333-3333-4333-8333-333333333333', sort_order: 60 },
+  { id: '33333333-3333-4333-8333-333333333339', slug: 'dekorativni-osvetleni', title: 'Dekorativní osvětlení', parent_id: '33333333-3333-4333-8333-333333333333', sort_order: 70 },
+  { id: '22222222-2222-4222-8222-222222222223', slug: 'stojanky-na-telefon', title: 'Stojánky na telefon', parent_id: '22222222-2222-4222-8222-222222222222', sort_order: 10 },
+  { id: '22222222-2222-4222-8222-222222222224', slug: 'krabicky', title: 'Krabičky', parent_id: '22222222-2222-4222-8222-222222222222', sort_order: 20 },
+  { id: '22222222-2222-4222-8222-222222222225', slug: 'kuchynska-prkenka', title: 'Kuchyňská prkénka', parent_id: '22222222-2222-4222-8222-222222222222', sort_order: 30 },
+  { id: '22222222-2222-4222-8222-222222222226', slug: 'dymky', title: 'Dýmky', parent_id: '22222222-2222-4222-8222-222222222222', sort_order: 40 },
+  { id: '22222222-2222-4222-8222-222222222227', slug: 'hrebeny', title: 'Hřebeny', parent_id: '22222222-2222-4222-8222-222222222222', sort_order: 50 },
+  { id: '22222222-2222-4222-8222-222222222228', slug: 'drevene-hracky', title: 'Dřevěné hračky', parent_id: '22222222-2222-4222-8222-222222222222', sort_order: 60 },
+  { id: '22222222-2222-4222-8222-222222222229', slug: 'personalizovane-darky', title: 'Personalizované dárky', parent_id: '22222222-2222-4222-8222-222222222222', sort_order: 70 },
+  { id: '22222222-2222-4222-8222-222222222230', slug: 'ostatni-drobne-vyrobky', title: 'Ostatní drobné výrobky', parent_id: '22222222-2222-4222-8222-222222222222', sort_order: 80 },
+  { id: '55555555-5555-4555-8555-555555555556', slug: 'drevena-loga', title: 'Dřevěná loga', parent_id: '55555555-5555-4555-8555-555555555555', sort_order: 10 },
+  { id: '55555555-5555-4555-8555-555555555557', slug: 'vizitky', title: 'Vizitky', parent_id: '55555555-5555-4555-8555-555555555555', sort_order: 20 },
+  { id: '55555555-5555-4555-8555-555555555558', slug: 'informacni-cedule', title: 'Informační cedule', parent_id: '55555555-5555-4555-8555-555555555555', sort_order: 30 },
+  { id: '55555555-5555-4555-8555-555555555559', slug: 'orientacni-systemy', title: 'Orientační systémy', parent_id: '55555555-5555-4555-8555-555555555555', sort_order: 40 },
+  { id: '66666666-6666-4666-8666-666666666667', slug: 'vyroba-podle-vaseho-navrhu', title: 'Výroba podle vašeho návrhu', parent_id: '66666666-6666-4666-8666-666666666666', sort_order: 10 },
+  { id: '66666666-6666-4666-8666-666666666668', slug: 'gravirovani-fotografie', title: 'Gravírování fotografie', parent_id: '66666666-6666-4666-8666-666666666666', sort_order: 20 },
+  { id: '66666666-6666-4666-8666-666666666669', slug: 'gravirovani-grafiky-nebo-loga', title: 'Gravírování grafiky nebo loga', parent_id: '66666666-6666-4666-8666-666666666666', sort_order: 30 },
+  { id: '66666666-6666-4666-8666-666666666670', slug: 'hudebni-nastroje', title: 'Hudební nástroje', parent_id: '66666666-6666-4666-8666-666666666666', sort_order: 40 },
+  { id: '77777777-7777-4777-8777-777777777777', slug: 'gravirovani-vasich-predmetu', title: 'Gravírování vašich předmětů', parent_id: '66666666-6666-4666-8666-666666666666', sort_order: 50 },
+  { id: '66666666-6666-4666-8666-666666666671', slug: 'individualni-navrh-vyrobku', title: 'Individuální návrh výrobku', parent_id: '66666666-6666-4666-8666-666666666666', sort_order: 60 }
 ];
 
 const DEFAULT_CMS_BLOG_CATEGORIES = [
@@ -117,6 +145,27 @@ const DEFAULT_CMS_BLOG_CATEGORIES = [
     title: 'Z dílny',
     description: 'Řemeslné postupy, materiály a pohled do zákulisí dílny.',
     sort_order: 40
+  },
+  {
+    id: '85555555-5555-4555-8555-555555555555',
+    slug: 'pribehy-vyrobku',
+    title: 'Příběhy výrobků',
+    description: 'Příběhy konkrétních výrobků, jejich dřeva, vzniku a místa, pro které byly vytvořeny.',
+    sort_order: 70
+  },
+  {
+    id: '86666666-6666-4666-8666-666666666666',
+    slug: 'drevo-a-priroda',
+    title: 'Dřevo a příroda',
+    description: 'Druhy dřeva, příroda, udržitelnost a vztah materiálu k místu.',
+    sort_order: 80
+  },
+  {
+    id: '87777777-7777-4777-8777-777777777777',
+    slug: 'pribeh-drevito',
+    title: 'Příběh Dřevito',
+    description: 'Příběh dílny, značky, autora a důležité události.',
+    sort_order: 90
   }
 ];
 
@@ -129,7 +178,10 @@ const DEFAULT_CMS_PRODUCTS = [
     short_description: 'Dřevěný čajový stoleček s vyřezávaným motivem.',
     description: 'Dřevěný čajový stoleček s vyřezávaným motivem.',
     price: 1790,
-    category_slug: 'engraved-furniture',
+    category_slug: 'cajove-stolky-a-oltarky',
+    wood_types: [],
+    availability: 'made_to_order',
+    use_context: ['interior'],
     external_url: 'https://drevito.t2.upgates.shop/p/stolecek-strom-zivota-slunecni-kruh',
     image: '/cajne-stolicky.JPG'
   },
@@ -141,7 +193,10 @@ const DEFAULT_CMS_PRODUCTS = [
     short_description: 'Dekorační tabulka s vyřezávaným motivem.',
     description: 'Dekorační tabulka s vyřezávaným motivem.',
     price: 1555,
-    category_slug: 'shadow-light',
+    category_slug: 'svicelenky-a-stinoherni-objekty',
+    wood_types: [],
+    availability: 'made_to_order',
+    use_context: ['interior'],
     external_url: 'https://drevito.t2.upgates.shop/p/svicelenka-osta',
     image: '/dekoracni-tabulka.JPG'
   },
@@ -153,7 +208,10 @@ const DEFAULT_CMS_PRODUCTS = [
     short_description: 'Zasouvací krabička z masivního dřeva.',
     description: 'Zasouvací krabička z masivního dřeva.',
     price: 1111,
-    category_slug: 'small-wood',
+    category_slug: 'krabicky',
+    wood_types: [],
+    availability: 'made_to_order',
+    use_context: ['interior'],
     external_url: 'https://drevito.t2.upgates.shop/p/krabicka-jin-jang',
     image: '/krabicka.JPG'
   },
@@ -165,7 +223,10 @@ const DEFAULT_CMS_PRODUCTS = [
     short_description: 'Dřevěná dekorace koně.',
     description: 'Dřevěná dekorace koně.',
     price: 0,
-    category_slug: 'decorations',
+    category_slug: 'zvirata-a-figuralni-motivy',
+    wood_types: [],
+    availability: 'made_to_order',
+    use_context: ['interior'],
     external_url: 'https://drevito.t2.upgates.shop/p/kun',
     image: '/kun-dekorace.JPG'
   },
@@ -177,7 +238,10 @@ const DEFAULT_CMS_PRODUCTS = [
     short_description: 'Dřevěná dekorace ženy.',
     description: 'Dřevěná dekorace ženy.',
     price: 0,
-    category_slug: 'decorations',
+    category_slug: 'zvirata-a-figuralni-motivy',
+    wood_types: [],
+    availability: 'made_to_order',
+    use_context: ['interior'],
     external_url: 'https://drevito.t2.upgates.shop/p/bohyne',
     image: '/dekorace-zena.JPG'
   },
@@ -189,7 +253,10 @@ const DEFAULT_CMS_PRODUCTS = [
     short_description: 'Stojan na telefon z masivního dřeva.',
     description: 'Stojan na telefon z masivního dřeva.',
     price: 2000,
-    category_slug: 'small-wood',
+    category_slug: 'stojanky-na-telefon',
+    wood_types: [],
+    availability: 'made_to_order',
+    use_context: ['interior'],
     external_url: 'https://drevito.t2.upgates.shop/p/vlk',
     image: '/stojan-na-telefon.JPG'
   },
@@ -201,7 +268,10 @@ const DEFAULT_CMS_PRODUCTS = [
     short_description: 'Dřevěná hračka autíčko.',
     description: 'Dřevěná hračka autíčko.',
     price: 0,
-    category_slug: 'small-wood',
+    category_slug: 'drevene-hracky',
+    wood_types: [],
+    availability: 'made_to_order',
+    use_context: ['interior'],
     external_url: 'https://drevito.t2.upgates.shop/p/lev-kvetinovych-ornamentech',
     image: '/hracka-auticko.JPG'
   }
@@ -613,6 +683,9 @@ function createEmptyCmsDb() {
     product_categories: [],
     products: [],
     product_category_links: [],
+    product_filters: [],
+    product_filter_options: [],
+    product_filter_value_links: [],
     blog_categories: [],
     blog_posts: [],
     blog_category_links: []
@@ -625,6 +698,9 @@ function shouldSeedDefaultCmsContent(db) {
     && db.product_categories.length === 0
     && db.products.length === 0
     && db.product_category_links.length === 0
+    && db.product_filters.length === 0
+    && db.product_filter_options.length === 0
+    && db.product_filter_value_links.length === 0
     && db.blog_categories.length === 0
     && db.blog_posts.length === 0
     && db.blog_category_links.length === 0;
@@ -640,9 +716,9 @@ function seedDefaultCmsContent(db) {
     id: category.id,
     title: category.title,
     slug: category.slug,
-    description: null,
+    description: category.description || null,
     image: null,
-    parent_id: null,
+    parent_id: category.parent_id || null,
     sort_order: category.sort_order,
     is_visible: true,
     archived_at: null,
@@ -666,6 +742,9 @@ function seedDefaultCmsContent(db) {
     }],
     price: product.price,
     external_url: product.external_url,
+    wood_types: product.wood_types || [],
+    availability: product.availability || null,
+    use_context: product.use_context || [],
     sort_order: (index + 1) * 10,
     is_visible: true,
     is_published: true,
@@ -709,12 +788,16 @@ function createDefaultBlogCategories(timestamp = nowIso()) {
 
 function normalizeCmsDb(db) {
   const normalized = db && typeof db === 'object' ? db : createEmptyCmsDb();
-  normalized.version = 1;
+  const previousVersion = Number(normalized.version || 1);
+  normalized.version = 4;
   normalized.seeded_defaults_at = normalized.seeded_defaults_at || null;
   normalized.site_content = Array.isArray(normalized.site_content) ? normalized.site_content : [];
   normalized.product_categories = Array.isArray(normalized.product_categories) ? normalized.product_categories : [];
   normalized.products = Array.isArray(normalized.products) ? normalized.products : [];
   normalized.product_category_links = Array.isArray(normalized.product_category_links) ? normalized.product_category_links : [];
+  normalized.product_filters = Array.isArray(normalized.product_filters) ? normalized.product_filters : [];
+  normalized.product_filter_options = Array.isArray(normalized.product_filter_options) ? normalized.product_filter_options : [];
+  normalized.product_filter_value_links = Array.isArray(normalized.product_filter_value_links) ? normalized.product_filter_value_links : [];
   normalized.blog_categories = Array.isArray(normalized.blog_categories) ? normalized.blog_categories : [];
   normalized.blog_posts = Array.isArray(normalized.blog_posts) ? normalized.blog_posts : [];
   normalized.blog_category_links = Array.isArray(normalized.blog_category_links) ? normalized.blog_category_links : [];
@@ -722,7 +805,81 @@ function normalizeCmsDb(db) {
   if (seeded.blog_categories.length === 0) {
     seeded.blog_categories = createDefaultBlogCategories();
   }
+  if (previousVersion < 3) upgradeLocalCmsTaxonomy(seeded);
   return seeded;
+}
+
+function upgradeLocalCmsTaxonomy(db) {
+  const productSlugReplacements = {
+    'engraved-furniture': 'rustikalni-nabytek',
+    'small-wood': 'darky-a-drobne-vyrobky',
+    'shadow-light': 'dekorace-svetla-a-stinohry',
+    promotion: 'informacni-a-propagacni-materialy',
+    'custom-graphics': 'zakazkova-vyroba-a-gravirovani-na-miru',
+    'engraving-items': 'gravirovani-vasich-predmetu',
+    decorations: 'ostatni-dekorace',
+    dekorace: 'ostatni-dekorace'
+  };
+  const defaultById = new Map(DEFAULT_CMS_PRODUCT_CATEGORIES.map((category) => [category.id, category]));
+  db.product_categories.forEach((category) => {
+    const replacementSlug = productSlugReplacements[category.slug];
+    const definition = defaultById.get(category.id) || DEFAULT_CMS_PRODUCT_CATEGORIES.find((item) => item.slug === replacementSlug);
+    if (!definition) return;
+    category.title = definition.title;
+    category.slug = definition.slug;
+    category.description = definition.description || category.description || null;
+    category.parent_id = definition.parent_id || null;
+    category.sort_order = definition.sort_order;
+    category.is_visible = true;
+    category.archived_at = null;
+    category.updated_at = nowIso();
+  });
+  const existingProductCategoryIds = new Set(db.product_categories.map((category) => category.id));
+  DEFAULT_CMS_PRODUCT_CATEGORIES.forEach((category) => {
+    if (existingProductCategoryIds.has(category.id) || db.product_categories.some((item) => item.slug === category.slug)) return;
+    db.product_categories.push(createLocalRow({
+      title: category.title,
+      slug: category.slug,
+      description: category.description || null,
+      image: null,
+      parent_id: category.parent_id || null,
+      sort_order: category.sort_order,
+      is_visible: true,
+      archived_at: null
+    }, category.id));
+  });
+  const categoryBySlug = new Map(db.product_categories.map((category) => [category.slug, category]));
+  const specificProductCategories = {
+    'cajne-stolicky': 'cajove-stolky-a-oltarky',
+    'dekoracni-tabulka': 'svicelenky-a-stinoherni-objekty',
+    krabicka: 'krabicky',
+    kun: 'zvirata-a-figuralni-motivy',
+    'dekorace-zena': 'zvirata-a-figuralni-motivy',
+    'stojan-na-telefon': 'stojanky-na-telefon',
+    'hracka-auticko': 'drevene-hracky'
+  };
+  db.products.forEach((product) => {
+    product.wood_types = Array.isArray(product.wood_types) ? product.wood_types : [];
+    product.availability = product.availability || 'made_to_order';
+    product.use_context = Array.isArray(product.use_context) && product.use_context.length ? product.use_context : ['interior'];
+    const category = categoryBySlug.get(specificProductCategories[product.slug]);
+    if (!category) return;
+    db.product_category_links = db.product_category_links.filter((link) => link.product_id !== product.id);
+    db.product_category_links.push({ product_id: product.id, category_id: category.id, sort_order: 0, created_at: nowIso() });
+  });
+  const existingBlogSlugs = new Set(db.blog_categories.map((category) => category.slug));
+  DEFAULT_CMS_BLOG_CATEGORIES.forEach((category) => {
+    if (existingBlogSlugs.has(category.slug)) return;
+    db.blog_categories.push(createLocalRow({
+      title: category.title,
+      slug: category.slug,
+      description: category.description,
+      image: null,
+      sort_order: category.sort_order,
+      is_visible: true,
+      archived_at: null
+    }, category.id));
+  });
 }
 
 function readCmsDb() {
@@ -730,10 +887,11 @@ function readCmsDb() {
   try {
     const raw = fs.readFileSync(CMS_DB_PATH, 'utf8');
     const parsed = JSON.parse(raw);
+    const previousVersion = Number(parsed.version || 1);
     const hadSeededDefaults = Boolean(parsed.seeded_defaults_at);
     const hadBlogCategories = Array.isArray(parsed.blog_categories) && parsed.blog_categories.length > 0;
     const normalized = normalizeCmsDb(parsed);
-    if ((!hadSeededDefaults && normalized.seeded_defaults_at) || (!hadBlogCategories && normalized.blog_categories.length)) {
+    if (previousVersion < normalized.version || (!hadSeededDefaults && normalized.seeded_defaults_at) || (!hadBlogCategories && normalized.blog_categories.length)) {
       writeCmsDb(normalized);
     }
     return normalized;
@@ -750,11 +908,11 @@ function writeCmsDb(db) {
   fs.writeFileSync(CMS_DB_PATH, `${JSON.stringify(normalizeCmsDb(db), null, 2)}\n`);
 }
 
-function createLocalRow(input) {
+function createLocalRow(input, id = '') {
   const timestamp = nowIso();
   return {
     ...input,
-    id: crypto.randomUUID(),
+    id: id || crypto.randomUUID(),
     created_at: timestamp,
     updated_at: timestamp
   };
@@ -1673,6 +1831,7 @@ function adminMasthead(session) {
       <div class="actions" style="margin:0;">
         <a class="button button--ghost" href="/admin/products">Výrobky</a>
         <a class="button button--ghost" href="/admin/product-categories">Kategorie výrobků</a>
+        <a class="button button--ghost" href="/admin/product-filters">Filtry výrobků</a>
         <a class="button button--ghost" href="/admin/blog-posts">Články blogu</a>
         <a class="button button--ghost" href="/admin/blog-categories">Kategorie blogu</a>
         <a class="button button--ghost" href="/admin/archive">Archiv</a>
@@ -1703,6 +1862,11 @@ function dashboardPage(session) {
             <span>Produkty</span>
             <strong>Kategorie výrobků</strong>
             <p>Spravovat hlavní kategorie, podkategorie a viditelnost v katalogu.</p>
+          </a>
+          <a class="admin-tool" href="/admin/product-filters">
+            <span>Produkty</span>
+            <strong>Filtry výrobků</strong>
+            <p>Vytvořit vlastní skupiny filtrů a jejich hodnoty pro katalog.</p>
           </a>
           <a class="admin-tool" href="/admin/blog-posts">
             <span>Blog</span>
@@ -2813,8 +2977,9 @@ function productCategoriesAdminPage(session) {
             <label>
               Patří pod
               <select id="category-parent-id" name="parent_id">
-                <option value="">Hlavní kategorie</option>
+                <option value="">Vytvořit hlavní kategorii</option>
               </select>
+              <span class="product-meta" id="category-parent-help">Hlavní kategorie se zobrazí přímo v hlavní nabídce výrobků.</span>
             </label>
             <label>
               Popis
@@ -2851,6 +3016,7 @@ function productCategoriesAdminPage(session) {
     <script>
     (function() {
       var categories = [];
+      var products = [];
       var editedId = '';
       var slugTouched = false;
       var form = document.getElementById('category-form');
@@ -2861,6 +3027,7 @@ function productCategoriesAdminPage(session) {
       var titleInput = document.getElementById('category-title');
       var slugInput = document.getElementById('category-slug');
       var parentInput = document.getElementById('category-parent-id');
+      var parentHelp = document.getElementById('category-parent-help');
       var descriptionInput = document.getElementById('category-description');
       var sortOrderInput = document.getElementById('category-sort-order');
       var visibleInput = document.getElementById('category-visible');
@@ -2935,12 +3102,21 @@ function productCategoriesAdminPage(session) {
       }
 
       function renderParentOptions(selectedId) {
-        var options = '<option value="">Hlavní kategorie</option>';
+        var options = '<option value="">Vytvořit hlavní kategorii</option>';
         categories.forEach(function(category) {
           if (category.id === editedId || category.parent_id) return;
-          options += '<option value="' + escapeHtml(category.id) + '"' + (category.id === selectedId ? ' selected' : '') + '>' + escapeHtml(category.title) + '</option>';
+          options += '<option value="' + escapeHtml(category.id) + '"' + (category.id === selectedId ? ' selected' : '') + '>Podkategorie v: ' + escapeHtml(category.title) + '</option>';
         });
         parentInput.innerHTML = options;
+        parentInput.value = selectedId || '';
+        updateParentHelp();
+      }
+
+      function updateParentHelp() {
+        var parent = categories.find(function(category) { return category.id === parentInput.value; });
+        parentHelp.textContent = parent
+          ? 'Tato kategorie bude uvnitř „' + parent.title + '“. Výrobky z ní se automaticky zobrazí také v hlavní kategorii „' + parent.title + '“.'
+          : 'Hlavní kategorie se zobrazí přímo v hlavní nabídce. Pod ni pak můžete přidávat podkategorie.';
       }
 
       function categoryTitle(categoryId) {
@@ -2978,6 +3154,14 @@ function productCategoriesAdminPage(session) {
         return '<div class="badges">' + badges.join('') + '</div>';
       }
 
+      function productsInCategory(category) {
+        var categoryIds = [category.id];
+        if (!category.parent_id) categories.forEach(function(child) { if (child.parent_id === category.id) categoryIds.push(child.id); });
+        return products.filter(function(product) {
+          return (product.category_ids || []).some(function(categoryId) { return categoryIds.indexOf(categoryId) !== -1; });
+        });
+      }
+
       function render() {
         if (!categories.length) {
           root.className = 'empty-state';
@@ -2993,13 +3177,16 @@ function productCategoriesAdminPage(session) {
             : '<div class="category-thumb category-thumb--empty">Bez obrázku</div>';
           var toggleLabel = category.is_visible ? 'Skrýt' : 'Zobrazit';
           var parentTitle = category.parent_id ? categoryTitle(category.parent_id) : '';
+          var assignedProducts = productsInCategory(category);
+          var productNames = assignedProducts.slice(0, 5).map(function(product) { return product.title; }).join(', ');
           var actionHtml = '<button class="button button--secondary button--small" type="button" data-action="toggle" data-id="' + escapeHtml(category.id) + '">' + toggleLabel + '</button>';
 
-          return '<article class="category-row">' +
+          return '<article class="category-row"' + (parentTitle ? ' style="margin-left:24px;border-left:4px solid #c9a96e;"' : '') + '>' +
             thumb +
             '<div class="category-main">' +
               '<div class="category-titleline"><strong>' + escapeHtml(category.title) + '</strong>' + statusBadges(category) + '</div>' +
               '<div class="category-meta">' + (parentTitle ? 'Podkategorie v: ' + escapeHtml(parentTitle) : 'Hlavní kategorie') + '</div>' +
+              '<div class="category-meta"><strong>' + assignedProducts.length + '</strong> výrobků' + (productNames ? ': ' + escapeHtml(productNames) + (assignedProducts.length > 5 ? '…' : '') : '') + '</div>' +
               (category.description ? '<p>' + escapeHtml(category.description) + '</p>' : '') +
               '<div class="category-actions">' +
                 '<button class="button button--small" type="button" data-action="edit" data-id="' + escapeHtml(category.id) + '">Upravit</button>' +
@@ -3022,8 +3209,9 @@ function productCategoriesAdminPage(session) {
       async function loadCategories() {
         root.className = 'empty-state';
         root.textContent = 'Načítám kategorie...';
-        var data = await requestJson('/admin/api/product-categories');
-        categories = (data.categories || []).filter(function(category) { return !category.archived_at; });
+        var results = await Promise.all([requestJson('/admin/api/product-categories'), requestJson('/admin/api/products')]);
+        categories = (results[0].categories || []).filter(function(category) { return !category.archived_at; });
+        products = (results[1].products || []).filter(function(product) { return !product.archived_at; });
         renderParentOptions(parentInput.value);
         render();
       }
@@ -3063,6 +3251,7 @@ function productCategoriesAdminPage(session) {
       titleInput.addEventListener('input', function() {
         if (!slugTouched) slugInput.value = slugify(titleInput.value);
       });
+      parentInput.addEventListener('change', updateParentHelp);
 
       slugInput.addEventListener('input', function() {
         slugTouched = true;
@@ -3399,6 +3588,65 @@ function blogCategoriesAdminPage(session) {
   `);
 }
 
+function productFiltersAdminPage(session) {
+  return adminLayout('Filtry výrobků', `
+    ${adminMasthead(session)}
+    <div class="content">
+      <h1>Vlastní filtry výrobků</h1>
+      <p>Nejdřív vytvořte skupinu filtru (např. <strong>Styl</strong>), potom její hodnoty (např. <strong>Rustikální</strong>, <strong>Moderní</strong>). Hodnoty pak přiřadíte výrobkům a návštěvník podle nich může filtrovat.</p>
+      <div id="filter-message" hidden></div>
+      <div class="category-layout">
+        <section class="category-panel">
+          <h2 id="filter-form-title">Nová skupina filtru</h2>
+          <form id="filter-form">
+            <input id="filter-id" type="hidden">
+            <label>Název skupiny<input id="filter-title" required placeholder="Např. Styl"></label>
+            <input id="filter-slug" type="hidden">
+            <label>Vysvětlení<textarea id="filter-description" placeholder="Co tímto filtrem zákazník vybírá"></textarea></label>
+            <label><span class="check-label"><input id="filter-visible" type="checkbox" checked> Zobrazit filtr na webu</span></label>
+            <div class="actions"><button class="button" type="submit">Uložit skupinu</button><button class="button button--secondary" id="filter-reset" type="button">Nová</button></div>
+          </form>
+          <hr style="margin:24px 0;border:0;border-top:1px solid var(--line)">
+          <h2 id="option-form-title">Nová hodnota</h2>
+          <form id="option-form">
+            <input id="option-id" type="hidden">
+            <label>Skupina filtru<select id="option-filter-id" required><option value="">Nejdřív vytvořte skupinu</option></select></label>
+            <label>Název hodnoty<input id="option-title" required placeholder="Např. Rustikální"></label>
+            <input id="option-slug" type="hidden">
+            <label><span class="check-label"><input id="option-visible" type="checkbox" checked> Nabízet tuto hodnotu na webu</span></label>
+            <div class="actions"><button class="button" type="submit">Uložit hodnotu</button><button class="button button--secondary" id="option-reset" type="button">Nová</button></div>
+          </form>
+        </section>
+        <section class="category-list"><h2>Vytvořené filtry</h2><div id="filters-root" class="empty-state">Načítám filtry…</div></section>
+      </div>
+    </div>
+    <script>
+    (function() {
+      var filters = [], editedFilterId = '', editedOptionId = '';
+      var message = document.getElementById('filter-message'), root = document.getElementById('filters-root');
+      function esc(v) { return String(v || '').replace(/[&<>"']/g, function(c) { return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]; }); }
+      function slug(v) { return String(v || '').normalize('NFD').replace(/[\\u0300-\\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, ''); }
+      function show(text, ok) { message.hidden = !text; message.className = ok ? 'success' : 'alert'; message.textContent = text || ''; }
+      async function request(url, options) { var response = await fetch(url, Object.assign({headers:{'Content-Type':'application/json',Accept:'application/json'}}, options || {})); var data = await response.json(); if (!response.ok) throw new Error(data.error || 'Požadavek se nepodařil.'); return data; }
+      function resetFilter() { editedFilterId = ''; document.getElementById('filter-form').reset(); document.getElementById('filter-visible').checked = true; document.getElementById('filter-form-title').textContent = 'Nová skupina filtru'; }
+      function resetOption() { editedOptionId = ''; document.getElementById('option-form').reset(); document.getElementById('option-visible').checked = true; document.getElementById('option-form-title').textContent = 'Nová hodnota'; renderSelect(); }
+      function renderSelect(selected) { document.getElementById('option-filter-id').innerHTML = '<option value="">Vyberte skupinu</option>' + filters.map(function(filter) { return '<option value="' + esc(filter.id) + '"' + (filter.id === selected ? ' selected' : '') + '>' + esc(filter.title) + '</option>'; }).join(''); }
+      function render() {
+        if (!filters.length) { root.className = 'empty-state'; root.textContent = 'Zatím nejsou vytvořené žádné vlastní filtry.'; return; }
+        root.className = ''; root.innerHTML = filters.map(function(filter) {
+          return '<article class="category-row"><div class="category-main"><div class="category-titleline"><strong>' + esc(filter.title) + '</strong><span class="badge ' + (filter.is_visible ? 'badge--ok' : 'badge--muted') + '">' + (filter.is_visible ? 'Na webu' : 'Skrytý') + '</span></div>' + (filter.description ? '<p>' + esc(filter.description) + '</p>' : '') + '<div class="category-actions"><button class="button button--small" data-edit-filter="' + esc(filter.id) + '">Upravit skupinu</button></div><div style="margin-top:14px"><strong>Hodnoty:</strong> ' + ((filter.options || []).length ? filter.options.map(function(option) { return '<button class="button button--secondary button--small" style="margin:4px" data-edit-option="' + esc(option.id) + '" data-filter-id="' + esc(filter.id) + '">' + esc(option.title) + (option.is_visible ? '' : ' (skrytá)') + '</button>'; }).join('') : '<span class="product-meta">zatím žádné</span>') + '</div></div></article>';
+        }).join('');
+      }
+      async function load() { var data = await request('/admin/api/product-filters'); filters = data.filters || []; renderSelect(); render(); }
+      document.getElementById('filter-form').addEventListener('submit', function(e) { e.preventDefault(); var body = {title:document.getElementById('filter-title').value.trim(),slug:slug(document.getElementById('filter-title').value),description:document.getElementById('filter-description').value.trim(),is_visible:document.getElementById('filter-visible').checked,sort_order:0}; request(editedFilterId ? '/admin/api/product-filters/' + editedFilterId : '/admin/api/product-filters', {method:editedFilterId?'PATCH':'POST',body:JSON.stringify(body)}).then(function(){show('Skupina filtru byla uložena.',true);resetFilter();return load();}).catch(function(error){show(error.message,false);}); });
+      document.getElementById('option-form').addEventListener('submit', function(e) { e.preventDefault(); var filterId=document.getElementById('option-filter-id').value; var body={title:document.getElementById('option-title').value.trim(),slug:slug(document.getElementById('option-title').value),is_visible:document.getElementById('option-visible').checked,sort_order:0}; request('/admin/api/product-filters/' + filterId + '/options' + (editedOptionId ? '/' + editedOptionId : ''), {method:editedOptionId?'PATCH':'POST',body:JSON.stringify(body)}).then(function(){show('Hodnota filtru byla uložena.',true);resetOption();return load();}).catch(function(error){show(error.message,false);}); });
+      root.addEventListener('click', function(e) { var filterButton=e.target.closest('[data-edit-filter]'), optionButton=e.target.closest('[data-edit-option]'); if(filterButton){var filter=filters.find(function(item){return item.id===filterButton.dataset.editFilter;});if(!filter)return;editedFilterId=filter.id;document.getElementById('filter-form-title').textContent='Upravit skupinu filtru';document.getElementById('filter-title').value=filter.title;document.getElementById('filter-description').value=filter.description||'';document.getElementById('filter-visible').checked=filter.is_visible;} if(optionButton){var filter=filters.find(function(item){return item.id===optionButton.dataset.filterId;}), option=filter&&(filter.options||[]).find(function(item){return item.id===optionButton.dataset.editOption;});if(!option)return;editedOptionId=option.id;document.getElementById('option-form-title').textContent='Upravit hodnotu';renderSelect(filter.id);document.getElementById('option-title').value=option.title;document.getElementById('option-visible').checked=option.is_visible;} });
+      document.getElementById('filter-reset').onclick=resetFilter; document.getElementById('option-reset').onclick=resetOption; load().catch(function(error){show(error.message,false);});
+    })();
+    </script>
+  `);
+}
+
 function productsAdminPage(session) {
   return adminLayout('Výrobky', `
     ${adminMasthead(session)}
@@ -3425,6 +3673,36 @@ function productsAdminPage(session) {
               Celý popis
               <textarea id="product-description" name="description"></textarea>
             </label>
+            <div class="form-grid">
+              <label>
+                Cena v Kč
+                <input id="product-price" name="price" type="number" min="0" step="1" placeholder="Nechte prázdné pro cenu na dotaz">
+              </label>
+              <label>
+                Dostupnost
+                <select id="product-availability" name="availability">
+                  <option value="">Neuvedeno</option>
+                  <option value="in_stock">Skladem</option>
+                  <option value="made_to_order">Na objednávku</option>
+                </select>
+              </label>
+            </div>
+            <label>
+              Druhy dřeva
+              <input id="product-wood-types" name="wood_types" placeholder="Např. dub, buk, jasan">
+              <span class="product-meta">Více druhů oddělte čárkou.</span>
+            </label>
+            <label>
+              Použití
+              <span class="category-checks">
+                <span class="check-label"><input id="product-use-interior" type="checkbox" value="interior"> Interiér</span>
+                <span class="check-label"><input id="product-use-exterior" type="checkbox" value="exterior"> Exteriér</span>
+              </span>
+            </label>
+            <label>
+              Odkaz do e-shopu
+              <input id="product-external-url" name="external_url" type="url" placeholder="https://…">
+            </label>
             <input id="product-sort-order" name="sort_order" type="hidden" value="0">
             <input id="product-published-at" name="published_at" type="hidden">
             <label>
@@ -3432,6 +3710,13 @@ function productsAdminPage(session) {
               <div class="category-checks" id="product-category-checks">
                 <span class="product-meta">Načítám kategorie...</span>
               </div>
+            </label>
+            <label>
+              Vlastní filtry
+              <div class="category-checks" id="product-filter-checks">
+                <span class="product-meta">Načítám filtry...</span>
+              </div>
+              <span class="product-meta">Nové skupiny a hodnoty vytvoříte ve <a href="/admin/product-filters">Správě filtrů</a>.</span>
             </label>
 
             <input id="product-photo-url" type="hidden">
@@ -3466,6 +3751,7 @@ function productsAdminPage(session) {
     (function() {
       var products = [];
       var categories = [];
+      var customFilters = [];
       var photos = [];
       var editedId = '';
       var slugTouched = false;
@@ -3479,9 +3765,16 @@ function productsAdminPage(session) {
       var slugInput = document.getElementById('product-slug');
       var shortDescriptionInput = document.getElementById('product-short-description');
       var descriptionInput = document.getElementById('product-description');
+      var priceInput = document.getElementById('product-price');
+      var availabilityInput = document.getElementById('product-availability');
+      var woodTypesInput = document.getElementById('product-wood-types');
+      var useInteriorInput = document.getElementById('product-use-interior');
+      var useExteriorInput = document.getElementById('product-use-exterior');
+      var externalUrlInput = document.getElementById('product-external-url');
       var sortOrderInput = document.getElementById('product-sort-order');
       var publishedAtInput = document.getElementById('product-published-at');
       var categoryChecks = document.getElementById('product-category-checks');
+      var filterChecks = document.getElementById('product-filter-checks');
       var photoUrlInput = document.getElementById('product-photo-url');
       var photoAltInput = document.getElementById('product-photo-alt');
       var photoMediaIdInput = document.getElementById('product-photo-media-id');
@@ -3526,14 +3819,24 @@ function productsAdminPage(session) {
           .map(function(input) { return input.value; });
       }
 
+      function selectedFilterOptionIds() {
+        return Array.prototype.slice.call(filterChecks.querySelectorAll('input[type="checkbox"]:checked')).map(function(input) { return input.value; });
+      }
+
       function currentPayload(publish) {
         return {
           title: titleInput.value.trim(),
           slug: slugInput.value.trim().toLowerCase(),
           short_description: shortDescriptionInput.value.trim(),
           description: descriptionInput.value.trim(),
+          price: priceInput.value,
+          availability: availabilityInput.value,
+          wood_types: woodTypesInput.value.split(',').map(function(value) { return value.trim(); }).filter(Boolean),
+          use_context: [useInteriorInput.checked ? 'interior' : '', useExteriorInput.checked ? 'exterior' : ''].filter(Boolean),
+          external_url: externalUrlInput.value.trim(),
           photos: photos,
           category_ids: selectedCategoryIds(),
+          filter_option_ids: selectedFilterOptionIds(),
           sort_order: sortOrderInput.value,
           is_visible: publish === true,
           is_published: publish === true,
@@ -3550,6 +3853,7 @@ function productsAdminPage(session) {
         form.reset();
         sortOrderInput.value = '0';
         renderCategoryChecks([]);
+        renderFilterChecks([]);
         renderPhotos();
         titleInput.focus();
       }
@@ -3564,9 +3868,16 @@ function productsAdminPage(session) {
         slugInput.value = product.slug || '';
         shortDescriptionInput.value = product.short_description || '';
         descriptionInput.value = product.description || '';
+        priceInput.value = product.price == null ? '' : product.price;
+        availabilityInput.value = product.availability || '';
+        woodTypesInput.value = Array.isArray(product.wood_types) ? product.wood_types.join(', ') : '';
+        useInteriorInput.checked = Array.isArray(product.use_context) && product.use_context.indexOf('interior') !== -1;
+        useExteriorInput.checked = Array.isArray(product.use_context) && product.use_context.indexOf('exterior') !== -1;
+        externalUrlInput.value = product.external_url || '';
         sortOrderInput.value = product.sort_order || 0;
         publishedAtInput.value = formatDateForInput(product.published_at);
         renderCategoryChecks(product.category_ids || []);
+        renderFilterChecks(product.filter_option_ids || []);
         renderPhotos();
         titleInput.focus();
       }
@@ -3586,6 +3897,19 @@ function productsAdminPage(session) {
             '<input type="checkbox" value="' + escapeHtml(category.id) + '"' + checked + '>' +
             escapeHtml(parent + category.title + muted) +
           '</label>';
+        }).join('');
+      }
+
+      function renderFilterChecks(selectedIds) {
+        if (!customFilters.length) {
+          filterChecks.innerHTML = '<span class="product-meta">Zatím nejsou vytvořené žádné vlastní filtry. <a href="/admin/product-filters">Vytvořit filtr</a></span>';
+          return;
+        }
+        filterChecks.innerHTML = customFilters.filter(function(filter) { return !filter.archived_at; }).map(function(filter) {
+          var options = (filter.options || []).filter(function(option) { return !option.archived_at; });
+          return '<div><strong>' + escapeHtml(filter.title) + '</strong>' + (options.length ? options.map(function(option) {
+            return '<label class="check-label"><input type="checkbox" value="' + escapeHtml(option.id) + '"' + (selectedIds.indexOf(option.id) !== -1 ? ' checked' : '') + '> ' + escapeHtml(option.title) + (option.is_visible ? '' : ' (skrytá)') + '</label>';
+          }).join('') : '<div class="product-meta">Bez hodnot.</div>') + '</div>';
         }).join('');
       }
 
@@ -3649,6 +3973,9 @@ function productsAdminPage(session) {
           var categoryText = product.categories && product.categories.length
             ? product.categories.map(function(category) { return category.title; }).join(', ')
             : 'Bez kategorie';
+          var filterText = product.filter_options && product.filter_options.length
+            ? product.filter_options.map(function(option) { return (option.filter ? option.filter.title + ': ' : '') + option.title; }).join(', ')
+            : '';
           var actionHtml = '<button class="button button--secondary button--small" type="button" data-action="hide" data-id="' + escapeHtml(product.id) + '">Skrýt</button>';
 
           return '<article class="product-row">' +
@@ -3656,6 +3983,8 @@ function productsAdminPage(session) {
             '<div class="product-main">' +
               '<div class="product-titleline"><strong>' + escapeHtml(product.title) + '</strong>' + statusBadges(product) + '</div>' +
               '<div class="product-meta">Kategorie: ' + escapeHtml(categoryText) + '</div>' +
+              (filterText ? '<div class="product-meta">Vlastní filtry: ' + escapeHtml(filterText) + '</div>' : '') +
+              '<div class="product-meta">' + escapeHtml(product.availability === 'in_stock' ? 'Skladem' : product.availability === 'made_to_order' ? 'Na objednávku' : 'Dostupnost neuvedena') + (product.price != null ? ' · ' + Number(product.price).toLocaleString('cs-CZ') + ' Kč' : ' · Cena na dotaz') + '</div>' +
               (product.short_description ? '<p>' + escapeHtml(product.short_description) + '</p>' : '') +
               '<div class="product-actions">' +
                 '<button class="button button--small" type="button" data-action="edit" data-id="' + escapeHtml(product.id) + '">Upravit</button>' +
@@ -3682,7 +4011,9 @@ function productsAdminPage(session) {
         var allProducts = data.products || [];
         products = allProducts.filter(function(product) { return !product.archived_at && product.is_published; });
         categories = (data.categories || []).filter(function(category) { return !category.archived_at; });
+        customFilters = data.filters || [];
         renderCategoryChecks(selectedCategoryIds());
+        renderFilterChecks(selectedFilterOptionIds());
         renderProducts();
         if (requestedEditId) {
           var requestedProduct = allProducts.find(function(product) { return product.id === requestedEditId && !product.archived_at; });
@@ -4599,6 +4930,117 @@ function ensureProductCategoryParentIsValid(categories, parentId, ownId = '') {
   }
 }
 
+function normalizeCustomFilterInput(input) {
+  const title = String(input.title || '').trim();
+  const slug = String(input.slug || '').trim().toLowerCase();
+  const description = String(input.description || '').trim();
+  const sortOrder = Number.parseInt(String(input.sort_order === undefined || input.sort_order === '' ? 0 : input.sort_order), 10);
+  const isVisible = input.is_visible === true || input.is_visible === 'true' || input.is_visible === 'on';
+  if (!title) throw new Error('Název filtru je povinný.');
+  if (!/^[a-z0-9][a-z0-9-]*$/.test(slug)) throw new Error('Název vytvořil neplatnou adresu filtru.');
+  if (!Number.isFinite(sortOrder)) throw new Error('Pořadí musí být číslo.');
+  return { title, slug, description: description || null, sort_order: sortOrder, is_visible: isVisible };
+}
+
+function normalizeCustomFilterOptionInput(input) {
+  const title = String(input.title || '').trim();
+  const slug = String(input.slug || '').trim().toLowerCase();
+  const sortOrder = Number.parseInt(String(input.sort_order === undefined || input.sort_order === '' ? 0 : input.sort_order), 10);
+  const isVisible = input.is_visible === true || input.is_visible === 'true' || input.is_visible === 'on';
+  if (!title) throw new Error('Název hodnoty je povinný.');
+  if (!/^[a-z0-9][a-z0-9-]*$/.test(slug)) throw new Error('Název vytvořil neplatnou adresu hodnoty.');
+  if (!Number.isFinite(sortOrder)) throw new Error('Pořadí musí být číslo.');
+  return { title, slug, sort_order: sortOrder, is_visible: isVisible };
+}
+
+function sortCustomFilters(filters) {
+  return [...filters].sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0) || String(a.title).localeCompare(String(b.title), 'cs'));
+}
+
+function attachFilterOptions(filters, options) {
+  return sortCustomFilters(filters).map((filter) => ({
+    ...filter,
+    options: sortCustomFilters(options.filter((option) => option.filter_id === filter.id))
+  }));
+}
+
+async function listProductFilters() {
+  if (!isSupabaseConfigured()) {
+    const db = readCmsDb();
+    return attachFilterOptions(db.product_filters, db.product_filter_options);
+  }
+  const [filters, options] = await Promise.all([
+    supabaseRequest('product_filters', { query: { select: 'id,title,slug,description,sort_order,is_visible,archived_at,created_at,updated_at', order: 'sort_order.asc,title.asc' } }),
+    supabaseRequest('product_filter_options', { query: { select: 'id,filter_id,title,slug,sort_order,is_visible,archived_at,created_at,updated_at', order: 'sort_order.asc,title.asc' } })
+  ]);
+  return attachFilterOptions(Array.isArray(filters) ? filters : [], Array.isArray(options) ? options : []);
+}
+
+async function createProductFilter(input) {
+  const filter = normalizeCustomFilterInput(input);
+  if (!isSupabaseConfigured()) {
+    const db = readCmsDb();
+    if (db.product_filters.some((item) => item.slug === filter.slug)) throw new Error('Filtr s tímto názvem už existuje.');
+    const created = createLocalRow({ ...filter, archived_at: null });
+    db.product_filters.push(created);
+    writeCmsDb(db);
+    return created;
+  }
+  const rows = await supabaseRequest('product_filters', { method: 'POST', body: filter, prefer: 'return=representation', query: { select: '*' } });
+  return Array.isArray(rows) ? rows[0] : rows;
+}
+
+async function updateProductFilter(id, input) {
+  assertUuid(id);
+  const filter = normalizeCustomFilterInput(input);
+  if (!isSupabaseConfigured()) {
+    const db = readCmsDb();
+    if (db.product_filters.some((item) => item.slug === filter.slug && item.id !== id)) throw new Error('Filtr s tímto názvem už existuje.');
+    const row = db.product_filters.find((item) => item.id === id);
+    if (!row) throw new Error('Filtr nebyl nalezen.');
+    updateLocalRow(row, filter);
+    writeCmsDb(db);
+    return row;
+  }
+  const rows = await supabaseRequest('product_filters', { method: 'PATCH', body: filter, prefer: 'return=representation', query: { id: `eq.${id}`, select: '*' } });
+  if (!Array.isArray(rows) || !rows.length) throw new Error('Filtr nebyl nalezen.');
+  return rows[0];
+}
+
+async function createProductFilterOption(filterId, input) {
+  assertUuid(filterId);
+  const option = { ...normalizeCustomFilterOptionInput(input), filter_id: filterId };
+  if (!isSupabaseConfigured()) {
+    const db = readCmsDb();
+    if (!db.product_filters.some((item) => item.id === filterId)) throw new Error('Filtr nebyl nalezen.');
+    if (db.product_filter_options.some((item) => item.filter_id === filterId && item.slug === option.slug)) throw new Error('Tato hodnota už ve filtru existuje.');
+    const created = createLocalRow({ ...option, archived_at: null });
+    db.product_filter_options.push(created);
+    writeCmsDb(db);
+    return created;
+  }
+  const rows = await supabaseRequest('product_filter_options', { method: 'POST', body: option, prefer: 'return=representation', query: { select: '*' } });
+  return Array.isArray(rows) ? rows[0] : rows;
+}
+
+async function updateProductFilterOption(filterId, optionId, input) {
+  assertUuid(filterId);
+  assertUuid(optionId);
+  const option = normalizeCustomFilterOptionInput(input);
+  if (!isSupabaseConfigured()) {
+    const db = readCmsDb();
+    if (db.product_filter_options.some((item) => item.filter_id === filterId && item.slug === option.slug && item.id !== optionId)) throw new Error('Tato hodnota už ve filtru existuje.');
+    const row = db.product_filter_options.find((item) => item.id === optionId && item.filter_id === filterId);
+    if (!row) throw new Error('Hodnota filtru nebyla nalezena.');
+    updateLocalRow(row, option);
+    writeCmsDb(db);
+    return row;
+  }
+  const rows = await supabaseRequest('product_filter_options', { method: 'PATCH', body: option, prefer: 'return=representation', query: { id: `eq.${optionId}`, filter_id: `eq.${filterId}`, select: '*' } });
+  if (!Array.isArray(rows) || !rows.length) throw new Error('Hodnota filtru nebyla nalezena.');
+  return rows[0];
+}
+
 async function listProductCategories() {
   if (!isSupabaseConfigured()) return sortProductCategories(readCmsDb().product_categories);
   const rows = await supabaseRequest('product_categories', {
@@ -4951,6 +5393,28 @@ function normalizeCategoryIds(input) {
   return uniqueIds;
 }
 
+function normalizeProductTextList(input) {
+  const values = Array.isArray(input) ? input : String(input || '').split(',');
+  return values.reduce((result, item) => {
+    const value = String(item || '').trim();
+    if (value && !result.some((existing) => existing.toLocaleLowerCase('cs') === value.toLocaleLowerCase('cs'))) result.push(value);
+    return result;
+  }, []);
+}
+
+function normalizeExternalUrl(value) {
+  const raw = String(value || '').trim();
+  if (!raw) return null;
+  let parsed;
+  try {
+    parsed = new URL(raw);
+  } catch (error) {
+    throw new Error('Odkaz do e-shopu musí začínat http:// nebo https://.');
+  }
+  if (!['http:', 'https:'].includes(parsed.protocol)) throw new Error('Odkaz do e-shopu musí začínat http:// nebo https://.');
+  return raw;
+}
+
 function normalizeProductInput(input) {
   const title = String(input.title || '').trim();
   const slug = String(input.slug || '').trim().toLowerCase();
@@ -4960,6 +5424,11 @@ function normalizeProductInput(input) {
   const sortOrder = Number.parseInt(sortOrderRaw === undefined || sortOrderRaw === '' ? '0' : String(sortOrderRaw), 10);
   const isVisible = input.is_visible === true || input.is_visible === 'true' || input.is_visible === 'on';
   const isPublished = input.is_published === true || input.is_published === 'true' || input.is_published === 'on';
+  const priceRaw = input.price === undefined || input.price === null ? '' : String(input.price).trim();
+  const price = priceRaw === '' ? null : Number(priceRaw.replace(',', '.'));
+  const availability = String(input.availability || '').trim();
+  const woodTypes = normalizeProductTextList(input.wood_types || input.woodTypes);
+  const useContext = normalizeProductTextList(input.use_context || input.useContext).map((value) => value.toLowerCase());
 
   if (!title) throw new Error('Název výrobku je povinný.');
   if (!slug) throw new Error('Název je povinný.');
@@ -4967,6 +5436,9 @@ function normalizeProductInput(input) {
     throw new Error('Název vytvořil neplatnou adresu. Upravte prosím název.');
   }
   if (!Number.isFinite(sortOrder)) throw new Error('Pořadí musí být číslo.');
+  if (price !== null && (!Number.isFinite(price) || price < 0)) throw new Error('Cena musí být nezáporné číslo.');
+  if (availability && !['in_stock', 'made_to_order'].includes(availability)) throw new Error('Vyberte platnou dostupnost.');
+  if (useContext.some((value) => !['interior', 'exterior'].includes(value))) throw new Error('Použití může být pouze interiér nebo exteriér.');
 
   return {
     product: {
@@ -4975,12 +5447,18 @@ function normalizeProductInput(input) {
       short_description: shortDescription || null,
       description: description || null,
       photos: normalizeProductPhotos(input.photos),
+      price,
+      external_url: normalizeExternalUrl(input.external_url || input.externalUrl),
+      wood_types: woodTypes,
+      availability: availability || null,
+      use_context: useContext,
       sort_order: sortOrder,
       is_visible: isVisible,
       is_published: isPublished,
       published_at: normalizePublishedAt(input.published_at || input.publishedAt, isPublished)
     },
-    categoryIds: normalizeCategoryIds(input.category_ids || input.categoryIds)
+    categoryIds: normalizeCategoryIds(input.category_ids || input.categoryIds),
+    filterOptionIds: normalizeCategoryIds(input.filter_option_ids || input.filterOptionIds)
   };
 }
 
@@ -5016,18 +5494,37 @@ function attachProductCategories(products, categories, links) {
   });
 }
 
+function attachProductFilterOptions(products, filters, options, links) {
+  const filterMap = new Map(filters.map((filter) => [filter.id, filter]));
+  const optionMap = new Map(options.map((option) => [option.id, option]));
+  const linksByProduct = new Map();
+  links.forEach((link) => {
+    if (!linksByProduct.has(link.product_id)) linksByProduct.set(link.product_id, []);
+    linksByProduct.get(link.product_id).push(link);
+  });
+  return products.map((product) => {
+    const productOptions = (linksByProduct.get(product.id) || []).map((link) => optionMap.get(link.option_id)).filter(Boolean).map((option) => ({
+      ...option,
+      filter: filterMap.get(option.filter_id) || null
+    }));
+    return { ...product, filter_option_ids: productOptions.map((option) => option.id), filter_options: productOptions };
+  });
+}
+
 async function listProducts() {
   if (!isSupabaseConfigured()) {
     const db = readCmsDb();
+    const products = attachProductCategories(db.products, db.product_categories, db.product_category_links);
     return {
-      products: sortProducts(attachProductCategories(db.products, db.product_categories, db.product_category_links)),
-      categories: sortProductCategories(db.product_categories)
+      products: sortProducts(attachProductFilterOptions(products, db.product_filters, db.product_filter_options, db.product_filter_value_links)),
+      categories: sortProductCategories(db.product_categories),
+      filters: attachFilterOptions(db.product_filters, db.product_filter_options)
     };
   }
-  const [products, categories, links] = await Promise.all([
+  const [products, categories, links, filters, filterOptions, filterLinks] = await Promise.all([
     supabaseRequest('products', {
       query: {
-        select: 'id,title,slug,short_description,description,photos,sort_order,is_visible,is_published,published_at,archived_at,created_at,updated_at',
+        select: 'id,title,slug,short_description,description,photos,price,external_url,wood_types,availability,use_context,sort_order,is_visible,is_published,published_at,archived_at,created_at,updated_at',
         order: 'sort_order.asc,title.asc'
       }
     }),
@@ -5042,15 +5539,20 @@ async function listProducts() {
         select: 'product_id,category_id,sort_order',
         order: 'sort_order.asc'
       }
-    })
+    }),
+    supabaseRequest('product_filters', { query: { select: 'id,title,slug,description,sort_order,is_visible,archived_at', order: 'sort_order.asc,title.asc' } }),
+    supabaseRequest('product_filter_options', { query: { select: 'id,filter_id,title,slug,sort_order,is_visible,archived_at', order: 'sort_order.asc,title.asc' } }),
+    supabaseRequest('product_filter_value_links', { query: { select: 'product_id,option_id' } })
   ]);
+  const categorizedProducts = attachProductCategories(
+    Array.isArray(products) ? products : [],
+    Array.isArray(categories) ? categories : [],
+    Array.isArray(links) ? links : []
+  );
   return {
-    products: sortProducts(attachProductCategories(
-      Array.isArray(products) ? products : [],
-      Array.isArray(categories) ? categories : [],
-      Array.isArray(links) ? links : []
-    )),
-    categories: sortProductCategories(Array.isArray(categories) ? categories : [])
+    products: sortProducts(attachProductFilterOptions(categorizedProducts, Array.isArray(filters) ? filters : [], Array.isArray(filterOptions) ? filterOptions : [], Array.isArray(filterLinks) ? filterLinks : [])),
+    categories: sortProductCategories(Array.isArray(categories) ? categories : []),
+    filters: attachFilterOptions(Array.isArray(filters) ? filters : [], Array.isArray(filterOptions) ? filterOptions : [])
   };
 }
 
@@ -5089,6 +5591,18 @@ async function replaceProductCategoryLinks(productId, categoryIds) {
   });
 }
 
+async function replaceProductFilterLinks(productId, optionIds) {
+  assertUuid(productId);
+  if (!isSupabaseConfigured()) return;
+  await supabaseRequest('product_filter_value_links', { method: 'DELETE', query: { product_id: `eq.${productId}` } });
+  if (!optionIds.length) return;
+  await supabaseRequest('product_filter_value_links', {
+    method: 'POST',
+    body: optionIds.map((optionId) => ({ product_id: productId, option_id: optionId })),
+    prefer: 'return=minimal'
+  });
+}
+
 async function getProductById(id) {
   assertUuid(id);
   const { products } = await listProducts();
@@ -5098,7 +5612,7 @@ async function getProductById(id) {
 }
 
 async function createProduct(input) {
-  const { product, categoryIds } = normalizeProductInput(input);
+  const { product, categoryIds, filterOptionIds } = normalizeProductInput(input);
   await assertProductSlugUnique(product.slug);
   if (!isSupabaseConfigured()) {
     const db = readCmsDb();
@@ -5106,6 +5620,9 @@ async function createProduct(input) {
       if (!db.product_categories.some((category) => category.id === categoryId)) {
         throw new Error('Vybraná kategorie nebyla nalezena.');
       }
+    });
+    filterOptionIds.forEach((optionId) => {
+      if (!db.product_filter_options.some((option) => option.id === optionId)) throw new Error('Vybraná hodnota filtru nebyla nalezena.');
     });
     const created = createLocalRow(product);
     db.products.push(created);
@@ -5117,6 +5634,7 @@ async function createProduct(input) {
         sort_order: index,
         created_at: nowIso()
       })));
+    db.product_filter_value_links = db.product_filter_value_links.filter((link) => link.product_id !== created.id).concat(filterOptionIds.map((optionId) => ({ product_id: created.id, option_id: optionId, created_at: nowIso() })));
     writeCmsDb(db);
     return getProductById(created.id);
   }
@@ -5124,17 +5642,18 @@ async function createProduct(input) {
     method: 'POST',
     body: product,
     prefer: 'return=representation',
-    query: { select: 'id,title,slug,short_description,description,photos,sort_order,is_visible,is_published,published_at,archived_at,created_at,updated_at' }
+    query: { select: 'id,title,slug,short_description,description,photos,price,external_url,wood_types,availability,use_context,sort_order,is_visible,is_published,published_at,archived_at,created_at,updated_at' }
   });
   const created = Array.isArray(rows) ? rows[0] : rows;
   if (!created || !created.id) throw new Error('Výrobek se nepodařilo vytvořit.');
   await replaceProductCategoryLinks(created.id, categoryIds);
+  await replaceProductFilterLinks(created.id, filterOptionIds);
   return getProductById(created.id);
 }
 
 async function updateProduct(id, input) {
   assertUuid(id);
-  const { product, categoryIds } = normalizeProductInput(input);
+  const { product, categoryIds, filterOptionIds } = normalizeProductInput(input);
   await assertProductSlugUnique(product.slug, id);
   if (!isSupabaseConfigured()) {
     const db = readCmsDb();
@@ -5145,6 +5664,9 @@ async function updateProduct(id, input) {
         throw new Error('Vybraná kategorie nebyla nalezena.');
       }
     });
+    filterOptionIds.forEach((optionId) => {
+      if (!db.product_filter_options.some((option) => option.id === optionId)) throw new Error('Vybraná hodnota filtru nebyla nalezena.');
+    });
     updateLocalRow(row, product);
     db.product_category_links = db.product_category_links
       .filter((link) => link.product_id !== id)
@@ -5154,6 +5676,7 @@ async function updateProduct(id, input) {
         sort_order: index,
         created_at: nowIso()
       })));
+    db.product_filter_value_links = db.product_filter_value_links.filter((link) => link.product_id !== id).concat(filterOptionIds.map((optionId) => ({ product_id: id, option_id: optionId, created_at: nowIso() })));
     writeCmsDb(db);
     return getProductById(id);
   }
@@ -5161,13 +5684,14 @@ async function updateProduct(id, input) {
     method: 'PATCH',
     query: {
       id: `eq.${id}`,
-      select: 'id,title,slug,short_description,description,photos,sort_order,is_visible,is_published,published_at,archived_at,created_at,updated_at'
+      select: 'id,title,slug,short_description,description,photos,price,external_url,wood_types,availability,use_context,sort_order,is_visible,is_published,published_at,archived_at,created_at,updated_at'
     },
     body: product,
     prefer: 'return=representation'
   });
   if (!Array.isArray(rows) || !rows.length) throw new Error('Výrobek nebyl nalezen.');
   await replaceProductCategoryLinks(id, categoryIds);
+  await replaceProductFilterLinks(id, filterOptionIds);
   return getProductById(id);
 }
 
@@ -5185,7 +5709,7 @@ async function archiveProduct(id) {
     method: 'PATCH',
     query: {
       id: `eq.${id}`,
-      select: 'id,title,slug,short_description,description,photos,sort_order,is_visible,is_published,published_at,archived_at,created_at,updated_at'
+      select: 'id,title,slug,short_description,description,photos,price,external_url,wood_types,availability,use_context,sort_order,is_visible,is_published,published_at,archived_at,created_at,updated_at'
     },
     body: {
       is_visible: false,
@@ -5213,7 +5737,7 @@ async function restoreProduct(id) {
     method: 'PATCH',
     query: {
       id: `eq.${id}`,
-      select: 'id,title,slug,short_description,description,photos,sort_order,is_visible,is_published,published_at,archived_at,created_at,updated_at'
+      select: 'id,title,slug,short_description,description,photos,price,external_url,wood_types,availability,use_context,sort_order,is_visible,is_published,published_at,archived_at,created_at,updated_at'
     },
     body: {
       archived_at: null
@@ -5790,6 +6314,9 @@ async function getPublicCmsPayload(locale = 'cs') {
       productRows: db.products,
       productCategoryRows: db.product_categories,
       productLinkRows: db.product_category_links,
+      productFilterRows: db.product_filters,
+      productFilterOptionRows: db.product_filter_options,
+      productFilterLinkRows: db.product_filter_value_links,
       blogPostRows: db.blog_posts,
       blogCategoryRows: db.blog_categories,
       blogLinkRows: db.blog_category_links
@@ -5800,7 +6327,7 @@ async function getPublicCmsPayload(locale = 'cs') {
       || publicRows.blogPostRows.length
       || publicRows.blogCategoryRows.length;
     if (!hasAnyContent) {
-      return { ok: true, configured: false, locale, site_content: {}, products: [], product_categories: [], blog_posts: [], blog_categories: [] };
+      return { ok: true, configured: false, locale, site_content: {}, products: [], product_categories: [], product_filters: [], blog_posts: [], blog_categories: [] };
     }
     return buildPublicCmsPayload(locale, publicRows, new Map());
   }
@@ -5812,7 +6339,10 @@ async function getPublicCmsPayload(locale = 'cs') {
     productLinkRows,
     blogPostRows,
     blogCategoryRows,
-    blogLinkRows
+    blogLinkRows,
+    productFilterRows,
+    productFilterOptionRows,
+    productFilterLinkRows
   ] = await Promise.all([
     supabaseRequest('site_content', {
       query: {
@@ -5822,7 +6352,7 @@ async function getPublicCmsPayload(locale = 'cs') {
     }),
     supabaseRequest('products', {
       query: {
-        select: 'id,title,slug,short_description,description,photos,sort_order,is_visible,is_published,published_at,archived_at,updated_at',
+        select: 'id,title,slug,short_description,description,photos,price,external_url,wood_types,availability,use_context,sort_order,is_visible,is_published,published_at,archived_at,updated_at',
         order: 'sort_order.asc,title.asc'
       }
     }),
@@ -5855,7 +6385,10 @@ async function getPublicCmsPayload(locale = 'cs') {
         select: 'blog_post_id,category_id,sort_order',
         order: 'sort_order.asc'
       }
-    })
+    }),
+    supabaseRequest('product_filters', { query: { select: 'id,title,slug,description,sort_order,is_visible,archived_at', order: 'sort_order.asc,title.asc' } }),
+    supabaseRequest('product_filter_options', { query: { select: 'id,filter_id,title,slug,sort_order,is_visible,archived_at', order: 'sort_order.asc,title.asc' } }),
+    supabaseRequest('product_filter_value_links', { query: { select: 'product_id,option_id' } })
   ]);
 
   return buildPublicCmsPayload(locale, {
@@ -5865,7 +6398,10 @@ async function getPublicCmsPayload(locale = 'cs') {
     productLinkRows,
     blogPostRows,
     blogCategoryRows,
-    blogLinkRows
+    blogLinkRows,
+    productFilterRows,
+    productFilterOptionRows,
+    productFilterLinkRows
   });
 }
 
@@ -5877,13 +6413,20 @@ async function buildPublicCmsPayload(locale, rows, givenMediaMap) {
     productLinkRows,
     blogPostRows,
     blogCategoryRows,
-    blogLinkRows
+    blogLinkRows,
+    productFilterRows,
+    productFilterOptionRows,
+    productFilterLinkRows
   } = rows;
   const siteContent = sortSiteContent((Array.isArray(siteContentRows) ? siteContentRows : []).filter((item) => isPublicSiteContentItem(item, locale)));
   const products = sortProducts((Array.isArray(productRows) ? productRows : []).filter(isPublicProduct));
   const productCategories = sortProductCategories((Array.isArray(productCategoryRows) ? productCategoryRows : []).filter(isPublicProductCategory));
   const blogPosts = sortBlogPosts((Array.isArray(blogPostRows) ? blogPostRows : []).filter(isPublicBlogPost));
   const blogCategories = sortBlogCategories((Array.isArray(blogCategoryRows) ? blogCategoryRows : []).filter(isPublicBlogCategory));
+  const productFilters = sortCustomFilters((Array.isArray(productFilterRows) ? productFilterRows : []).filter(isPublicProductCategory));
+  const publicFilterIds = new Set(productFilters.map((filter) => filter.id));
+  const productFilterOptions = sortCustomFilters((Array.isArray(productFilterOptionRows) ? productFilterOptionRows : []).filter((option) => isPublicProductCategory(option) && publicFilterIds.has(option.filter_id)));
+  const publicOptionIds = new Set(productFilterOptions.map((option) => option.id));
   const publicProductIds = new Set(products.map((product) => product.id));
   const publicProductCategoryIds = new Set(productCategories.map((category) => category.id));
   const publicBlogPostIds = new Set(blogPosts.map((post) => post.id));
@@ -5894,6 +6437,7 @@ async function buildPublicCmsPayload(locale, rows, givenMediaMap) {
   const blogLinks = (Array.isArray(blogLinkRows) ? blogLinkRows : []).filter((link) => (
     publicBlogPostIds.has(link.blog_post_id) && publicBlogCategoryIds.has(link.category_id)
   ));
+  const productFilterLinks = (Array.isArray(productFilterLinkRows) ? productFilterLinkRows : []).filter((link) => publicProductIds.has(link.product_id) && publicOptionIds.has(link.option_id));
 
   const mediaIds = new Set();
   siteContent.forEach((item) => collectMediaIdsFromSiteValue(mediaIds, item.content_type, item.value));
@@ -5931,6 +6475,12 @@ async function buildPublicCmsPayload(locale, rows, givenMediaMap) {
     if (!blogLinksByPost.has(link.blog_post_id)) blogLinksByPost.set(link.blog_post_id, []);
     blogLinksByPost.get(link.blog_post_id).push(link);
   });
+  const filterOptionMap = new Map(productFilterOptions.map((option) => [option.id, option]));
+  const productFilterLinksByProduct = new Map();
+  productFilterLinks.forEach((link) => {
+    if (!productFilterLinksByProduct.has(link.product_id)) productFilterLinksByProduct.set(link.product_id, []);
+    productFilterLinksByProduct.get(link.product_id).push(link);
+  });
 
   const publicProducts = products.map((product) => {
     const photos = hydratePublicPhotos(product.photos, mediaMap);
@@ -5938,6 +6488,7 @@ async function buildPublicCmsPayload(locale, rows, givenMediaMap) {
       .sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0))
       .map((link) => productCategoryMap.get(link.category_id))
       .filter(Boolean);
+    const filterOptions = (productFilterLinksByProduct.get(product.id) || []).map((link) => filterOptionMap.get(link.option_id)).filter(Boolean).map((option) => ({ id: option.id, filter_id: option.filter_id, title: option.title, slug: option.slug }));
     return {
       id: product.id,
       title: product.title,
@@ -5946,9 +6497,13 @@ async function buildPublicCmsPayload(locale, rows, givenMediaMap) {
       description: product.description || '',
       price: Number.isFinite(Number(product.price)) ? Number(product.price) : 0,
       url: product.external_url || product.url || '',
+      wood_types: Array.isArray(product.wood_types) ? product.wood_types : [],
+      availability: product.availability || '',
+      use_context: Array.isArray(product.use_context) ? product.use_context : [],
       photos,
       featured_image: photos[0] || null,
       categories,
+      filter_options: filterOptions,
       published_at: product.published_at || null,
       updated_at: product.updated_at || null
     };
@@ -5998,6 +6553,7 @@ async function buildPublicCmsPayload(locale, rows, givenMediaMap) {
     site_content: publicSiteContent,
     products: publicProducts,
     product_categories: [...productCategoryMap.values()],
+    product_filters: attachFilterOptions(productFilters, productFilterOptions).map((filter) => ({ id: filter.id, title: filter.title, slug: filter.slug, description: filter.description || '', sort_order: filter.sort_order || 0, options: filter.options.map((option) => ({ id: option.id, title: option.title, slug: option.slug, sort_order: option.sort_order || 0 })) })),
     blog_posts: publicBlogPosts,
     blog_categories: [...blogCategoryMap.values()]
   };
@@ -6741,6 +7297,10 @@ function serveStatic(req, res, pathname) {
   });
 }
 
+function isPublicProductsRoute(pathname) {
+  return /^\/vyrobky(?:\/[a-z0-9-]+){0,2}\/?$/.test(pathname);
+}
+
 async function handleAdmin(req, res, url) {
   const session = getSession(req);
 
@@ -6977,6 +7537,38 @@ async function handleAdmin(req, res, url) {
         'Cache-Control': 'no-store'
       });
     }
+    return;
+  }
+
+  if (url.pathname === '/admin/api/product-filters' && req.method === 'GET') {
+    try { sendJson(res, 200, { ok: true, filters: await listProductFilters() }, { 'Cache-Control': 'no-store' }); }
+    catch (error) { sendJson(res, error.statusCode || 500, { ok: false, error: normalizeSupabaseError(error) }, { 'Cache-Control': 'no-store' }); }
+    return;
+  }
+
+  if (url.pathname === '/admin/api/product-filters' && req.method === 'POST') {
+    try { sendJson(res, 201, { ok: true, filter: await createProductFilter(await parseJsonBody(req)) }, { 'Cache-Control': 'no-store' }); }
+    catch (error) { sendJson(res, error.statusCode || 400, { ok: false, error: normalizeSupabaseError(error) }, { 'Cache-Control': 'no-store' }); }
+    return;
+  }
+
+  const productFilterMatch = url.pathname.match(/^\/admin\/api\/product-filters\/([^/]+)$/);
+  if (productFilterMatch && req.method === 'PATCH') {
+    try { sendJson(res, 200, { ok: true, filter: await updateProductFilter(decodeURIComponent(productFilterMatch[1]), await parseJsonBody(req)) }, { 'Cache-Control': 'no-store' }); }
+    catch (error) { sendJson(res, error.statusCode || 400, { ok: false, error: normalizeSupabaseError(error) }, { 'Cache-Control': 'no-store' }); }
+    return;
+  }
+
+  const productFilterOptionMatch = url.pathname.match(/^\/admin\/api\/product-filters\/([^/]+)\/options(?:\/([^/]+))?$/);
+  if (productFilterOptionMatch && (req.method === 'POST' || req.method === 'PATCH')) {
+    try {
+      const filterId = decodeURIComponent(productFilterOptionMatch[1]);
+      const input = await parseJsonBody(req);
+      const option = req.method === 'POST'
+        ? await createProductFilterOption(filterId, input)
+        : await updateProductFilterOption(filterId, decodeURIComponent(productFilterOptionMatch[2]), input);
+      sendJson(res, req.method === 'POST' ? 201 : 200, { ok: true, option }, { 'Cache-Control': 'no-store' });
+    } catch (error) { sendJson(res, error.statusCode || 400, { ok: false, error: normalizeSupabaseError(error) }, { 'Cache-Control': 'no-store' }); }
     return;
   }
 
@@ -7251,6 +7843,11 @@ async function handleAdmin(req, res, url) {
     return;
   }
 
+  if (url.pathname === '/admin/product-filters' && req.method === 'GET') {
+    send(res, 200, productFiltersAdminPage(session), { 'Cache-Control': 'no-store' });
+    return;
+  }
+
   if (url.pathname === '/admin/products' && req.method === 'GET') {
     send(res, 200, productsAdminPage(session), {
       'Cache-Control': 'no-store'
@@ -7337,7 +7934,7 @@ function handleRequest(req, res) {
 
   handlePublicBlogRoute(req, res, url)
     .then((handled) => {
-      if (!handled) serveStatic(req, res, url.pathname);
+      if (!handled) serveStatic(req, res, isPublicProductsRoute(url.pathname) ? '/index.html' : url.pathname);
     })
     .catch((error) => {
       console.error(error);

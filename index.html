@@ -71,39 +71,14 @@
         }
         .nav__logo {
             display: flex;
-            align-items: flex-start;
-            align-self: stretch;
-            gap: 0.625rem;
+            align-items: center;
             text-decoration: none;
-            color: var(--color-primary);
-            font-family: var(--font-display);
-            font-size: 1.25rem;
-            font-weight: 500;
-            min-width: 214px;
-            position: relative;
-        }
-        .nav__logo::before {
-            content: '';
-            position: absolute;
-            top: -0.75rem;
-            left: -2rem;
-            width: 214px;
-            height: 214px;
-            background: rgba(218, 190, 125, 0.96);
-            border: 1px solid rgba(61, 43, 31, 0.12);
-            border-radius: 50%;
-            box-shadow: 0 10px 22px rgba(42, 31, 22, 0.12);
-            pointer-events: none;
+            min-width: 84px;
         }
         .nav__logo img {
             display: block;
             width: auto;
-            height: 166px;
-            margin-top: 0.375rem;
-            background: transparent;
-            filter: drop-shadow(0 5px 10px rgba(42, 31, 22, 0.2));
-            position: relative;
-            z-index: 1;
+            height: 84px;
         }
         .nav__links {
             display: flex;
@@ -266,9 +241,8 @@
         }
         @media (max-width: 768px) {
             .nav__inner { padding: 0 1.25rem; }
-            .nav__logo { min-width: 142px; }
-            .nav__logo::before { top: -0.5rem; left: -1.25rem; width: 158px; height: 158px; }
-            .nav__logo img { height: 124px; margin-top: 0.5rem; }
+            .nav__logo { min-width: 76px; }
+            .nav__logo img { height: 76px; }
             .nav__links { display: none; }
             .nav__dropdown { display: block; }
         }
@@ -860,7 +834,7 @@
     <nav class="nav">
         <div class="nav__inner">
             <a href="#" class="nav__logo">
-                <img src="drevito-logo-transparent-black.png" alt="Dřevito">
+                <img src="logo.jpg" alt="Dřevito">
             </a>
             <div class="nav__links">
                 <a href="#about" class="nav__link" data-copy-key="nav.about">O nás</a>
@@ -1062,7 +1036,7 @@
             <div class="footer__main">
                 <div class="footer__details">
                     <div class="footer__brand">
-                        <img src="logo.jpg" alt="Dřevito" height="36" style="height:36px;width:auto;margin-bottom:0.5rem;">
+                        <img src="logo.jpg" alt="Dřevito" height="96" style="height:96px;width:auto;margin-bottom:0.5rem;">
                         <p class="footer__tagline">Dřevěné výrobky zhotovené srdcem</p>
                     </div>
                     <div class="footer__contact">
@@ -1620,10 +1594,6 @@
         if (image.alt) element.alt = image.alt;
     }
 
-    function isLegacyDefaultLogo(image) {
-        return image && /^\/logo\.jpg(?:[?#].*)?$/.test(String(image.url || ''));
-    }
-
     function applyManagedImages(targets) {
         var hero = firstManagedImage(targets, 'site_sections', 'hero');
         if (hero && hero.url) {
@@ -1637,7 +1607,7 @@
         setImageSrc('.custom__images .custom__image:nth-child(2) img', firstManagedImage(targets, 'site_sections', 'custom_secondary'));
 
         var logo = firstManagedImage(targets, 'site_sections', 'brand_logo');
-        if (!isLegacyDefaultLogo(logo)) setImageSrc('.nav__logo img', logo);
+        setImageSrc('.nav__logo img', logo);
         setImageSrc('.footer__brand img', logo);
 
         for (var i = 0; i < products.length; i++) {

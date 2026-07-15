@@ -1747,6 +1747,17 @@ function adminLayout(title, content) {
       overflow: auto;
       background: #fff;
     }
+    .filter-settings {
+      display: grid;
+      gap: 14px;
+      margin: 8px 0;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: #f8f5ef;
+    }
+    .filter-settings h3 { margin: 0; font-size: 1.15rem; }
+    .filter-settings > p { margin: -6px 0 2px; color: var(--muted); font-size: 0.86rem; }
     @media (max-width: 760px) {
       .masthead { align-items: flex-start; flex-direction: column; padding: 20px; }
       .content { padding: 24px 20px; }
@@ -2961,7 +2972,7 @@ function productCategoriesAdminPage(session) {
     ${adminMasthead(session)}
     <div class="content">
       <h1>Kategorie výrobků</h1>
-      <p>Správa skupin výrobků pro pozdější filtrování a přiřazení produktů.</p>
+      <p>Vytvořte hlavní kategorie a podkategorie, do kterých se potom přiřazují výrobky.</p>
       <div id="category-message" hidden></div>
 
       <div class="category-layout" id="category-app">
@@ -2980,10 +2991,6 @@ function productCategoriesAdminPage(session) {
                 <option value="">Vytvořit hlavní kategorii</option>
               </select>
               <span class="product-meta" id="category-parent-help">Hlavní kategorie se zobrazí přímo v hlavní nabídce výrobků.</span>
-            </label>
-            <label>
-              Popis
-              <textarea id="category-description" name="description"></textarea>
             </label>
             <input id="category-sort-order" name="sort_order" type="hidden" value="0">
             <label>
@@ -3028,7 +3035,6 @@ function productCategoriesAdminPage(session) {
       var slugInput = document.getElementById('category-slug');
       var parentInput = document.getElementById('category-parent-id');
       var parentHelp = document.getElementById('category-parent-help');
-      var descriptionInput = document.getElementById('category-description');
       var sortOrderInput = document.getElementById('category-sort-order');
       var visibleInput = document.getElementById('category-visible');
       var imageUrlInput = document.getElementById('category-image-url');
@@ -3076,11 +3082,12 @@ function productCategoriesAdminPage(session) {
       }
 
       function currentPayload() {
+        var existing = categories.find(function(category) { return category.id === editedId; });
         return {
           title: titleInput.value.trim(),
           slug: slugInput.value.trim().toLowerCase(),
           parent_id: parentInput.value,
-          description: descriptionInput.value.trim(),
+          description: existing && existing.description ? existing.description : '',
           sort_order: sortOrderInput.value,
           is_visible: visibleInput.checked,
           image_url: imageUrlInput.value.trim(),
@@ -3133,7 +3140,6 @@ function productCategoriesAdminPage(session) {
         titleInput.value = category.title || '';
         slugInput.value = category.slug || '';
         renderParentOptions(category.parent_id || '');
-        descriptionInput.value = category.description || '';
         sortOrderInput.value = category.sort_order || 0;
         visibleInput.checked = category.is_visible === true;
         imageUrlInput.value = image.url || '';
@@ -3187,7 +3193,6 @@ function productCategoriesAdminPage(session) {
               '<div class="category-titleline"><strong>' + escapeHtml(category.title) + '</strong>' + statusBadges(category) + '</div>' +
               '<div class="category-meta">' + (parentTitle ? 'Podkategorie v: ' + escapeHtml(parentTitle) : 'Hlavní kategorie') + '</div>' +
               '<div class="category-meta"><strong>' + assignedProducts.length + '</strong> výrobků' + (productNames ? ': ' + escapeHtml(productNames) + (assignedProducts.length > 5 ? '…' : '') : '') + '</div>' +
-              (category.description ? '<p>' + escapeHtml(category.description) + '</p>' : '') +
               '<div class="category-actions">' +
                 '<button class="button button--small" type="button" data-action="edit" data-id="' + escapeHtml(category.id) + '">Upravit</button>' +
                 actionHtml +
@@ -3209,9 +3214,10 @@ function productCategoriesAdminPage(session) {
       async function loadCategories() {
         root.className = 'empty-state';
         root.textContent = 'Načítám kategorie...';
-        var results = await Promise.all([requestJson('/admin/api/product-categories'), requestJson('/admin/api/products')]);
-        categories = (results[0].categories || []).filter(function(category) { return !category.archived_at; });
-        products = (results[1].products || []).filter(function(product) { return !product.archived_at; });
+        var categoryData = await requestJson('/admin/api/product-categories');
+        var productData = await requestJson('/admin/api/products').catch(function() { return { products: [] }; });
+        categories = (categoryData.categories || []).filter(function(category) { return !category.archived_at; });
+        products = (productData.products || []).filter(function(product) { return !product.archived_at; });
         renderParentOptions(parentInput.value);
         render();
       }
@@ -3673,32 +3679,6 @@ function productsAdminPage(session) {
               Celý popis
               <textarea id="product-description" name="description"></textarea>
             </label>
-            <div class="form-grid">
-              <label>
-                Cena v Kč
-                <input id="product-price" name="price" type="number" min="0" step="1" placeholder="Nechte prázdné pro cenu na dotaz">
-              </label>
-              <label>
-                Dostupnost
-                <select id="product-availability" name="availability">
-                  <option value="">Neuvedeno</option>
-                  <option value="in_stock">Skladem</option>
-                  <option value="made_to_order">Na objednávku</option>
-                </select>
-              </label>
-            </div>
-            <label>
-              Druhy dřeva
-              <input id="product-wood-types" name="wood_types" placeholder="Např. dub, buk, jasan">
-              <span class="product-meta">Více druhů oddělte čárkou.</span>
-            </label>
-            <label>
-              Použití
-              <span class="category-checks">
-                <span class="check-label"><input id="product-use-interior" type="checkbox" value="interior"> Interiér</span>
-                <span class="check-label"><input id="product-use-exterior" type="checkbox" value="exterior"> Exteriér</span>
-              </span>
-            </label>
             <label>
               Odkaz do e-shopu
               <input id="product-external-url" name="external_url" type="url" placeholder="https://…">
@@ -3711,13 +3691,43 @@ function productsAdminPage(session) {
                 <span class="product-meta">Načítám kategorie...</span>
               </div>
             </label>
-            <label>
-              Vlastní filtry
-              <div class="category-checks" id="product-filter-checks">
-                <span class="product-meta">Načítám filtry...</span>
+            <section class="filter-settings" aria-labelledby="product-filter-heading">
+              <h3 id="product-filter-heading">Filtry pro hledání na webu</h3>
+              <p>Vyplněné hodnoty se návštěvníkům automaticky nabídnou ve filtrování výrobků.</p>
+              <div class="form-grid">
+                <label>
+                  Cena v Kč
+                  <input id="product-price" name="price" type="number" min="0" step="1" placeholder="Nechte prázdné pro cenu na dotaz">
+                </label>
+                <label>
+                  Dostupnost
+                  <select id="product-availability" name="availability">
+                    <option value="">Neuvedeno</option>
+                    <option value="in_stock">Skladem</option>
+                    <option value="made_to_order">Na objednávku</option>
+                  </select>
+                </label>
               </div>
-              <span class="product-meta">Nové skupiny a hodnoty vytvoříte ve <a href="/admin/product-filters">Správě filtrů</a>.</span>
-            </label>
+              <label>
+                Materiál / druh dřeva
+                <input id="product-wood-types" name="wood_types" placeholder="Např. dub, buk, jasan">
+                <span class="product-meta">Toto je filtr materiálu. Více hodnot oddělte čárkou.</span>
+              </label>
+              <label>
+                Umístění
+                <span class="category-checks">
+                  <span class="check-label"><input id="product-use-interior" type="checkbox" value="interior"> Interiér</span>
+                  <span class="check-label"><input id="product-use-exterior" type="checkbox" value="exterior"> Exteriér</span>
+                </span>
+              </label>
+              <label>
+                Další vlastní filtry
+                <div class="category-checks" id="product-filter-checks">
+                  <span class="product-meta">Načítám filtry...</span>
+                </div>
+                <span class="product-meta">Například Styl nebo Příležitost vytvoříte ve <a href="/admin/product-filters">Správě filtrů</a> a tady vyberete jejich hodnoty.</span>
+              </label>
+            </section>
 
             <input id="product-photo-url" type="hidden">
             <input id="product-photo-alt" type="hidden">

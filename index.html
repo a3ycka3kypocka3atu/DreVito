@@ -3,7 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <base href="/">
+    <base id="site-base" href="/">
+    <script>
+        if (window.location.protocol === 'file:') {
+            document.getElementById('site-base').href = new URL('.', window.location.href).href;
+        }
+    </script>
     <title>Dřevito — Dřevěné výrobky zhotovené srdcem</title>
     <meta name="description" content="Ruční výroba z masivního dřeva. Každý kus je originál. Zakázková výroba individuálních dřevěných výrobků.">
     <link id="page-canonical" rel="canonical" href="/">
@@ -1705,10 +1710,11 @@
         applySiteContent(payload.site_content || {});
         var cmsProducts = Array.isArray(payload.products) ? payload.products : [];
         var cmsProductCategories = Array.isArray(payload.product_categories) ? payload.product_categories : [];
-        var hasCmsProductContent = cmsProducts.length > 0 || cmsProductCategories.length > 0;
-        productsCmsBacked = hasCmsProductContent;
-        products = hasCmsProductContent ? cmsProducts : defaultProducts.slice();
-        productCategories = hasCmsProductContent && cmsProductCategories.length ? cmsProductCategories : defaultProductCategories.slice();
+        var hasCmsProducts = cmsProducts.length > 0;
+        var hasCmsProductCategories = cmsProductCategories.length > 0;
+        productsCmsBacked = hasCmsProducts;
+        products = hasCmsProducts ? cmsProducts : defaultProducts.slice();
+        productCategories = hasCmsProductCategories ? cmsProductCategories : defaultProductCategories.slice();
         blogPosts = Array.isArray(payload.blog_posts) ? payload.blog_posts : [];
         blogCategories = Array.isArray(payload.blog_categories) ? payload.blog_categories : [];
         customProductFilters = Array.isArray(payload.product_filters) ? payload.product_filters : [];

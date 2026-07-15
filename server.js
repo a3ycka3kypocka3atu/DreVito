@@ -3893,23 +3893,26 @@ function blogPostsAdminPage(session) {
             <input id="blog-sort-order" name="sort_order" type="hidden" value="0">
             <input id="blog-published-at" name="published_at" type="hidden">
             <input id="blog-status" name="status" type="hidden" value="draft">
-            <label>
-              Kategorie
-              <div class="category-checks" id="blog-category-checks">
-                <span class="blog-meta">Načítám kategorie...</span>
-              </div>
-            </label>
 
             <input id="blog-photo-url" type="hidden">
             <input id="blog-photo-alt" type="hidden">
             <input id="blog-photo-media-id" type="hidden">
             <button class="button button--secondary button--small" id="blog-add-photo" type="button" hidden>Přidat fotku</button>
 
-            <label>Fotky</label>
-            <input id="blog-upload" type="file" accept="image/jpeg,image/png,image/webp,image/gif" multiple hidden>
-            <button class="button button--secondary button--small" id="blog-upload-button" type="button">Nahrát fotku</button>
+            <fieldset style="margin:0; border:1px solid var(--line); border-radius:8px; padding:16px;">
+              <legend style="padding:0 8px; font-weight:700;">Fotky článku</legend>
+              <p style="margin-bottom:12px; font-size:0.88rem;">Můžete vybrat jednu nebo více fotografií ve formátu JPG, PNG, WebP nebo GIF.</p>
+              <input id="blog-upload" type="file" accept="image/jpeg,image/png,image/webp,image/gif" multiple hidden>
+              <button class="button button--secondary" id="blog-upload-button" type="button" style="width:100%;">Vybrat a nahrát fotky</button>
+              <div class="photo-list" id="blog-photos"></div>
+            </fieldset>
 
-            <div class="photo-list" id="blog-photos"></div>
+            <label>
+              Kategorie
+              <div class="category-checks" id="blog-category-checks">
+                <span class="blog-meta">Načítám kategorie...</span>
+              </div>
+            </label>
 
             <div class="actions">
               <button class="button" type="submit" value="save">Uložit</button>
@@ -4278,7 +4281,7 @@ function blogPostsAdminPage(session) {
           setMessage(error.message, 'error');
         }).finally(function() {
           uploadButton.disabled = false;
-          uploadButton.textContent = 'Nahrát fotku';
+          uploadButton.textContent = 'Vybrat a nahrát fotky';
         });
       });
 

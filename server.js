@@ -1921,7 +1921,7 @@ function dashboardPage(session) {
           <a class="admin-tool" href="/admin/product-filters">
             <span>Produkty</span>
             <strong>Filtry výrobků</strong>
-            <p>Vytvořit vlastní skupiny filtrů a jejich hodnoty pro katalog.</p>
+            <p>Vytvořit vlastní skupiny filtrů a jejich možnosti pro katalog.</p>
           </a>
           <a class="admin-tool" href="/admin/blog-posts">
             <span>Blog</span>
@@ -3678,7 +3678,7 @@ function productFiltersAdminPage(session) {
     ${adminMasthead(session)}
     <div class="content">
       <h1>Vlastní filtry výrobků</h1>
-      <p>Nejdřív vytvořte skupinu filtru (např. <strong>Styl</strong>), potom její hodnoty (např. <strong>Rustikální</strong>, <strong>Moderní</strong>). Hodnoty pak přiřadíte výrobkům a návštěvník podle nich může filtrovat.</p>
+      <p>Nejdřív vytvořte skupinu filtru (např. <strong>Styl</strong>), potom možnosti, které v ní zákazník uvidí (např. <strong>Rustikální</strong>, <strong>Moderní</strong>). Možnosti pak přiřadíte výrobkům a návštěvník podle nich může filtrovat.</p>
       <div id="filter-message" hidden></div>
       <div class="category-layout">
         <section class="category-panel">
@@ -3692,14 +3692,14 @@ function productFiltersAdminPage(session) {
             <div class="actions"><button class="button" type="submit">Uložit skupinu</button><button class="button button--secondary" id="filter-reset" type="button">Nová</button></div>
           </form>
           <hr style="margin:24px 0;border:0;border-top:1px solid var(--line)">
-          <h2 id="option-form-title">Nová hodnota</h2>
+          <h2 id="option-form-title">Nová možnost filtru</h2>
           <form id="option-form">
             <input id="option-id" type="hidden">
             <label>Skupina filtru<select id="option-filter-id" required><option value="">Nejdřív vytvořte skupinu</option></select></label>
-            <label>Název hodnoty<input id="option-title" required placeholder="Např. Rustikální"></label>
+            <label>Název možnosti<input id="option-title" required placeholder="Např. Rustikální"></label>
             <input id="option-slug" type="hidden">
-            <label><span class="check-label"><input id="option-visible" type="checkbox" checked> Nabízet tuto hodnotu na webu</span></label>
-            <div class="actions"><button class="button" type="submit">Uložit hodnotu</button><button class="button button--secondary" id="option-reset" type="button">Nová</button></div>
+            <label><span class="check-label"><input id="option-visible" type="checkbox" checked> Zobrazit tuto možnost ve filtru na webu</span></label>
+            <div class="actions"><button class="button" type="submit">Uložit možnost</button><button class="button button--secondary" id="option-reset" type="button">Nová</button></div>
           </form>
         </section>
         <section class="category-list"><h2>Vytvořené filtry</h2><div id="filters-root" class="empty-state">Načítám filtry…</div></section>
@@ -3714,18 +3714,18 @@ function productFiltersAdminPage(session) {
       function show(text, ok) { message.hidden = !text; message.className = ok ? 'success' : 'alert'; message.textContent = text || ''; }
       async function request(url, options) { var response = await fetch(url, Object.assign({headers:{'Content-Type':'application/json',Accept:'application/json'}}, options || {})); var data = await response.json(); if (!response.ok) throw new Error(data.error || 'Požadavek se nepodařil.'); return data; }
       function resetFilter() { editedFilterId = ''; document.getElementById('filter-form').reset(); document.getElementById('filter-visible').checked = true; document.getElementById('filter-form-title').textContent = 'Nová skupina filtru'; }
-      function resetOption() { editedOptionId = ''; document.getElementById('option-form').reset(); document.getElementById('option-visible').checked = true; document.getElementById('option-form-title').textContent = 'Nová hodnota'; renderSelect(); }
+      function resetOption() { editedOptionId = ''; document.getElementById('option-form').reset(); document.getElementById('option-visible').checked = true; document.getElementById('option-form-title').textContent = 'Nová možnost filtru'; renderSelect(); }
       function renderSelect(selected) { document.getElementById('option-filter-id').innerHTML = '<option value="">Vyberte skupinu</option>' + filters.map(function(filter) { return '<option value="' + esc(filter.id) + '"' + (filter.id === selected ? ' selected' : '') + '>' + esc(filter.title) + '</option>'; }).join(''); }
       function render() {
         if (!filters.length) { root.className = 'empty-state'; root.textContent = 'Zatím nejsou vytvořené žádné vlastní filtry.'; return; }
         root.className = ''; root.innerHTML = filters.map(function(filter) {
-          return '<article class="category-row"><div class="category-main"><div class="category-titleline"><strong>' + esc(filter.title) + '</strong><span class="badge ' + (filter.is_visible ? 'badge--ok' : 'badge--muted') + '">' + (filter.is_visible ? 'Na webu' : 'Skrytý') + '</span></div>' + (filter.description ? '<p>' + esc(filter.description) + '</p>' : '') + '<div class="category-actions"><button class="button button--small" data-edit-filter="' + esc(filter.id) + '">Upravit skupinu</button></div><div style="margin-top:14px"><strong>Hodnoty:</strong> ' + ((filter.options || []).length ? filter.options.map(function(option) { return '<button class="button button--secondary button--small" style="margin:4px" data-edit-option="' + esc(option.id) + '" data-filter-id="' + esc(filter.id) + '">' + esc(option.title) + (option.is_visible ? '' : ' (skrytá)') + '</button>'; }).join('') : '<span class="product-meta">zatím žádné</span>') + '</div></div></article>';
+          return '<article class="category-row"><div class="category-main"><div class="category-titleline"><strong>' + esc(filter.title) + '</strong><span class="badge ' + (filter.is_visible ? 'badge--ok' : 'badge--muted') + '">' + (filter.is_visible ? 'Na webu' : 'Skrytý') + '</span></div>' + (filter.description ? '<p>' + esc(filter.description) + '</p>' : '') + '<div class="category-actions"><button class="button button--small" data-edit-filter="' + esc(filter.id) + '">Upravit skupinu</button></div><div style="margin-top:14px"><strong>Možnosti:</strong> ' + ((filter.options || []).length ? filter.options.map(function(option) { return '<button class="button button--secondary button--small" style="margin:4px" data-edit-option="' + esc(option.id) + '" data-filter-id="' + esc(filter.id) + '">' + esc(option.title) + (option.is_visible ? '' : ' (skrytá)') + '</button>'; }).join('') : '<span class="product-meta">zatím žádné</span>') + '</div></div></article>';
         }).join('');
       }
       async function load() { var data = await request('/admin/api/product-filters'); filters = data.filters || []; renderSelect(); render(); }
       document.getElementById('filter-form').addEventListener('submit', function(e) { e.preventDefault(); var body = {title:document.getElementById('filter-title').value.trim(),slug:slug(document.getElementById('filter-title').value),description:document.getElementById('filter-description').value.trim(),is_visible:document.getElementById('filter-visible').checked,sort_order:0}; request(editedFilterId ? '/admin/api/product-filters/' + editedFilterId : '/admin/api/product-filters', {method:editedFilterId?'PATCH':'POST',body:JSON.stringify(body)}).then(function(){show('Skupina filtru byla uložena.',true);resetFilter();return load();}).catch(function(error){show(error.message,false);}); });
-      document.getElementById('option-form').addEventListener('submit', function(e) { e.preventDefault(); var filterId=document.getElementById('option-filter-id').value; var body={title:document.getElementById('option-title').value.trim(),slug:slug(document.getElementById('option-title').value),is_visible:document.getElementById('option-visible').checked,sort_order:0}; request('/admin/api/product-filters/' + filterId + '/options' + (editedOptionId ? '/' + editedOptionId : ''), {method:editedOptionId?'PATCH':'POST',body:JSON.stringify(body)}).then(function(){show('Hodnota filtru byla uložena.',true);resetOption();return load();}).catch(function(error){show(error.message,false);}); });
-      root.addEventListener('click', function(e) { var filterButton=e.target.closest('[data-edit-filter]'), optionButton=e.target.closest('[data-edit-option]'); if(filterButton){var filter=filters.find(function(item){return item.id===filterButton.dataset.editFilter;});if(!filter)return;editedFilterId=filter.id;document.getElementById('filter-form-title').textContent='Upravit skupinu filtru';document.getElementById('filter-title').value=filter.title;document.getElementById('filter-description').value=filter.description||'';document.getElementById('filter-visible').checked=filter.is_visible;} if(optionButton){var filter=filters.find(function(item){return item.id===optionButton.dataset.filterId;}), option=filter&&(filter.options||[]).find(function(item){return item.id===optionButton.dataset.editOption;});if(!option)return;editedOptionId=option.id;document.getElementById('option-form-title').textContent='Upravit hodnotu';renderSelect(filter.id);document.getElementById('option-title').value=option.title;document.getElementById('option-visible').checked=option.is_visible;} });
+      document.getElementById('option-form').addEventListener('submit', function(e) { e.preventDefault(); var filterId=document.getElementById('option-filter-id').value; var body={title:document.getElementById('option-title').value.trim(),slug:slug(document.getElementById('option-title').value),is_visible:document.getElementById('option-visible').checked,sort_order:0}; request('/admin/api/product-filters/' + filterId + '/options' + (editedOptionId ? '/' + editedOptionId : ''), {method:editedOptionId?'PATCH':'POST',body:JSON.stringify(body)}).then(function(){show('Možnost filtru byla uložena.',true);resetOption();return load();}).catch(function(error){show(error.message,false);}); });
+      root.addEventListener('click', function(e) { var filterButton=e.target.closest('[data-edit-filter]'), optionButton=e.target.closest('[data-edit-option]'); if(filterButton){var filter=filters.find(function(item){return item.id===filterButton.dataset.editFilter;});if(!filter)return;editedFilterId=filter.id;document.getElementById('filter-form-title').textContent='Upravit skupinu filtru';document.getElementById('filter-title').value=filter.title;document.getElementById('filter-description').value=filter.description||'';document.getElementById('filter-visible').checked=filter.is_visible;} if(optionButton){var filter=filters.find(function(item){return item.id===optionButton.dataset.filterId;}), option=filter&&(filter.options||[]).find(function(item){return item.id===optionButton.dataset.editOption;});if(!option)return;editedOptionId=option.id;document.getElementById('option-form-title').textContent='Upravit možnost filtru';renderSelect(filter.id);document.getElementById('option-title').value=option.title;document.getElementById('option-visible').checked=option.is_visible;} });
       document.getElementById('filter-reset').onclick=resetFilter; document.getElementById('option-reset').onclick=resetOption; load().catch(function(error){show(error.message,false);});
     })();
     </script>
@@ -3759,8 +3759,9 @@ function productsAdminPage(session) {
               <textarea id="product-description" name="description"></textarea>
             </label>
             <label>
-              Odkaz do e-shopu
-              <input id="product-external-url" name="external_url" type="url" placeholder="https://…">
+              Externí odkaz po kliknutí (volitelné)
+              <input id="product-external-url" name="external_url" type="url" placeholder="https://jiny-web.cz/produkt">
+              <span class="product-meta">Běžně nechte prázdné — výrobek se otevře přímo tady na webu. Vyplňte jen tehdy, pokud má návštěvník přejít na jinou stránku.</span>
             </label>
             <input id="product-sort-order" name="sort_order" type="hidden" value="0">
             <input id="product-published-at" name="published_at" type="hidden">
@@ -3772,7 +3773,7 @@ function productsAdminPage(session) {
             </label>
             <section class="filter-settings" aria-labelledby="product-filter-heading">
               <h3 id="product-filter-heading">Filtry pro hledání na webu</h3>
-              <p>Vyplněné hodnoty se návštěvníkům automaticky nabídnou ve filtrování výrobků.</p>
+              <p>Vybrané možnosti se návštěvníkům automaticky nabídnou ve filtrování výrobků.</p>
               <div class="form-grid">
                 <label>
                   Cena v Kč
@@ -3804,7 +3805,7 @@ function productsAdminPage(session) {
                 <div class="category-checks" id="product-filter-checks">
                   <span class="product-meta">Načítám filtry...</span>
                 </div>
-                <span class="product-meta">Například Styl nebo Příležitost vytvoříte ve <a href="/admin/product-filters">Správě filtrů</a> a tady vyberete jejich hodnoty.</span>
+                <span class="product-meta">Například Styl nebo Příležitost vytvoříte ve <a href="/admin/product-filters">Správě filtrů</a> a tady vyberete jejich možnosti.</span>
               </label>
             </section>
 
@@ -3998,7 +3999,7 @@ function productsAdminPage(session) {
           var options = (filter.options || []).filter(function(option) { return !option.archived_at; });
           return '<div><strong>' + escapeHtml(filter.title) + '</strong>' + (options.length ? options.map(function(option) {
             return '<label class="check-label"><input type="checkbox" value="' + escapeHtml(option.id) + '"' + (selectedIds.indexOf(option.id) !== -1 ? ' checked' : '') + '> ' + escapeHtml(option.title) + (option.is_visible ? '' : ' (skrytá)') + '</label>';
-          }).join('') : '<div class="product-meta">Bez hodnot.</div>') + '</div>';
+          }).join('') : '<div class="product-meta">Bez možností.</div>') + '</div>';
         }).join('');
       }
 
@@ -5036,8 +5037,8 @@ function normalizeCustomFilterOptionInput(input) {
   const slug = String(input.slug || '').trim().toLowerCase();
   const sortOrder = Number.parseInt(String(input.sort_order === undefined || input.sort_order === '' ? 0 : input.sort_order), 10);
   const isVisible = input.is_visible === true || input.is_visible === 'true' || input.is_visible === 'on';
-  if (!title) throw new Error('Název hodnoty je povinný.');
-  if (!/^[a-z0-9][a-z0-9-]*$/.test(slug)) throw new Error('Název vytvořil neplatnou adresu hodnoty.');
+  if (!title) throw new Error('Název možnosti je povinný.');
+  if (!/^[a-z0-9][a-z0-9-]*$/.test(slug)) throw new Error('Název vytvořil neplatnou adresu možnosti.');
   if (!Number.isFinite(sortOrder)) throw new Error('Pořadí musí být číslo.');
   return { title, slug, sort_order: sortOrder, is_visible: isVisible };
 }
@@ -5102,7 +5103,7 @@ async function createProductFilterOption(filterId, input) {
   if (!isSupabaseConfigured()) {
     const db = readCmsDb();
     if (!db.product_filters.some((item) => item.id === filterId)) throw new Error('Filtr nebyl nalezen.');
-    if (db.product_filter_options.some((item) => item.filter_id === filterId && item.slug === option.slug)) throw new Error('Tato hodnota už ve filtru existuje.');
+    if (db.product_filter_options.some((item) => item.filter_id === filterId && item.slug === option.slug)) throw new Error('Tato možnost už ve filtru existuje.');
     const created = createLocalRow({ ...option, archived_at: null });
     db.product_filter_options.push(created);
     writeCmsDb(db);
@@ -5118,15 +5119,15 @@ async function updateProductFilterOption(filterId, optionId, input) {
   const option = normalizeCustomFilterOptionInput(input);
   if (!isSupabaseConfigured()) {
     const db = readCmsDb();
-    if (db.product_filter_options.some((item) => item.filter_id === filterId && item.slug === option.slug && item.id !== optionId)) throw new Error('Tato hodnota už ve filtru existuje.');
+    if (db.product_filter_options.some((item) => item.filter_id === filterId && item.slug === option.slug && item.id !== optionId)) throw new Error('Tato možnost už ve filtru existuje.');
     const row = db.product_filter_options.find((item) => item.id === optionId && item.filter_id === filterId);
-    if (!row) throw new Error('Hodnota filtru nebyla nalezena.');
+    if (!row) throw new Error('Možnost filtru nebyla nalezena.');
     updateLocalRow(row, option);
     writeCmsDb(db);
     return row;
   }
   const rows = await supabaseRequest('product_filter_options', { method: 'PATCH', body: option, prefer: 'return=representation', query: { id: `eq.${optionId}`, filter_id: `eq.${filterId}`, select: '*' } });
-  if (!Array.isArray(rows) || !rows.length) throw new Error('Hodnota filtru nebyla nalezena.');
+  if (!Array.isArray(rows) || !rows.length) throw new Error('Možnost filtru nebyla nalezena.');
   return rows[0];
 }
 
@@ -5498,9 +5499,9 @@ function normalizeExternalUrl(value) {
   try {
     parsed = new URL(raw);
   } catch (error) {
-    throw new Error('Odkaz do e-shopu musí začínat http:// nebo https://.');
+    throw new Error('Externí odkaz musí začínat http:// nebo https://.');
   }
-  if (!['http:', 'https:'].includes(parsed.protocol)) throw new Error('Odkaz do e-shopu musí začínat http:// nebo https://.');
+  if (!['http:', 'https:'].includes(parsed.protocol)) throw new Error('Externí odkaz musí začínat http:// nebo https://.');
   return raw;
 }
 
@@ -5711,7 +5712,7 @@ async function createProduct(input) {
       }
     });
     filterOptionIds.forEach((optionId) => {
-      if (!db.product_filter_options.some((option) => option.id === optionId)) throw new Error('Vybraná hodnota filtru nebyla nalezena.');
+      if (!db.product_filter_options.some((option) => option.id === optionId)) throw new Error('Vybraná možnost filtru nebyla nalezena.');
     });
     const created = createLocalRow(product);
     db.products.push(created);
@@ -5754,7 +5755,7 @@ async function updateProduct(id, input) {
       }
     });
     filterOptionIds.forEach((optionId) => {
-      if (!db.product_filter_options.some((option) => option.id === optionId)) throw new Error('Vybraná hodnota filtru nebyla nalezena.');
+      if (!db.product_filter_options.some((option) => option.id === optionId)) throw new Error('Vybraná možnost filtru nebyla nalezena.');
     });
     updateLocalRow(row, product);
     db.product_category_links = db.product_category_links

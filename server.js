@@ -1689,6 +1689,50 @@ function adminLayout(title, content) {
       width: auto;
       margin: 0;
     }
+    .category-type-options {
+      display: grid;
+      gap: 10px;
+      margin: 0;
+      padding: 0;
+      border: 0;
+    }
+    .category-type-options legend {
+      margin-bottom: 8px;
+      color: var(--ink);
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+    .category-type-option {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr);
+      gap: 12px;
+      align-items: start;
+      padding: 13px 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      cursor: pointer;
+    }
+    .category-type-option:has(input:checked) {
+      border-color: var(--accent);
+      background: #fbf7ee;
+      box-shadow: 0 0 0 2px rgba(201, 169, 110, 0.16);
+    }
+    .category-type-option input {
+      width: auto;
+      margin: 4px 0 0;
+    }
+    .category-type-option strong,
+    .category-type-option span {
+      display: block;
+    }
+    .category-type-option span {
+      margin-top: 2px;
+      color: var(--muted);
+      font-size: 0.8rem;
+      font-weight: 400;
+      line-height: 1.4;
+    }
     .preview-box {
       display: none;
       border: 1px solid var(--line);
@@ -2985,12 +3029,23 @@ function productCategoriesAdminPage(session) {
               <input id="category-title" name="title" required autocomplete="off">
             </label>
             <input id="category-slug" name="slug" type="hidden" required autocomplete="off" pattern="[a-z0-9][a-z0-9-]*">
-            <label>
-              Patří pod
-              <select id="category-parent-id" name="parent_id">
-                <option value="">Vytvořit hlavní kategorii</option>
+            <fieldset class="category-type-options">
+              <legend>Typ kategorie</legend>
+              <label class="category-type-option">
+                <input type="radio" name="category_type" value="main" checked>
+                <span><strong>Hlavní kategorie</strong><span>Nová samostatná skupina v hlavní nabídce výrobků.</span></span>
+              </label>
+              <label class="category-type-option">
+                <input type="radio" name="category_type" value="subcategory">
+                <span><strong>Podkategorie</strong><span>Nová podskupina uvnitř jedné existující hlavní kategorie.</span></span>
+              </label>
+            </fieldset>
+            <label id="category-parent-field" hidden>
+              Nadřazená hlavní kategorie
+              <select id="category-parent-id" name="parent_id" disabled>
+                <option value="">Vyberte hlavní kategorii</option>
               </select>
-              <span class="product-meta" id="category-parent-help">Hlavní kategorie se zobrazí přímo v hlavní nabídce výrobků.</span>
+              <span class="product-meta" id="category-parent-help">Vyberte, do které hlavní kategorie má nová podkategorie patřit.</span>
             </label>
             <input id="category-sort-order" name="sort_order" type="hidden" value="0">
             <label>
@@ -3033,6 +3088,8 @@ function productCategoriesAdminPage(session) {
       var idInput = document.getElementById('category-id');
       var titleInput = document.getElementById('category-title');
       var slugInput = document.getElementById('category-slug');
+      var typeInputs = Array.from(document.querySelectorAll('input[name="category_type"]'));
+      var parentField = document.getElementById('category-parent-field');
       var parentInput = document.getElementById('category-parent-id');
       var parentHelp = document.getElementById('category-parent-help');
       var sortOrderInput = document.getElementById('category-sort-order');
@@ -3083,10 +3140,11 @@ function productCategoriesAdminPage(session) {
 
       function currentPayload() {
         var existing = categories.find(function(category) { return category.id === editedId; });
+        var isSubcategory = typeInputs.some(function(input) { return input.checked && input.value === 'subcategory'; });
         return {
           title: titleInput.value.trim(),
           slug: slugInput.value.trim().toLowerCase(),
-          parent_id: parentInput.value,
+          parent_id: isSubcategory ? parentInput.value : '',
           description: existing && existing.description ? existing.description : '',
           sort_order: sortOrderInput.value,
           is_visible: visibleInput.checked,
@@ -3105,17 +3163,30 @@ function productCategoriesAdminPage(session) {
         sortOrderInput.value = '0';
         visibleInput.checked = true;
         renderParentOptions('');
+        setCategoryType('main');
         titleInput.focus();
       }
 
       function renderParentOptions(selectedId) {
-        var options = '<option value="">Vytvořit hlavní kategorii</option>';
+        var options = '<option value="">Vyberte hlavní kategorii</option>';
         categories.forEach(function(category) {
           if (category.id === editedId || category.parent_id) return;
-          options += '<option value="' + escapeHtml(category.id) + '"' + (category.id === selectedId ? ' selected' : '') + '>Podkategorie v: ' + escapeHtml(category.title) + '</option>';
+          options += '<option value="' + escapeHtml(category.id) + '"' + (category.id === selectedId ? ' selected' : '') + '>' + escapeHtml(category.title) + '</option>';
         });
         parentInput.innerHTML = options;
         parentInput.value = selectedId || '';
+        updateParentHelp();
+      }
+
+      function setCategoryType(type) {
+        var isSubcategory = type === 'subcategory';
+        typeInputs.forEach(function(input) {
+          input.checked = input.value === (isSubcategory ? 'subcategory' : 'main');
+        });
+        parentField.hidden = !isSubcategory;
+        parentInput.disabled = !isSubcategory;
+        parentInput.required = isSubcategory;
+        if (!isSubcategory) parentInput.value = '';
         updateParentHelp();
       }
 
@@ -3123,7 +3194,7 @@ function productCategoriesAdminPage(session) {
         var parent = categories.find(function(category) { return category.id === parentInput.value; });
         parentHelp.textContent = parent
           ? 'Tato kategorie bude uvnitř „' + parent.title + '“. Výrobky z ní se automaticky zobrazí také v hlavní kategorii „' + parent.title + '“.'
-          : 'Hlavní kategorie se zobrazí přímo v hlavní nabídce. Pod ni pak můžete přidávat podkategorie.';
+          : 'Vyberte, do které hlavní kategorie má nová podkategorie patřit.';
       }
 
       function categoryTitle(categoryId) {
@@ -3140,6 +3211,9 @@ function productCategoriesAdminPage(session) {
         titleInput.value = category.title || '';
         slugInput.value = category.slug || '';
         renderParentOptions(category.parent_id || '');
+        setCategoryType(category.parent_id ? 'subcategory' : 'main');
+        if (category.parent_id) parentInput.value = category.parent_id;
+        updateParentHelp();
         sortOrderInput.value = category.sort_order || 0;
         visibleInput.checked = category.is_visible === true;
         imageUrlInput.value = image.url || '';
@@ -3222,6 +3296,12 @@ function productCategoriesAdminPage(session) {
         render();
       }
 
+      function showCategoryLoadFailure() {
+        setMessage('', 'success');
+        root.className = 'empty-state';
+        root.textContent = 'Kategorie se nepodařilo načíst. Zkuste to prosím znovu.';
+      }
+
       async function saveCategory(payload, id) {
         var data = await requestJson(id ? '/admin/api/product-categories/' + encodeURIComponent(id) : '/admin/api/product-categories', {
           method: id ? 'PATCH' : 'POST',
@@ -3258,6 +3338,11 @@ function productCategoriesAdminPage(session) {
         if (!slugTouched) slugInput.value = slugify(titleInput.value);
       });
       parentInput.addEventListener('change', updateParentHelp);
+      typeInputs.forEach(function(input) {
+        input.addEventListener('change', function() {
+          if (input.checked) setCategoryType(input.value);
+        });
+      });
 
       slugInput.addEventListener('input', function() {
         slugTouched = true;
@@ -3270,9 +3355,7 @@ function productCategoriesAdminPage(session) {
       });
 
       document.getElementById('category-reload').addEventListener('click', function() {
-        loadCategories().catch(function(error) {
-          setMessage(error.message, 'error');
-        });
+        loadCategories().catch(showCategoryLoadFailure);
       });
 
       root.addEventListener('click', function(event) {
@@ -3294,11 +3377,7 @@ function productCategoriesAdminPage(session) {
         }
       });
 
-      loadCategories().catch(function(error) {
-        setMessage(error.message, 'error');
-        root.className = 'empty-state';
-        root.textContent = 'Kategorie se nepodařilo načíst.';
-      });
+      loadCategories().catch(showCategoryLoadFailure);
     })();
     </script>
   `);

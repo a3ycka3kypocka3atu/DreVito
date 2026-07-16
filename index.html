@@ -411,11 +411,125 @@
         .products__subtabs:empty { display: none; }
         .products__subtab { padding: 0.5rem 1rem; border: 1px solid rgba(61, 43, 31, 0.24); background: rgba(253, 252, 250, 0.55); color: var(--color-primary); font: 500 0.8125rem var(--font-body); border-radius: 100px; cursor: pointer; }
         .products__subtab:hover, .products__subtab.active { border-color: var(--color-accent); background: var(--color-card); }
-        .products__filters { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 0.75rem; margin: 0 0 2.5rem; padding: 1.25rem; background: rgba(253, 252, 250, 0.72); border: 1px solid rgba(61, 43, 31, 0.1); border-radius: var(--radius-card); }
-        .products__filter { display: flex; flex-direction: column; gap: 0.35rem; color: var(--color-text-muted); font-size: 0.75rem; }
-        .products__filter select, .products__filter input { width: 100%; min-height: 42px; padding: 0.55rem 0.7rem; border: 1px solid rgba(61, 43, 31, 0.22); border-radius: 6px; background: var(--color-card); color: var(--color-primary); font: 0.8125rem var(--font-body); }
-        .products__price-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 0.35rem; }
-        .products__filter-reset { align-self: end; min-height: 42px; border: 0; border-radius: 6px; background: var(--color-primary); color: var(--color-card); cursor: pointer; font: 500 0.8125rem var(--font-body); }
+        .products__filters {
+            position: relative;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+            gap: 1rem;
+            margin: 0 0 2.5rem;
+            padding: 1.5rem;
+            overflow: hidden;
+            background:
+                radial-gradient(circle at 100% 0%, rgba(201, 169, 110, 0.18), transparent 30%),
+                rgba(253, 252, 250, 0.9);
+            border: 1px solid rgba(61, 43, 31, 0.11);
+            border-radius: 20px;
+            box-shadow: 0 14px 35px rgba(61, 43, 31, 0.08);
+        }
+        .products__filters::before {
+            content: '';
+            position: absolute;
+            inset: 0 auto 0 0;
+            width: 4px;
+            background: linear-gradient(180deg, var(--color-accent), #9f7843);
+        }
+        .products__filters-heading {
+            grid-column: 1 / -1;
+            display: flex;
+            align-items: baseline;
+            gap: 0.75rem;
+            padding: 0 0 0.15rem;
+        }
+        .products__filters-title {
+            font: 600 1.45rem/1.1 var(--font-display);
+            letter-spacing: 0.01em;
+            color: var(--color-primary);
+        }
+        .products__filters-note {
+            color: var(--color-text-muted);
+            font-size: 0.72rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+        .products__filter {
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            color: var(--color-primary);
+            font-size: 0.7rem;
+            font-weight: 600;
+            letter-spacing: 0.07em;
+            text-transform: uppercase;
+        }
+        .products__filter select,
+        .products__filter input {
+            width: 100%;
+            min-height: 50px;
+            padding: 0.7rem 0.95rem;
+            border: 1px solid rgba(61, 43, 31, 0.17);
+            border-radius: 14px;
+            outline: none;
+            background-color: rgba(255, 255, 255, 0.72);
+            color: var(--color-primary);
+            font: 500 0.88rem/1.2 var(--font-body);
+            letter-spacing: 0;
+            text-transform: none;
+            transition: border-color var(--transition-smooth), background-color var(--transition-smooth), box-shadow var(--transition-smooth);
+        }
+        .products__filter select {
+            padding-right: 2.65rem;
+            appearance: none;
+            -webkit-appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg width='16' height='16' viewBox='0 0 16 16' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='m4 6 4 4 4-4' fill='none' stroke='%233D2B1F' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 0.95rem center;
+        }
+        .products__filter input::placeholder { color: rgba(107, 90, 74, 0.58); }
+        .products__filter input::-webkit-inner-spin-button,
+        .products__filter input::-webkit-outer-spin-button { margin: 0; appearance: none; }
+        .products__filter select:hover,
+        .products__filter input:hover {
+            border-color: rgba(201, 169, 110, 0.8);
+            background-color: #fff;
+        }
+        .products__filter select:focus-visible,
+        .products__filter input:focus-visible {
+            border-color: var(--color-accent);
+            background-color: #fff;
+            box-shadow: 0 0 0 4px rgba(201, 169, 110, 0.16);
+        }
+        .products__price-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; }
+        .products__filter-reset {
+            align-self: end;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.65rem;
+            min-height: 50px;
+            padding: 0.65rem 1rem;
+            border: 1px solid var(--color-primary);
+            border-radius: 999px;
+            background: var(--color-primary);
+            color: var(--color-card);
+            cursor: pointer;
+            font: 600 0.8rem var(--font-body);
+            letter-spacing: 0.02em;
+            transition: transform var(--transition-smooth), background-color var(--transition-smooth), box-shadow var(--transition-smooth);
+        }
+        .products__filter-reset svg {
+            width: 17px;
+            height: 17px;
+            color: var(--color-accent);
+            transition: transform var(--transition-smooth);
+        }
+        .products__filter-reset:hover {
+            transform: translateY(-2px);
+            background: #2f2118;
+            box-shadow: 0 8px 20px rgba(61, 43, 31, 0.2);
+        }
+        .products__filter-reset:hover svg { transform: rotate(90deg); }
+        .products__filter-reset:focus-visible { outline: 3px solid rgba(201, 169, 110, 0.55); outline-offset: 3px; }
         .product-card__meta { display: flex; flex-wrap: wrap; gap: 0.35rem; margin: -0.35rem 0 0.85rem; }
         .product-card__meta span { padding: 0.2rem 0.45rem; border-radius: 100px; background: rgba(201, 169, 110, 0.14); color: var(--color-text-muted); font-size: 0.6875rem; }
         .products__grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; }
@@ -486,7 +600,10 @@
         @media (max-width: 900px) { .products__grid { grid-template-columns: repeat(2, 1fr); } .products__filters { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
         @media (max-width: 600px) {
             .products { padding: 4rem 1.25rem; }
-            .products__filters { grid-template-columns: 1fr; }
+            .products__filters { grid-template-columns: 1fr; gap: 0.9rem; padding: 1.25rem; border-radius: 18px; }
+            .products__filters-heading { display: block; padding-bottom: 0.25rem; }
+            .products__filters-title { display: block; margin-bottom: 0.25rem; font-size: 1.35rem; }
+            .products__filter-reset { width: 100%; margin-top: 0.15rem; }
             .products__intro {
                 margin-bottom: 1.75rem;
                 font-size: 0.9375rem;
@@ -1010,12 +1127,19 @@
             </div>
             <div class="products__subtabs" id="products-subtabs" role="tablist" aria-label="Podkategorie výrobků"></div>
             <div class="products__filters" id="products-filters" aria-label="Filtrování výrobků">
+                <div class="products__filters-heading">
+                    <strong class="products__filters-title">Upřesněte svůj výběr</strong>
+                    <span class="products__filters-note">Najděte výrobek přesně pro vás</span>
+                </div>
                 <label class="products__filter">Druh dřeva<select id="filter-wood"><option value="all">Všechny druhy</option></select></label>
                 <label class="products__filter">Dostupnost<select id="filter-availability"><option value="all">Vše</option><option value="in_stock">Skladem</option><option value="made_to_order">Na objednávku</option></select></label>
                 <label class="products__filter">Použití<select id="filter-use"><option value="all">Interiér i exteriér</option><option value="interior">Interiér</option><option value="exterior">Exteriér</option></select></label>
                 <label class="products__filter">Cena v Kč<span class="products__price-fields"><input id="filter-price-min" type="number" min="0" step="100" placeholder="Od"><input id="filter-price-max" type="number" min="0" step="100" placeholder="Do"></span></label>
                 <div id="custom-product-filters" style="display:contents"></div>
-                <button class="products__filter-reset" id="filter-reset" type="button">Zrušit filtry</button>
+                <button class="products__filter-reset" id="filter-reset" type="button">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>
+                    <span>Zrušit filtry</span>
+                </button>
             </div>
             <div class="products__grid" id="products-grid"></div>
             <article class="content-detail" id="product-detail" aria-live="polite"></article>

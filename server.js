@@ -1187,6 +1187,12 @@ function adminLayout(title, content) {
       align-items: center;
       gap: 12px;
       min-width: 0;
+      border-radius: 4px;
+      text-decoration: none;
+    }
+    a.brand:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 5px;
     }
     .brand img {
       width: 52px;
@@ -1877,12 +1883,12 @@ function loginPage({ error = '', next = '/admin', devLogin = false } = {}) {
 function adminMasthead(session) {
   return `
     <div class="masthead">
-      <div class="brand">
+      <a class="brand" href="/admin" aria-label="Zpět na hlavní stránku administrace">
         <img src="/drevito-logo-transparent.png" alt="Dřevito">
         <div>
           <strong>Dřevito</strong>
         </div>
-      </div>
+      </a>
       <div class="actions" style="margin:0;">
         <a class="button button--ghost" href="/admin/products">Výrobky</a>
         <a class="button button--ghost" href="/admin/product-categories">Kategorie výrobků</a>

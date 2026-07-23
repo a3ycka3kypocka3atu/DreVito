@@ -38,12 +38,10 @@ on public.blog_categories (is_visible, archived_at, sort_order, title);
 
 insert into public.blog_categories (title, slug, description, sort_order, is_visible)
 values
-  ('Craft', 'craft', 'Řemeslné postupy, materiály a dílenské poznámky.', 10, true),
-  ('Place', 'place', 'Místa, odkud výrobky a inspirace vyrůstají.', 20, true),
-  ('Author', 'author', 'Příběhy a poznámky autora.', 30, true),
-  ('Philosophy', 'philosophy', 'Hodnoty, přístup k tvorbě a vztah ke dřevu.', 40, true),
-  ('Products', 'products', 'Novinky a zákulisí konkrétních výrobků.', 50, true),
-  ('News', 'news', 'Aktuality, oznámení a krátké zprávy.', 60, true)
+  ('Z dílny', 'craft', 'Řemeslné postupy, materiály a dílenské poznámky.', 10, true),
+  ('O autorovi', 'author', 'Příběhy a poznámky autora.', 30, true),
+  ('Filozofie značky', 'philosophy', 'Hodnoty, přístup k tvorbě a vztah ke dřevu.', 40, true),
+  ('Výrobky', 'products', 'Novinky a zákulisí konkrétních výrobků.', 50, true)
 on conflict (slug) do nothing;
 
 comment on column public.blog_categories.image is 'Optional blog category image metadata. Temporary shape: { "url": "...", "alt": "...", "media_id": "..." } until media selection uses Supabase Storage.';

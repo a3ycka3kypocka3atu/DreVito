@@ -288,7 +288,7 @@ const DEFAULT_BLOG_POSTS = [
     photos: [],
     featured_image: null,
     author_name: 'Dřevito',
-    categories: [{ title: 'Author', slug: 'author' }],
+    categories: [{ title: 'O autorovi', slug: 'author' }],
     published_at: null,
     updated_at: null
   },
@@ -302,7 +302,7 @@ const DEFAULT_BLOG_POSTS = [
     photos: [],
     featured_image: null,
     author_name: 'Dřevito',
-    categories: [{ title: 'Craft', slug: 'craft' }, { title: 'Products', slug: 'products' }],
+    categories: [{ title: 'Z dílny', slug: 'craft' }, { title: 'Výrobky', slug: 'products' }],
     published_at: null,
     updated_at: null
   }
@@ -1314,6 +1314,30 @@ function adminLayout(title, content) {
       border-radius: 8px;
       padding: 12px 14px;
       font-weight: 600;
+    }
+    .admin-guide {
+      max-width: 980px;
+      margin: 24px 0 30px;
+      padding: 18px 20px;
+      border: 1px solid rgba(182, 120, 66, 0.24);
+      border-left: 4px solid var(--accent);
+      border-radius: 14px;
+      background: #fbf7ee;
+    }
+    .admin-guide > strong {
+      display: block;
+      margin-bottom: 5px;
+      color: var(--ink);
+    }
+    .admin-guide p {
+      color: var(--muted);
+    }
+    .admin-guide p + p {
+      margin-top: 9px;
+    }
+    .admin-guide a {
+      color: var(--accent-dark);
+      font-weight: 700;
     }
     [hidden] { display: none !important; }
     .grid {
@@ -3511,7 +3535,12 @@ function productCategoriesAdminPage(session) {
     ${adminMasthead(session)}
     <div class="content">
       <h1>Kategorie výrobků</h1>
-      <p>Vytvořte hlavní kategorie a podkategorie, do kterých se potom přiřazují výrobky.</p>
+      <p>Kategorie rozdělují výrobky podle toho, co zákazník hledá.</p>
+      <aside class="admin-guide" aria-label="Vysvětlení kategorií">
+        <strong>Kategorie odpovídá na otázku „Co hledám?“</strong>
+        <p>Například <strong>Stoly</strong>, <strong>Židle</strong> nebo <strong>Dekorace</strong>. Výrobek „Dubový jídelní stůl“ proto patří do kategorie <strong>Stoly</strong>.</p>
+        <p>Vlastnosti výrobku, například dubový, rustikální nebo hnědý, patří do <a href="/admin/product-filters">filtrů výrobků</a>.</p>
+      </aside>
       <div id="category-message" hidden></div>
 
       <div class="category-layout" id="category-app">
@@ -4173,7 +4202,12 @@ function productFiltersAdminPage(session) {
     ${adminMasthead(session)}
     <div class="content">
       <h1>Vlastní filtry výrobků</h1>
-      <p>Nejdřív vytvořte skupinu filtru (např. <strong>Styl</strong>), potom možnosti, které v ní zákazník uvidí (např. <strong>Rustikální</strong>, <strong>Moderní</strong>). Možnosti pak přiřadíte výrobkům a návštěvník podle nich může filtrovat.</p>
+      <p>Filtry pomáhají zákazníkovi zúžit nabídku podle vlastností výrobků.</p>
+      <aside class="admin-guide" aria-label="Vysvětlení filtrů">
+        <strong>Filtr odpovídá na otázku „Jaké to má být?“</strong>
+        <p>Nejdřív vytvořte skupinu, například <strong>Materiál</strong>, a do ní možnosti <strong>Dub</strong>, <strong>Buk</strong> nebo <strong>Ořech</strong>. Další skupinou může být <strong>Styl</strong> s možnostmi <strong>Rustikální</strong> a <strong>Moderní</strong>.</p>
+        <p>Příklad: „Dubový jídelní stůl“ patří do <a href="/admin/product-categories">kategorie Stoly</a>, ale může mít filtr <strong>Materiál → Dub</strong> a <strong>Styl → Rustikální</strong>.</p>
+      </aside>
       <div id="filter-message" hidden></div>
       <div class="category-layout">
         <section class="category-panel">
@@ -4252,11 +4286,6 @@ function productsAdminPage(session) {
             <label>
               Celý popis
               <textarea id="product-description" name="description"></textarea>
-            </label>
-            <label>
-              Externí odkaz po kliknutí (volitelné)
-              <input id="product-external-url" name="external_url" type="url" placeholder="https://jiny-web.cz/produkt">
-              <span class="product-meta">Běžně nechte prázdné — výrobek se otevře přímo tady na webu. Vyplňte jen tehdy, pokud má návštěvník přejít na jinou stránku.</span>
             </label>
             <input id="product-sort-order" name="sort_order" type="hidden" value="0">
             <input id="product-published-at" name="published_at" type="hidden">
@@ -4355,7 +4384,6 @@ function productsAdminPage(session) {
       var woodTypesInput = document.getElementById('product-wood-types');
       var useInteriorInput = document.getElementById('product-use-interior');
       var useExteriorInput = document.getElementById('product-use-exterior');
-      var externalUrlInput = document.getElementById('product-external-url');
       var sortOrderInput = document.getElementById('product-sort-order');
       var publishedAtInput = document.getElementById('product-published-at');
       var categoryChecks = document.getElementById('product-category-checks');
@@ -4418,7 +4446,6 @@ function productsAdminPage(session) {
           availability: availabilityInput.value,
           wood_types: woodTypesInput.value.split(',').map(function(value) { return value.trim(); }).filter(Boolean),
           use_context: [useInteriorInput.checked ? 'interior' : '', useExteriorInput.checked ? 'exterior' : ''].filter(Boolean),
-          external_url: externalUrlInput.value.trim(),
           photos: photos,
           category_ids: selectedCategoryIds(),
           filter_option_ids: selectedFilterOptionIds(),
@@ -4458,7 +4485,6 @@ function productsAdminPage(session) {
         woodTypesInput.value = Array.isArray(product.wood_types) ? product.wood_types.join(', ') : '';
         useInteriorInput.checked = Array.isArray(product.use_context) && product.use_context.indexOf('interior') !== -1;
         useExteriorInput.checked = Array.isArray(product.use_context) && product.use_context.indexOf('exterior') !== -1;
-        externalUrlInput.value = product.external_url || '';
         sortOrderInput.value = product.sort_order || 0;
         publishedAtInput.value = formatDateForInput(product.published_at);
         renderCategoryChecks(product.category_ids || []);
@@ -5795,8 +5821,21 @@ function normalizeBlogCategoryInput(input) {
   };
 }
 
+const LEGACY_BLOG_CATEGORY_TITLES = {
+  craft: { legacy: 'Craft', localized: 'Z dílny' },
+  author: { legacy: 'Author', localized: 'O autorovi' },
+  philosophy: { legacy: 'Philosophy', localized: 'Filozofie značky' },
+  products: { legacy: 'Products', localized: 'Výrobky' }
+};
+
+function localizeLegacyBlogCategory(category) {
+  const translation = category && LEGACY_BLOG_CATEGORY_TITLES[category.slug];
+  if (!translation || category.title !== translation.legacy) return category;
+  return { ...category, title: translation.localized };
+}
+
 function sortBlogCategories(categories) {
-  return [...categories].sort((a, b) => {
+  return categories.map(localizeLegacyBlogCategory).sort((a, b) => {
     const aArchived = a.archived_at ? 1 : 0;
     const bArchived = b.archived_at ? 1 : 0;
     if (aArchived !== bArchived) return aArchived - bArchived;
@@ -6397,7 +6436,7 @@ function sortBlogPosts(posts) {
 }
 
 function attachBlogCategories(posts, categories, links) {
-  const categoryMap = new Map(categories.map((category) => [category.id, category]));
+  const categoryMap = new Map(categories.map(localizeLegacyBlogCategory).map((category) => [category.id, category]));
   const linksByPost = new Map();
   links.forEach((link) => {
     if (!linksByPost.has(link.blog_post_id)) linksByPost.set(link.blog_post_id, []);

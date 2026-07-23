@@ -1135,7 +1135,7 @@ function adminLayout(title, content) {
   <link rel="icon" href="/favicon.ico?v=20260622-3" sizes="any">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
       --bg: #f5f0e8;
@@ -1833,6 +1833,485 @@ function adminLayout(title, content) {
       .photo-row__empty { width: 100%; max-width: 180px; }
       .form-row { grid-template-columns: 1fr; }
     }
+
+    /* Dřevito admin design system */
+    :root {
+      --bg: #f1eadf;
+      --panel: #fffcf6;
+      --ink: #2b2118;
+      --muted: #706255;
+      --accent: #b67842;
+      --accent-dark: #7b4726;
+      --forest: #314139;
+      --forest-light: #40544a;
+      --sand: #ded2c1;
+      --line: rgba(43, 33, 24, 0.12);
+      --shadow: 0 28px 90px rgba(43, 33, 24, 0.13);
+      --font-display: 'Fraunces', Georgia, serif;
+      --font-body: 'Manrope', system-ui, sans-serif;
+    }
+    html { scroll-behavior: smooth; }
+    body {
+      background:
+        radial-gradient(circle at 92% 4%, rgba(182, 120, 66, 0.18), transparent 31rem),
+        radial-gradient(circle at 3% 82%, rgba(49, 65, 57, 0.10), transparent 34rem),
+        var(--bg);
+    }
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      opacity: 0.24;
+      pointer-events: none;
+      background-image: linear-gradient(rgba(43, 33, 24, 0.025) 1px, transparent 1px);
+      background-size: 100% 48px;
+    }
+    a { text-underline-offset: 3px; }
+    :focus-visible {
+      outline: 3px solid rgba(182, 120, 66, 0.62) !important;
+      outline-offset: 3px;
+    }
+    .shell {
+      display: block;
+      padding: clamp(14px, 2.4vw, 34px);
+    }
+    .panel {
+      width: min(100%, 1500px);
+      min-height: calc(100vh - clamp(28px, 4.8vw, 68px));
+      margin: 0 auto;
+      overflow: hidden;
+      border-color: rgba(43, 33, 24, 0.10);
+      border-radius: 30px;
+      background: rgba(255, 252, 246, 0.94);
+      box-shadow: var(--shadow);
+    }
+    .masthead {
+      position: relative;
+      align-items: center;
+      padding: 18px clamp(20px, 3vw, 42px);
+      border-bottom: 1px solid rgba(255, 252, 246, 0.11);
+      background:
+        radial-gradient(circle at 12% 10%, rgba(231, 198, 150, 0.13), transparent 20rem),
+        var(--forest);
+    }
+    .masthead::after {
+      content: '';
+      position: absolute;
+      right: clamp(24px, 5vw, 76px);
+      bottom: -1px;
+      width: 86px;
+      height: 3px;
+      border-radius: 999px 999px 0 0;
+      background: #e7c696;
+    }
+    .brand { gap: 14px; flex: 0 0 auto; }
+    .brand img {
+      width: 62px;
+      height: 62px;
+      padding: 4px;
+      border: 1px solid rgba(255, 252, 246, 0.16);
+      border-radius: 50%;
+      background: #e7c696;
+    }
+    .brand strong {
+      font-size: 1.42rem;
+      letter-spacing: -0.025em;
+    }
+    .brand span {
+      color: rgba(255, 252, 246, 0.62);
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+    .admin-nav {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 7px;
+      flex-wrap: wrap;
+    }
+    .admin-nav form { margin: 0; }
+    .admin-nav .button--ghost {
+      min-height: 36px;
+      padding: 0 13px;
+      border-color: rgba(255, 252, 246, 0.16);
+      color: rgba(255, 252, 246, 0.76);
+      font-size: 0.72rem;
+    }
+    .admin-nav .button--ghost:hover,
+    .admin-nav .button--ghost[aria-current="page"] {
+      border-color: rgba(231, 198, 150, 0.6);
+      background: rgba(255, 252, 246, 0.10);
+      color: #fffdf8;
+    }
+    .admin-nav .button--web {
+      border-color: #e7c696;
+      background: #e7c696;
+      color: var(--forest);
+    }
+    .admin-nav .button--web:hover {
+      background: #f0d8b3;
+      color: var(--forest);
+    }
+    .content {
+      padding: clamp(30px, 4.5vw, 68px);
+      animation: admin-rise 0.45s ease both;
+    }
+    .content > h1 {
+      max-width: 980px;
+      margin-bottom: 14px;
+      font-size: clamp(2.8rem, 5.5vw, 5.35rem);
+      line-height: 0.95;
+      letter-spacing: -0.055em;
+      text-wrap: balance;
+    }
+    .content > p {
+      max-width: 780px;
+      color: var(--muted);
+      font-size: clamp(0.96rem, 1.4vw, 1.08rem);
+    }
+    h2, h3 { font-family: var(--font-display); }
+    form { gap: 20px; }
+    label {
+      gap: 9px;
+      font-size: 0.82rem;
+      letter-spacing: 0.012em;
+    }
+    input,
+    select,
+    textarea {
+      min-height: 50px;
+      border-color: rgba(43, 33, 24, 0.15);
+      border-radius: 13px;
+      padding: 13px 15px;
+      background: #fffdf9;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
+      transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+    }
+    textarea { min-height: 112px; line-height: 1.6; }
+    input:hover,
+    select:hover,
+    textarea:hover { border-color: rgba(123, 71, 38, 0.32); }
+    input:focus,
+    select:focus,
+    textarea:focus {
+      outline: 0;
+      border-color: var(--accent);
+      background: #fff;
+      box-shadow: 0 0 0 4px rgba(182, 120, 66, 0.12);
+    }
+    .button {
+      min-height: 48px;
+      padding: 0 21px;
+      background: var(--accent-dark);
+      box-shadow: 0 8px 20px rgba(123, 71, 38, 0.14);
+      font-size: 0.8rem;
+      letter-spacing: 0.01em;
+      transition: transform 0.22s ease, background-color 0.22s ease, box-shadow 0.22s ease;
+    }
+    .button:hover {
+      background: var(--accent);
+      box-shadow: 0 12px 28px rgba(123, 71, 38, 0.2);
+      transform: translateY(-2px);
+    }
+    .button--secondary { background: var(--forest); }
+    .button--secondary:hover { background: var(--forest-light); }
+    .button--danger { background: #93432e; }
+    .button--small {
+      min-height: 38px;
+      padding: 0 14px;
+      font-size: 0.73rem;
+    }
+    .alert,
+    .success {
+      border-radius: 14px;
+      padding: 14px 17px;
+      box-shadow: 0 8px 24px rgba(43, 33, 24, 0.06);
+    }
+    .grid { gap: 18px; }
+    .card,
+    .admin-hero,
+    .admin-tool,
+    .media-form,
+    .media-target,
+    .site-content-panel,
+    .site-content-list,
+    .category-panel,
+    .category-list,
+    .product-panel,
+    .product-list,
+    .blog-panel,
+    .blog-list {
+      border-color: rgba(43, 33, 24, 0.11);
+      border-radius: 22px;
+      background: rgba(255, 253, 249, 0.9);
+      box-shadow: 0 16px 44px rgba(43, 33, 24, 0.065);
+    }
+    .admin-hero {
+      position: relative;
+      margin-top: 34px;
+      padding: clamp(24px, 4vw, 46px);
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 95% 0%, rgba(182, 120, 66, 0.18), transparent 26rem),
+        #fffdf9;
+    }
+    .admin-hero::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: clamp(24px, 4vw, 46px);
+      width: 72px;
+      height: 4px;
+      border-radius: 0 0 999px 999px;
+      background: var(--accent);
+    }
+    .admin-hero h2 {
+      font-size: clamp(2rem, 4vw, 3.4rem);
+      letter-spacing: -0.04em;
+    }
+    .admin-tools {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+      margin-top: 30px;
+    }
+    .admin-tool {
+      min-height: 184px;
+      align-content: start;
+      gap: 11px;
+      padding: 23px;
+      overflow: hidden;
+      position: relative;
+      transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+    }
+    .admin-tool::after {
+      content: '↗';
+      position: absolute;
+      top: 18px;
+      right: 19px;
+      color: rgba(43, 33, 24, 0.28);
+      font-size: 1.05rem;
+      transition: color 0.25s ease, transform 0.25s ease;
+    }
+    .admin-tool:hover {
+      border-color: rgba(182, 120, 66, 0.46);
+      box-shadow: 0 22px 50px rgba(43, 33, 24, 0.11);
+      transform: translateY(-4px);
+    }
+    .admin-tool:hover::after {
+      color: var(--accent-dark);
+      transform: translate(2px, -2px);
+    }
+    .admin-tool span {
+      color: var(--accent-dark);
+      font-size: 0.68rem;
+      letter-spacing: 0.14em;
+    }
+    .admin-tool strong {
+      padding-right: 26px;
+      font-size: 1.55rem;
+      letter-spacing: -0.025em;
+    }
+    .admin-tool p { line-height: 1.55; }
+    .media-layout,
+    .site-content-layout,
+    .category-layout,
+    .product-layout,
+    .blog-layout {
+      grid-template-columns: minmax(340px, 420px) minmax(0, 1fr);
+      gap: 24px;
+      margin-top: 34px;
+    }
+    .site-content-panel,
+    .site-content-list,
+    .category-panel,
+    .category-list,
+    .product-panel,
+    .product-list,
+    .blog-panel,
+    .blog-list { padding: clamp(20px, 2.3vw, 30px); }
+    .site-content-panel,
+    .category-panel,
+    .product-panel,
+    .blog-panel {
+      position: sticky;
+      top: 20px;
+    }
+    .site-content-panel h2,
+    .site-content-list h2,
+    .category-panel h2,
+    .category-list h2,
+    .product-panel h2,
+    .product-list h2,
+    .blog-panel h2,
+    .blog-list h2 {
+      font-size: 1.8rem;
+      letter-spacing: -0.035em;
+    }
+    .site-content-row,
+    .category-row,
+    .product-row,
+    .blog-row {
+      grid-template-columns: 108px minmax(0, 1fr);
+      gap: 17px;
+      margin-top: 13px;
+      padding: 14px;
+      border: 1px solid rgba(43, 33, 24, 0.09);
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.62);
+      transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+    }
+    .site-content-row:first-child,
+    .category-row:first-child,
+    .product-row:first-child,
+    .blog-row:first-child { border-top: 1px solid rgba(43, 33, 24, 0.09); }
+    .site-content-row:hover,
+    .category-row:hover,
+    .product-row:hover,
+    .blog-row:hover {
+      border-color: rgba(182, 120, 66, 0.34);
+      box-shadow: 0 12px 30px rgba(43, 33, 24, 0.07);
+      transform: translateY(-1px);
+    }
+    .site-content-thumb,
+    .category-thumb,
+    .product-thumb,
+    .blog-thumb {
+      width: 108px;
+      border-radius: 13px;
+      background: var(--sand);
+    }
+    .site-content-titleline strong,
+    .category-titleline strong,
+    .product-titleline strong,
+    .blog-titleline strong {
+      font-size: 1.45rem;
+      letter-spacing: -0.025em;
+    }
+    .badge {
+      min-height: 27px;
+      padding: 0 10px;
+      background: rgba(222, 210, 193, 0.62);
+      font-size: 0.65rem;
+      letter-spacing: 0.08em;
+    }
+    .badge--ok { background: #dfece2; color: #2d6543; }
+    .badge--muted { background: #ece6dc; color: var(--muted); }
+    .badge--archived { background: #f2ded7; color: #86412f; }
+    .check-label,
+    .category-checks,
+    .category-type-option,
+    .filter-settings,
+    .photo-row,
+    .preview-box {
+      border-color: rgba(43, 33, 24, 0.11);
+      border-radius: 14px;
+    }
+    .check-label { background: #fffdf9; }
+    .category-type-option:has(input:checked) {
+      border-color: var(--accent);
+      background: #fbf2e6;
+      box-shadow: 0 0 0 3px rgba(182, 120, 66, 0.12);
+    }
+    .filter-settings {
+      padding: 19px;
+      background: rgba(222, 210, 193, 0.25);
+    }
+    .media-tabs { gap: 9px; margin-top: 30px; }
+    .media-tab {
+      min-height: 43px;
+      border-radius: 999px;
+      background: #fffdf9;
+      font-size: 0.78rem;
+    }
+    .media-tab.active {
+      border-color: var(--forest);
+      background: var(--forest);
+    }
+    .media-target { overflow: hidden; }
+    .media-target__head { padding: 20px; }
+    .media-grid { gap: 16px; padding: 20px; }
+    .media-image {
+      border-color: rgba(43, 33, 24, 0.1);
+      border-radius: 15px;
+      background: #f7f1e7;
+      box-shadow: 0 9px 25px rgba(43, 33, 24, 0.06);
+    }
+    .empty-state {
+      border: 1px dashed rgba(43, 33, 24, 0.18);
+      border-radius: 14px;
+      background: rgba(222, 210, 193, 0.16);
+      text-align: center;
+    }
+    @keyframes admin-rise {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @media (max-width: 1180px) {
+      .masthead { align-items: flex-start; flex-direction: column; }
+      .admin-nav { justify-content: flex-start; }
+      .admin-tools { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    @media (max-width: 840px) {
+      .shell { padding: 0; }
+      .panel { min-height: 100vh; border: 0; border-radius: 0; }
+      .masthead { padding: 17px 18px; }
+      .brand img { width: 54px; height: 54px; }
+      .admin-nav {
+        width: 100%;
+        flex-wrap: nowrap;
+        justify-content: flex-start;
+        padding-bottom: 5px;
+        overflow-x: auto;
+        scrollbar-width: thin;
+      }
+      .admin-nav .button--ghost { flex: 0 0 auto; }
+      .content { padding: 30px 18px 50px; }
+      .content > h1 { font-size: clamp(2.55rem, 14vw, 4.4rem); }
+      .admin-tools { grid-template-columns: 1fr; }
+      .admin-tool { min-height: 0; }
+      .media-layout,
+      .site-content-layout,
+      .category-layout,
+      .product-layout,
+      .blog-layout { grid-template-columns: 1fr; }
+      .site-content-panel,
+      .category-panel,
+      .product-panel,
+      .blog-panel { position: static; }
+    }
+    @media (max-width: 560px) {
+      .content > h1 { letter-spacing: -0.045em; }
+      .admin-hero { padding: 26px 18px; }
+      .site-content-panel,
+      .site-content-list,
+      .category-panel,
+      .category-list,
+      .product-panel,
+      .product-list,
+      .blog-panel,
+      .blog-list { padding: 17px; border-radius: 18px; }
+      .site-content-row,
+      .category-row,
+      .product-row,
+      .blog-row,
+      .photo-row { grid-template-columns: 1fr; }
+      .site-content-thumb,
+      .category-thumb,
+      .product-thumb,
+      .blog-thumb { width: 100%; max-width: none; aspect-ratio: 16 / 9; }
+      .actions .button { width: 100%; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
   </style>
 </head>
 <body>
@@ -1841,6 +2320,15 @@ function adminLayout(title, content) {
       ${content}
     </section>
   </main>
+  <script>
+  (function() {
+    var currentPath = window.location.pathname.replace(/\\/+$/, '') || '/admin';
+    document.querySelectorAll('.admin-nav a[href^="/admin"]').forEach(function(link) {
+      var linkPath = new URL(link.href, window.location.origin).pathname.replace(/\\/+$/, '') || '/admin';
+      if (linkPath === currentPath) link.setAttribute('aria-current', 'page');
+    });
+  })();
+  </script>
 </body>
 </html>`.replace('<strong>Dřevito</strong>', '<strong>Dřevito admin panel</strong>');
 }
@@ -1887,20 +2375,21 @@ function adminMasthead(session) {
         <img src="/drevito-logo-transparent.png" alt="Dřevito">
         <div>
           <strong>Dřevito</strong>
+          <span>Správa webu</span>
         </div>
       </a>
-      <div class="actions" style="margin:0;">
+      <nav class="admin-nav" aria-label="Administrace">
         <a class="button button--ghost" href="/admin/products">Výrobky</a>
         <a class="button button--ghost" href="/admin/product-categories">Kategorie výrobků</a>
         <a class="button button--ghost" href="/admin/product-filters">Filtry výrobků</a>
         <a class="button button--ghost" href="/admin/blog-posts">Články blogu</a>
         <a class="button button--ghost" href="/admin/blog-categories">Kategorie blogu</a>
         <a class="button button--ghost" href="/admin/archive">Archiv</a>
-        <a class="button button--ghost" href="/" target="_blank" rel="noopener">Otevřít web</a>
+        <a class="button button--ghost button--web" href="/" target="_blank" rel="noopener">Otevřít web</a>
         <form method="post" action="/admin/logout" style="margin:0;">
           <button class="button button--ghost" type="submit">Odhlásit se</button>
         </form>
-      </div>
+      </nav>
     </div>`;
 }
 
@@ -7067,6 +7556,368 @@ async function handleSiteContentPhotoUpload(req, res, session) {
   }
 }
 
+function normalizeProductRouteSlug(pathname) {
+  const decodedPath = decodeURIComponent(pathname || '').replace(/\/+$/, '');
+  const segments = decodedPath.split('/').filter(Boolean);
+  if (segments.length !== 2 || segments[0] !== 'vyrobek') return '';
+  return slugify(segments[1], '');
+}
+
+function fallbackProduct(slug) {
+  const product = DEFAULT_CMS_PRODUCTS.find((item) => item.slug === slug);
+  if (!product) return null;
+  return {
+    ...product,
+    url: product.external_url || '',
+    photos: product.image ? [{ url: product.image, alt: product.title, is_featured: true, sort_order: 0 }] : [],
+    featured_image: product.image ? { url: product.image, alt: product.title } : null,
+    categories: [],
+    filter_options: []
+  };
+}
+
+async function getPublicProduct(slug, locale = 'cs') {
+  const payload = await getPublicCmsPayload(locale);
+  const product = (payload.products || []).find((item) => item.slug === slug);
+  return product || fallbackProduct(slug);
+}
+
+function publicProductPhotos(product) {
+  const candidates = [];
+  if (product.featured_image && product.featured_image.url) candidates.push(product.featured_image);
+  if (Array.isArray(product.photos)) candidates.push(...product.photos);
+  if (product.image) candidates.push({ url: product.image, alt: product.title || '' });
+
+  const seen = new Set();
+  return candidates.filter((photo) => {
+    if (!photo || !photo.url || seen.has(photo.url)) return false;
+    seen.add(photo.url);
+    return true;
+  });
+}
+
+function publicProductAvailability(product) {
+  if (product.availability === 'in_stock') return { label: 'Skladem', schema: 'https://schema.org/InStock' };
+  if (product.availability === 'made_to_order') return { label: 'Na objednávku', schema: 'https://schema.org/PreOrder' };
+  return { label: 'Dostupnost na dotaz', schema: 'https://schema.org/LimitedAvailability' };
+}
+
+function renderPublicProductPage(product, statusCode = 200) {
+  const photos = publicProductPhotos(product);
+  const primaryPhoto = photos[0] || null;
+  const title = product.title || 'Výrobek Dřevito';
+  const summary = product.short_description || stripHtmlToText(product.description || '') || 'Originální výrobek z dílny Dřevito.';
+  const descriptionBlocks = textBlocks(stripHtmlToText(product.description || product.short_description || ''));
+  const availability = publicProductAvailability(product);
+  const price = Number(product.price);
+  const hasPrice = Number.isFinite(price) && price > 0;
+  const formattedPrice = hasPrice
+    ? new Intl.NumberFormat('cs-CZ', { style: 'currency', currency: 'CZK', maximumFractionDigits: 0 }).format(price)
+    : 'Cena na dotaz';
+  const externalUrl = product.url || product.external_url || '';
+  const categoryNames = Array.isArray(product.categories)
+    ? product.categories.map((category) => category && category.title).filter(Boolean)
+    : [];
+  const useLabels = { interior: 'Do interiéru', exterior: 'Do exteriéru' };
+  const detailTags = [
+    ...(Array.isArray(product.wood_types) ? product.wood_types : []),
+    ...(Array.isArray(product.use_context) ? product.use_context.map((item) => useLabels[item] || item) : []),
+    ...(Array.isArray(product.filter_options) ? product.filter_options.map((option) => option && option.title).filter(Boolean) : [])
+  ];
+  const categoryLine = categoryNames.join(' · ') || 'Originál z dílny Dřevito';
+  const descriptionHtml = descriptionBlocks.length
+    ? descriptionBlocks.map((block) => `<p>${escapeHtml(block)}</p>`).join('')
+    : '<p>Podrobnější informace k tomuto výrobku pro vás právě připravujeme. Rádi vše doplníme při osobní domluvě.</p>';
+  const primaryImageHtml = primaryPhoto
+    ? `<img src="${escapeHtml(primaryPhoto.url)}" alt="${escapeHtml(primaryPhoto.alt || title)}">`
+    : `<div class="product-visual-placeholder">${escapeHtml(title)}</div>`;
+  const secondaryImagesHtml = photos.slice(1, 4).length
+    ? `<div class="gallery-grid">${photos.slice(1, 4).map((photo) => `<figure><img src="${escapeHtml(photo.url)}" alt="${escapeHtml(photo.alt || title)}" loading="lazy"></figure>`).join('')}</div>`
+    : '';
+  const tagsHtml = detailTags.length
+    ? `<div class="tags">${detailTags.map((tag) => `<span>${escapeHtml(tag)}</span>`).join('')}</div>`
+    : '';
+  const primaryAction = externalUrl
+    ? `<a class="button button--primary" href="${escapeHtml(externalUrl)}" target="_blank" rel="noopener">Koupit v obchodě <span aria-hidden="true">↗</span></a>`
+    : '<a class="button button--primary" href="mailto:info@drevito.cz">Poptat výrobek</a>';
+  const schema = {
+    '@context': 'https://schema.org',
+    '@type': 'Product',
+    name: title,
+    description: summary,
+    image: photos.map((photo) => photo.url),
+    sku: product.legacy_id || product.id || undefined,
+    brand: { '@type': 'Brand', name: 'Dřevito' },
+    offers: {
+      '@type': 'Offer',
+      url: externalUrl || `/vyrobek/${product.slug}`,
+      priceCurrency: 'CZK',
+      ...(hasPrice ? { price } : {}),
+      availability: availability.schema
+    }
+  };
+  const schemaJson = JSON.stringify(schema).replace(/</g, '\\u003c');
+
+  return {
+    statusCode,
+    html: `<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>${escapeHtml(title)} | Dřevito</title>
+  <meta name="description" content="${escapeHtml(summary.slice(0, 160))}">
+  <link rel="canonical" href="/vyrobek/${escapeHtml(product.slug)}">
+  <meta property="og:type" content="product">
+  <meta property="og:title" content="${escapeHtml(title)} | Dřevito">
+  <meta property="og:description" content="${escapeHtml(summary.slice(0, 200))}">
+  ${primaryPhoto ? `<meta property="og:image" content="${escapeHtml(primaryPhoto.url)}">` : ''}
+  <link rel="icon" href="/favicon.ico?v=20260622-3" sizes="any">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script type="application/ld+json">${schemaJson}</script>
+  <style>
+    :root {
+      --bg: #f1eadf;
+      --panel: #fffcf6;
+      --ink: #2b2118;
+      --muted: #706255;
+      --accent: #b67842;
+      --accent-dark: #7b4726;
+      --forest: #314139;
+      --sand: #ded2c1;
+      --display: 'Fraunces', Georgia, serif;
+      --body: 'Manrope', system-ui, sans-serif;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background:
+        radial-gradient(circle at 90% 5%, rgba(182, 120, 66, 0.13), transparent 30rem),
+        var(--bg);
+      color: var(--ink);
+      font-family: var(--body);
+      line-height: 1.65;
+    }
+    a { color: inherit; }
+    :focus-visible { outline: 3px solid rgba(182, 120, 66, 0.6); outline-offset: 4px; }
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      border-bottom: 1px solid rgba(43, 33, 24, 0.1);
+      background: rgba(241, 234, 223, 0.94);
+      backdrop-filter: blur(14px);
+    }
+    .topbar-inner {
+      width: min(1240px, calc(100% - 40px));
+      min-height: 82px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 28px;
+    }
+    .brand { display: inline-flex; align-items: center; gap: 12px; text-decoration: none; }
+    .brand img { width: 66px; height: 66px; object-fit: contain; }
+    .brand span { font: 600 1.15rem/1 var(--display); letter-spacing: 0.04em; }
+    .topnav { display: flex; align-items: center; gap: clamp(16px, 2.5vw, 34px); }
+    .topnav a { color: rgba(43, 33, 24, 0.76); font-size: 0.82rem; font-weight: 700; text-decoration: none; }
+    .topnav a:hover { color: var(--accent-dark); }
+    .breadcrumbs {
+      width: min(1240px, calc(100% - 40px));
+      margin: 0 auto;
+      padding: 25px 0 0;
+      color: var(--muted);
+      font-size: 0.75rem;
+      font-weight: 700;
+    }
+    .breadcrumbs a { text-decoration: none; }
+    .breadcrumbs span { margin: 0 8px; color: rgba(112, 98, 85, 0.5); }
+    main { width: min(1240px, calc(100% - 40px)); margin: 0 auto; padding: clamp(38px, 6vw, 76px) 0 90px; }
+    .product-hero { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(340px, 0.95fr); gap: clamp(42px, 7vw, 92px); align-items: center; }
+    .product-visual { position: relative; }
+    .product-visual::before {
+      content: '';
+      position: absolute;
+      inset: -14px 18px 18px -14px;
+      z-index: -1;
+      border: 1px solid rgba(123, 71, 38, 0.42);
+      border-radius: 32px 12px 32px 32px;
+      transform: rotate(-1deg);
+    }
+    .product-visual > img,
+    .product-visual-placeholder {
+      display: block;
+      width: 100%;
+      aspect-ratio: 4 / 4.6;
+      border-radius: 32px 12px 32px 32px;
+      object-fit: cover;
+      background: var(--sand);
+      box-shadow: 0 30px 75px rgba(43, 33, 24, 0.16);
+    }
+    .product-visual-placeholder { display: grid; place-items: center; padding: 28px; color: var(--muted); text-align: center; }
+    .eyebrow { margin: 0 0 16px; color: var(--accent-dark); font-size: 0.7rem; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; }
+    h1 { margin: 0 0 22px; font: 600 clamp(3.25rem, 7vw, 6.6rem)/0.92 var(--display); letter-spacing: -0.052em; text-wrap: balance; }
+    .summary { max-width: 620px; margin: 0 0 28px; color: var(--muted); font-size: clamp(1rem, 1.7vw, 1.2rem); }
+    .purchase-row { display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 22px 0; border-top: 1px solid rgba(43, 33, 24, 0.13); border-bottom: 1px solid rgba(43, 33, 24, 0.13); }
+    .price { display: block; font: 600 clamp(1.65rem, 3vw, 2.35rem)/1 var(--display); }
+    .availability { display: block; margin-top: 6px; color: var(--muted); font-size: 0.76rem; font-weight: 700; }
+    .button {
+      display: inline-flex;
+      min-height: 52px;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 0 22px;
+      border: 1px solid rgba(43, 33, 24, 0.22);
+      border-radius: 999px;
+      font-size: 0.83rem;
+      font-weight: 700;
+      text-decoration: none;
+      transition: transform 0.25s ease, background-color 0.25s ease, color 0.25s ease;
+    }
+    .button:hover { transform: translateY(-2px); }
+    .button--primary { border-color: var(--ink); background: var(--ink); color: var(--panel); }
+    .button--primary:hover { background: var(--forest); }
+    .tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 24px; }
+    .tags span { padding: 7px 11px; border: 1px solid rgba(43, 33, 24, 0.13); border-radius: 999px; background: rgba(255, 252, 246, 0.55); font-size: 0.72rem; font-weight: 700; }
+    .story {
+      display: grid;
+      grid-template-columns: minmax(220px, 0.6fr) minmax(0, 1.4fr);
+      gap: clamp(34px, 7vw, 90px);
+      margin-top: clamp(72px, 11vw, 140px);
+      padding: clamp(38px, 6vw, 72px);
+      border-radius: 32px;
+      background: var(--forest);
+      color: var(--panel);
+    }
+    .story-label { color: #e7c696; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.19em; text-transform: uppercase; }
+    .story h2 { margin: 14px 0 0; font: 600 clamp(2.4rem, 5vw, 4.6rem)/0.98 var(--display); letter-spacing: -0.045em; }
+    .story-copy { max-width: 700px; }
+    .story-copy p { margin: 0 0 18px; color: rgba(255, 252, 246, 0.76); }
+    .story-copy p:last-child { margin-bottom: 0; }
+    .gallery-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-top: 18px; }
+    .gallery-grid figure { margin: 0; overflow: hidden; border-radius: 16px; background: var(--sand); }
+    .gallery-grid img { display: block; width: 100%; aspect-ratio: 4 / 3; object-fit: cover; transition: transform 0.55s ease; }
+    .gallery-grid figure:hover img { transform: scale(1.035); }
+    .craft-values { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; margin-top: clamp(52px, 8vw, 92px); border: 1px solid rgba(43, 33, 24, 0.12); border-radius: 24px; overflow: hidden; background: rgba(43, 33, 24, 0.12); }
+    .craft-value { padding: clamp(22px, 4vw, 38px); background: rgba(255, 252, 246, 0.76); }
+    .craft-value strong { display: block; margin-bottom: 7px; font: 600 1.3rem/1.15 var(--display); }
+    .craft-value span { color: var(--muted); font-size: 0.83rem; }
+    .final-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-top: 46px; }
+    footer { padding: 34px 20px; background: #221a14; color: rgba(255, 252, 246, 0.58); text-align: center; font-size: 0.75rem; }
+    @media (max-width: 820px) {
+      .topbar-inner { min-height: 72px; }
+      .brand img { width: 56px; height: 56px; }
+      .brand span { display: none; }
+      .topnav a:not(:last-child) { display: none; }
+      .product-hero { grid-template-columns: 1fr; }
+      .product-info { order: -1; }
+      .product-visual { width: min(100%, 620px); margin: 0 auto; }
+      .product-visual > img, .product-visual-placeholder { aspect-ratio: 4 / 4.25; }
+      .story { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 560px) {
+      .topbar-inner, .breadcrumbs, main { width: min(100% - 28px, 1240px); }
+      .topnav { gap: 12px; }
+      .topnav a { font-size: 0.75rem; }
+      .breadcrumbs { padding-top: 18px; }
+      main { padding-top: 30px; }
+      h1 { font-size: clamp(3rem, 16vw, 4.8rem); }
+      .purchase-row { align-items: stretch; flex-direction: column; }
+      .button { width: 100%; }
+      .story { margin-right: -14px; margin-left: -14px; padding: 34px 22px; border-radius: 24px; }
+      .gallery-grid { grid-template-columns: 1fr; }
+      .craft-values { grid-template-columns: 1fr; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after { transition-duration: 0.01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="/" aria-label="Dřevito – úvodní stránka">
+        <img src="/drevito-logo-transparent.png" alt="">
+        <span>Dřevito</span>
+      </a>
+      <nav class="topnav" aria-label="Hlavní navigace">
+        <a href="/#about">O nás</a>
+        <a href="/#products">Výrobky</a>
+        <a href="/#custom">Výroba na míru</a>
+        <a href="/#contact">Kontakt</a>
+      </nav>
+    </div>
+  </header>
+
+  <nav class="breadcrumbs" aria-label="Drobečková navigace">
+    <a href="/">Domů</a><span>/</span><a href="/#products">Výrobky</a><span>/</span>${escapeHtml(title)}
+  </nav>
+
+  <main>
+    <section class="product-hero">
+      <div class="product-visual">${primaryImageHtml}</div>
+      <div class="product-info">
+        <p class="eyebrow">${escapeHtml(categoryLine)}</p>
+        <h1>${escapeHtml(title)}</h1>
+        <p class="summary">${escapeHtml(summary)}</p>
+        <div class="purchase-row">
+          <div><strong class="price">${escapeHtml(formattedPrice)}</strong><span class="availability">${escapeHtml(availability.label)}</span></div>
+          ${primaryAction}
+        </div>
+        ${tagsHtml}
+      </div>
+    </section>
+
+    ${secondaryImagesHtml}
+
+    <section class="story">
+      <div><span class="story-label">Příběh výrobku</span><h2>Vyrobeno s&nbsp;respektem ke dřevu</h2></div>
+      <div class="story-copy">${descriptionHtml}</div>
+    </section>
+
+    <section class="craft-values" aria-label="Hodnoty výrobku">
+      <div class="craft-value"><strong>Ruční práce</strong><span>Každý kus vzniká v dílně Dřevito.</span></div>
+      <div class="craft-value"><strong>Přírodní materiál</strong><span>Dřevo vybíráme podle charakteru výrobku.</span></div>
+      <div class="craft-value"><strong>Každý kus je originál</strong><span>Kresba a odstín dřeva se přirozeně liší.</span></div>
+    </section>
+
+    <div class="final-actions">
+      ${primaryAction}
+      <a class="button" href="/#products">Zpět na všechny výrobky</a>
+    </div>
+  </main>
+
+  <footer>© 2026 Dřevito · Dřevěné výrobky zhotovené srdcem</footer>
+</body>
+</html>`
+  };
+}
+
+async function handlePublicProductRoute(req, res, url) {
+  const slug = normalizeProductRouteSlug(url.pathname);
+  if (!slug) return false;
+
+  try {
+    const product = await getPublicProduct(slug, (url.searchParams.get('locale') || 'cs').trim().toLowerCase());
+    if (!product) return false;
+    const rendered = renderPublicProductPage(product);
+    send(res, rendered.statusCode, rendered.html, { 'Cache-Control': 'no-cache' });
+  } catch (error) {
+    const fallback = fallbackProduct(slug);
+    if (!fallback) throw error;
+    console.error(error);
+    const rendered = renderPublicProductPage(fallback);
+    send(res, rendered.statusCode, rendered.html, { 'Cache-Control': 'no-store' });
+  }
+  return true;
+}
+
 function normalizeBlogRouteSlug(pathname) {
   const decodedPath = decodeURIComponent(pathname || '').replace(/\/+$/, '');
   const segments = decodedPath.split('/').filter(Boolean);
@@ -7123,8 +7974,6 @@ function formatDateCs(value) {
 
 async function getPublicBlogPost(slug, locale = 'cs') {
   const fallback = fallbackBlogPost(slug);
-  if (!isSupabaseConfigured()) return fallback;
-
   const payload = await getPublicCmsPayload(locale);
   const post = (payload.blog_posts || []).find((item) => item.slug === slug);
   return post || fallback;
@@ -8028,7 +8877,8 @@ function handleRequest(req, res) {
     return;
   }
 
-  handlePublicBlogRoute(req, res, url)
+  handlePublicProductRoute(req, res, url)
+    .then((handled) => handled || handlePublicBlogRoute(req, res, url))
     .then((handled) => {
       if (!handled) serveStatic(req, res, isPublicProductsRoute(url.pathname) ? '/index.html' : url.pathname);
     })

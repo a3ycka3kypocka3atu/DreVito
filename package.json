@@ -4,7 +4,8 @@
   "private": true,
   "description": "Drevito static website with protected admin area.",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "test:smoke": "node scripts/smoke-test.mjs"
   },
   "engines": {
     "node": ">=18"

@@ -84,6 +84,25 @@ set
   updated_at = now()
 where slug in ('custom-graphics', 'zakazkova-vyroba-a-gravirovani-na-miru');
 
+-- Production can start with an empty category table. Ensure the five agreed
+-- parent categories exist before inserting their children below.
+insert into public.product_categories (title, slug, description, sort_order, is_visible, parent_id)
+values
+  ('Rustikální nábytek', 'rustikalni-nabytek', 'Originální stoly, lavice, stoličky a další solitérní kusy z masivního dřeva.', 10, true, null),
+  ('Dekorace, světla a stínohry', 'dekorace-svetla-a-stinohry', 'Dřevěné dekorace a objekty, které pracují se světlem, stínem a atmosférou prostoru.', 20, true, null),
+  ('Dárky a drobné výrobky', 'darky-a-drobne-vyrobky', 'Menší dřevěné radosti, dárky a praktické výrobky pro každý den.', 30, true, null),
+  ('Informační a propagační materiály', 'informacni-a-propagacni-materialy', 'Loga, vizitky, informační cedule a orientační prvky zpracované osobitě ve dřevě.', 40, true, null),
+  ('Zakázková výroba a gravírování na míru', 'zakazkova-vyroba-a-gravirovani-na-miru', 'Výroba podle vaší představy i gravírování vlastních předmětů, fotografií, motivů a log.', 50, true, null)
+on conflict (slug) do update
+set
+  title = excluded.title,
+  description = excluded.description,
+  sort_order = excluded.sort_order,
+  parent_id = null,
+  is_visible = true,
+  archived_at = null,
+  updated_at = now();
+
 -- Existing broad categories become useful children of the merged groups.
 update public.product_categories child
 set

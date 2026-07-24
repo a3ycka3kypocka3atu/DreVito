@@ -152,7 +152,7 @@ try {
   })).option;
 
   const imageForm = new FormData();
-  imageForm.append('image', new Blob([await readFile(path.join(projectRoot, 'favicon.png'))], { type: 'image/png' }), 'smoke-product.png');
+  imageForm.append('image', new Blob([await readFile(path.join(projectRoot, 'drevito-logo-transparent.png'))], { type: 'image/png' }), 'smoke-product.png');
   imageForm.append('targetLabel', 'Smoke výrobek');
   imageForm.append('targetKey', 'smoke-vyrobek');
   imageForm.append('alt', 'Smoke výrobek');
@@ -169,7 +169,6 @@ try {
     description: 'Celý popis testovacího výrobku.',
     photos: [photoUpload.photo],
     price: 1234,
-    external_url: '',
     wood_types: ['dub'],
     availability: 'made_to_order',
     use_context: ['interior'],
@@ -193,6 +192,7 @@ try {
   check(publicProduct, 'Published product was missing from public content.');
   check(publicProduct.categories.some((item) => item.id === productCategory.id), 'Public product category was missing.');
   check(publicProduct.filter_options.some((item) => item.id === filterOption.id), 'Public product filter was missing.');
+  check(!Object.prototype.hasOwnProperty.call(publicProduct, 'url'), 'Public product unexpectedly exposed a shop URL.');
   check(publicContent.product_filters.some((item) => item.id === filter.id), 'Visible product filter was missing from public content.');
 
   const productPage = await request(`/vyrobek/${productPayload.slug}`, {
@@ -202,6 +202,8 @@ try {
   const productHtml = await productPage.text();
   check(productHtml.includes(productPayload.title), 'Product detail page did not contain the product title.');
   check(productHtml.includes('1&nbsp;234') || productHtml.includes('1 234') || productHtml.includes('1 234'), 'Product detail page did not contain the product price.');
+  check(productHtml.includes('mailto:info@drevito.cz') && productHtml.includes('Poptat výrobek'), 'Product detail page did not contain the direct enquiry action.');
+  check(!/<a[^>]+href=["']https?:\/\//i.test(productHtml), 'Product detail page unexpectedly linked away from Dřevito.');
 
   await jsonRequest(`/admin/api/products/${product.id}/archive`, { method: 'POST', json: {} });
   publicContent = await jsonRequest('/api/public-content?locale=cs', { authenticated: false });

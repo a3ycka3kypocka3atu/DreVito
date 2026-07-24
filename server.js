@@ -182,7 +182,6 @@ const DEFAULT_CMS_PRODUCTS = [
     wood_types: [],
     availability: 'made_to_order',
     use_context: ['interior'],
-    external_url: 'https://drevito.t2.upgates.shop/p/stolecek-strom-zivota-slunecni-kruh',
     image: '/cajne-stolicky.JPG'
   },
   {
@@ -197,7 +196,6 @@ const DEFAULT_CMS_PRODUCTS = [
     wood_types: [],
     availability: 'made_to_order',
     use_context: ['interior'],
-    external_url: 'https://drevito.t2.upgates.shop/p/svicelenka-osta',
     image: '/dekoracni-tabulka.JPG'
   },
   {
@@ -212,7 +210,6 @@ const DEFAULT_CMS_PRODUCTS = [
     wood_types: [],
     availability: 'made_to_order',
     use_context: ['interior'],
-    external_url: 'https://drevito.t2.upgates.shop/p/krabicka-jin-jang',
     image: '/krabicka.JPG'
   },
   {
@@ -227,7 +224,6 @@ const DEFAULT_CMS_PRODUCTS = [
     wood_types: [],
     availability: 'made_to_order',
     use_context: ['interior'],
-    external_url: 'https://drevito.t2.upgates.shop/p/kun',
     image: '/kun-dekorace.JPG'
   },
   {
@@ -242,7 +238,6 @@ const DEFAULT_CMS_PRODUCTS = [
     wood_types: [],
     availability: 'made_to_order',
     use_context: ['interior'],
-    external_url: 'https://drevito.t2.upgates.shop/p/bohyne',
     image: '/dekorace-zena.JPG'
   },
   {
@@ -257,7 +252,6 @@ const DEFAULT_CMS_PRODUCTS = [
     wood_types: [],
     availability: 'made_to_order',
     use_context: ['interior'],
-    external_url: 'https://drevito.t2.upgates.shop/p/vlk',
     image: '/stojan-na-telefon.JPG'
   },
   {
@@ -272,7 +266,6 @@ const DEFAULT_CMS_PRODUCTS = [
     wood_types: [],
     availability: 'made_to_order',
     use_context: ['interior'],
-    external_url: 'https://drevito.t2.upgates.shop/p/lev-kvetinovych-ornamentech',
     image: '/hracka-auticko.JPG'
   }
 ];
@@ -288,7 +281,7 @@ const DEFAULT_BLOG_POSTS = [
     photos: [],
     featured_image: null,
     author_name: 'Dřevito',
-    categories: [{ title: 'Author', slug: 'author' }],
+    categories: [{ title: 'O autorovi', slug: 'author' }],
     published_at: null,
     updated_at: null
   },
@@ -302,7 +295,7 @@ const DEFAULT_BLOG_POSTS = [
     photos: [],
     featured_image: null,
     author_name: 'Dřevito',
-    categories: [{ title: 'Craft', slug: 'craft' }, { title: 'Products', slug: 'products' }],
+    categories: [{ title: 'Z dílny', slug: 'craft' }, { title: 'Výrobky', slug: 'products' }],
     published_at: null,
     updated_at: null
   }
@@ -741,7 +734,6 @@ function seedDefaultCmsContent(db) {
       is_featured: true
     }],
     price: product.price,
-    external_url: product.external_url,
     wood_types: product.wood_types || [],
     availability: product.availability || null,
     use_context: product.use_context || [],
@@ -1314,6 +1306,30 @@ function adminLayout(title, content) {
       border-radius: 8px;
       padding: 12px 14px;
       font-weight: 600;
+    }
+    .admin-guide {
+      max-width: 980px;
+      margin: 24px 0 30px;
+      padding: 18px 20px;
+      border: 1px solid rgba(182, 120, 66, 0.24);
+      border-left: 4px solid var(--accent);
+      border-radius: 14px;
+      background: #fbf7ee;
+    }
+    .admin-guide > strong {
+      display: block;
+      margin-bottom: 5px;
+      color: var(--ink);
+    }
+    .admin-guide p {
+      color: var(--muted);
+    }
+    .admin-guide p + p {
+      margin-top: 9px;
+    }
+    .admin-guide a {
+      color: var(--accent-dark);
+      font-weight: 700;
     }
     [hidden] { display: none !important; }
     .grid {
@@ -3511,7 +3527,12 @@ function productCategoriesAdminPage(session) {
     ${adminMasthead(session)}
     <div class="content">
       <h1>Kategorie výrobků</h1>
-      <p>Vytvořte hlavní kategorie a podkategorie, do kterých se potom přiřazují výrobky.</p>
+      <p>Kategorie rozdělují výrobky podle toho, co zákazník hledá.</p>
+      <aside class="admin-guide" aria-label="Vysvětlení kategorií">
+        <strong>Kategorie odpovídá na otázku „Co hledám?“</strong>
+        <p>Například <strong>Stoly</strong>, <strong>Židle</strong> nebo <strong>Dekorace</strong>. Výrobek „Dubový jídelní stůl“ proto patří do kategorie <strong>Stoly</strong>.</p>
+        <p>Vlastnosti výrobku, například dubový, rustikální nebo hnědý, patří do <a href="/admin/product-filters">filtrů výrobků</a>.</p>
+      </aside>
       <div id="category-message" hidden></div>
 
       <div class="category-layout" id="category-app">
@@ -4173,7 +4194,12 @@ function productFiltersAdminPage(session) {
     ${adminMasthead(session)}
     <div class="content">
       <h1>Vlastní filtry výrobků</h1>
-      <p>Nejdřív vytvořte skupinu filtru (např. <strong>Styl</strong>), potom možnosti, které v ní zákazník uvidí (např. <strong>Rustikální</strong>, <strong>Moderní</strong>). Možnosti pak přiřadíte výrobkům a návštěvník podle nich může filtrovat.</p>
+      <p>Filtry pomáhají zákazníkovi zúžit nabídku podle vlastností výrobků.</p>
+      <aside class="admin-guide" aria-label="Vysvětlení filtrů">
+        <strong>Filtr odpovídá na otázku „Jaké to má být?“</strong>
+        <p>Nejdřív vytvořte skupinu, například <strong>Materiál</strong>, a do ní možnosti <strong>Dub</strong>, <strong>Buk</strong> nebo <strong>Ořech</strong>. Další skupinou může být <strong>Styl</strong> s možnostmi <strong>Rustikální</strong> a <strong>Moderní</strong>.</p>
+        <p>Příklad: „Dubový jídelní stůl“ patří do <a href="/admin/product-categories">kategorie Stoly</a>, ale může mít filtr <strong>Materiál → Dub</strong> a <strong>Styl → Rustikální</strong>.</p>
+      </aside>
       <div id="filter-message" hidden></div>
       <div class="category-layout">
         <section class="category-panel">
@@ -4252,11 +4278,6 @@ function productsAdminPage(session) {
             <label>
               Celý popis
               <textarea id="product-description" name="description"></textarea>
-            </label>
-            <label>
-              Externí odkaz po kliknutí (volitelné)
-              <input id="product-external-url" name="external_url" type="url" placeholder="https://jiny-web.cz/produkt">
-              <span class="product-meta">Běžně nechte prázdné — výrobek se otevře přímo tady na webu. Vyplňte jen tehdy, pokud má návštěvník přejít na jinou stránku.</span>
             </label>
             <input id="product-sort-order" name="sort_order" type="hidden" value="0">
             <input id="product-published-at" name="published_at" type="hidden">
@@ -4355,7 +4376,6 @@ function productsAdminPage(session) {
       var woodTypesInput = document.getElementById('product-wood-types');
       var useInteriorInput = document.getElementById('product-use-interior');
       var useExteriorInput = document.getElementById('product-use-exterior');
-      var externalUrlInput = document.getElementById('product-external-url');
       var sortOrderInput = document.getElementById('product-sort-order');
       var publishedAtInput = document.getElementById('product-published-at');
       var categoryChecks = document.getElementById('product-category-checks');
@@ -4418,7 +4438,6 @@ function productsAdminPage(session) {
           availability: availabilityInput.value,
           wood_types: woodTypesInput.value.split(',').map(function(value) { return value.trim(); }).filter(Boolean),
           use_context: [useInteriorInput.checked ? 'interior' : '', useExteriorInput.checked ? 'exterior' : ''].filter(Boolean),
-          external_url: externalUrlInput.value.trim(),
           photos: photos,
           category_ids: selectedCategoryIds(),
           filter_option_ids: selectedFilterOptionIds(),
@@ -4458,7 +4477,6 @@ function productsAdminPage(session) {
         woodTypesInput.value = Array.isArray(product.wood_types) ? product.wood_types.join(', ') : '';
         useInteriorInput.checked = Array.isArray(product.use_context) && product.use_context.indexOf('interior') !== -1;
         useExteriorInput.checked = Array.isArray(product.use_context) && product.use_context.indexOf('exterior') !== -1;
-        externalUrlInput.value = product.external_url || '';
         sortOrderInput.value = product.sort_order || 0;
         publishedAtInput.value = formatDateForInput(product.published_at);
         renderCategoryChecks(product.category_ids || []);
@@ -5795,8 +5813,21 @@ function normalizeBlogCategoryInput(input) {
   };
 }
 
+const LEGACY_BLOG_CATEGORY_TITLES = {
+  craft: { legacy: 'Craft', localized: 'Z dílny' },
+  author: { legacy: 'Author', localized: 'O autorovi' },
+  philosophy: { legacy: 'Philosophy', localized: 'Filozofie značky' },
+  products: { legacy: 'Products', localized: 'Výrobky' }
+};
+
+function localizeLegacyBlogCategory(category) {
+  const translation = category && LEGACY_BLOG_CATEGORY_TITLES[category.slug];
+  if (!translation || category.title !== translation.legacy) return category;
+  return { ...category, title: translation.localized };
+}
+
 function sortBlogCategories(categories) {
-  return [...categories].sort((a, b) => {
+  return categories.map(localizeLegacyBlogCategory).sort((a, b) => {
     const aArchived = a.archived_at ? 1 : 0;
     const bArchived = b.archived_at ? 1 : 0;
     if (aArchived !== bArchived) return aArchived - bArchived;
@@ -5987,19 +6018,6 @@ function normalizeProductTextList(input) {
   }, []);
 }
 
-function normalizeExternalUrl(value) {
-  const raw = String(value || '').trim();
-  if (!raw) return null;
-  let parsed;
-  try {
-    parsed = new URL(raw);
-  } catch (error) {
-    throw new Error('Externí odkaz musí začínat http:// nebo https://.');
-  }
-  if (!['http:', 'https:'].includes(parsed.protocol)) throw new Error('Externí odkaz musí začínat http:// nebo https://.');
-  return raw;
-}
-
 function normalizeProductInput(input) {
   const title = String(input.title || '').trim();
   const slug = String(input.slug || '').trim().toLowerCase();
@@ -6033,7 +6051,6 @@ function normalizeProductInput(input) {
       description: description || null,
       photos: normalizeProductPhotos(input.photos),
       price,
-      external_url: normalizeExternalUrl(input.external_url || input.externalUrl),
       wood_types: woodTypes,
       availability: availability || null,
       use_context: useContext,
@@ -6109,7 +6126,7 @@ async function listProducts() {
   const [products, categories, links, filters, filterOptions, filterLinks] = await Promise.all([
     supabaseRequest('products', {
       query: {
-        select: 'id,title,slug,short_description,description,photos,price,external_url,wood_types,availability,use_context,sort_order,is_visible,is_published,published_at,archived_at,created_at,updated_at',
+        select: 'id,title,slug,short_description,description,photos,price,wood_types,availability,use_context,sort_order,is_visible,is_published,published_at,archived_at,created_at,updated_at',
         order: 'sort_order.asc,title.asc'
       }
     }),
@@ -6227,7 +6244,7 @@ async function createProduct(input) {
     method: 'POST',
     body: product,
     prefer: 'return=representation',
-    query: { select: 'id,title,slug,short_description,description,photos,price,external_url,wood_types,availability,use_context,sort_order,is_visible,is_published,published_at,archived_at,created_at,updated_at' }
+    query: { select: 'id,title,slug,short_description,description,photos,price,wood_types,availability,use_context,sort_order,is_visible,is_published,published_at,archived_at,created_at,updated_at' }
   });
   const created = Array.isArray(rows) ? rows[0] : rows;
   if (!created || !created.id) throw new Error('Výrobek se nepodařilo vytvořit.');
@@ -6269,7 +6286,7 @@ async function updateProduct(id, input) {
     method: 'PATCH',
     query: {
       id: `eq.${id}`,
-      select: 'id,title,slug,short_description,description,photos,price,external_url,wood_types,availability,use_context,sort_order,is_visible,is_published,published_at,archived_at,created_at,updated_at'
+      select: 'id,title,slug,short_description,description,photos,price,wood_types,availability,use_context,sort_order,is_visible,is_published,published_at,archived_at,created_at,updated_at'
     },
     body: product,
     prefer: 'return=representation'
@@ -6294,7 +6311,7 @@ async function archiveProduct(id) {
     method: 'PATCH',
     query: {
       id: `eq.${id}`,
-      select: 'id,title,slug,short_description,description,photos,price,external_url,wood_types,availability,use_context,sort_order,is_visible,is_published,published_at,archived_at,created_at,updated_at'
+      select: 'id,title,slug,short_description,description,photos,price,wood_types,availability,use_context,sort_order,is_visible,is_published,published_at,archived_at,created_at,updated_at'
     },
     body: {
       is_visible: false,
@@ -6322,7 +6339,7 @@ async function restoreProduct(id) {
     method: 'PATCH',
     query: {
       id: `eq.${id}`,
-      select: 'id,title,slug,short_description,description,photos,price,external_url,wood_types,availability,use_context,sort_order,is_visible,is_published,published_at,archived_at,created_at,updated_at'
+      select: 'id,title,slug,short_description,description,photos,price,wood_types,availability,use_context,sort_order,is_visible,is_published,published_at,archived_at,created_at,updated_at'
     },
     body: {
       archived_at: null
@@ -6397,7 +6414,7 @@ function sortBlogPosts(posts) {
 }
 
 function attachBlogCategories(posts, categories, links) {
-  const categoryMap = new Map(categories.map((category) => [category.id, category]));
+  const categoryMap = new Map(categories.map(localizeLegacyBlogCategory).map((category) => [category.id, category]));
   const linksByPost = new Map();
   links.forEach((link) => {
     if (!linksByPost.has(link.blog_post_id)) linksByPost.set(link.blog_post_id, []);
@@ -6937,7 +6954,7 @@ async function getPublicCmsPayload(locale = 'cs') {
     }),
     supabaseRequest('products', {
       query: {
-        select: 'id,title,slug,short_description,description,photos,price,external_url,wood_types,availability,use_context,sort_order,is_visible,is_published,published_at,archived_at,updated_at',
+        select: 'id,title,slug,short_description,description,photos,price,wood_types,availability,use_context,sort_order,is_visible,is_published,published_at,archived_at,updated_at',
         order: 'sort_order.asc,title.asc'
       }
     }),
@@ -7081,7 +7098,6 @@ async function buildPublicCmsPayload(locale, rows, givenMediaMap) {
       short_description: product.short_description || '',
       description: product.description || '',
       price: Number.isFinite(Number(product.price)) ? Number(product.price) : 0,
-      url: product.external_url || product.url || '',
       wood_types: Array.isArray(product.wood_types) ? product.wood_types : [],
       availability: product.availability || '',
       use_context: Array.isArray(product.use_context) ? product.use_context : [],
@@ -7568,7 +7584,6 @@ function fallbackProduct(slug) {
   if (!product) return null;
   return {
     ...product,
-    url: product.external_url || '',
     photos: product.image ? [{ url: product.image, alt: product.title, is_featured: true, sort_order: 0 }] : [],
     featured_image: product.image ? { url: product.image, alt: product.title } : null,
     categories: [],
@@ -7614,7 +7629,6 @@ function renderPublicProductPage(product, statusCode = 200) {
   const formattedPrice = hasPrice
     ? new Intl.NumberFormat('cs-CZ', { style: 'currency', currency: 'CZK', maximumFractionDigits: 0 }).format(price)
     : 'Cena na dotaz';
-  const externalUrl = product.url || product.external_url || '';
   const categoryNames = Array.isArray(product.categories)
     ? product.categories.map((category) => category && category.title).filter(Boolean)
     : [];
@@ -7637,9 +7651,7 @@ function renderPublicProductPage(product, statusCode = 200) {
   const tagsHtml = detailTags.length
     ? `<div class="tags">${detailTags.map((tag) => `<span>${escapeHtml(tag)}</span>`).join('')}</div>`
     : '';
-  const primaryAction = externalUrl
-    ? `<a class="button button--primary" href="${escapeHtml(externalUrl)}" target="_blank" rel="noopener">Koupit v obchodě <span aria-hidden="true">↗</span></a>`
-    : '<a class="button button--primary" href="mailto:info@drevito.cz">Poptat výrobek</a>';
+  const primaryAction = '<a class="button button--primary" href="mailto:info@drevito.cz">Poptat výrobek</a>';
   const schema = {
     '@context': 'https://schema.org',
     '@type': 'Product',
@@ -7650,7 +7662,7 @@ function renderPublicProductPage(product, statusCode = 200) {
     brand: { '@type': 'Brand', name: 'Dřevito' },
     offers: {
       '@type': 'Offer',
-      url: externalUrl || `/vyrobek/${product.slug}`,
+      url: `/vyrobek/${product.slug}`,
       priceCurrency: 'CZK',
       ...(hasPrice ? { price } : {}),
       availability: availability.schema

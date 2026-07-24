@@ -1,6 +1,5 @@
 alter table public.products
 add column if not exists price numeric(12, 2),
-add column if not exists external_url text,
 add column if not exists wood_types text[] not null default '{}'::text[],
 add column if not exists availability text,
 add column if not exists use_context text[] not null default '{}'::text[];
@@ -18,7 +17,6 @@ add constraint products_use_context_valid check (
 );
 
 comment on column public.products.price is 'Public price in CZK. Null means price on request.';
-comment on column public.products.external_url is 'Optional link to the product in an external shop.';
 comment on column public.products.wood_types is 'Filter values for wood species, stored as normalized Czech labels.';
 comment on column public.products.availability is 'Public availability filter: in_stock or made_to_order.';
 comment on column public.products.use_context is 'Public placement filter containing interior and/or exterior.';

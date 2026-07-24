@@ -182,7 +182,6 @@ const DEFAULT_CMS_PRODUCTS = [
     wood_types: [],
     availability: 'made_to_order',
     use_context: ['interior'],
-    external_url: 'https://drevito.t2.upgates.shop/p/stolecek-strom-zivota-slunecni-kruh',
     image: '/cajne-stolicky.JPG'
   },
   {
@@ -197,7 +196,6 @@ const DEFAULT_CMS_PRODUCTS = [
     wood_types: [],
     availability: 'made_to_order',
     use_context: ['interior'],
-    external_url: 'https://drevito.t2.upgates.shop/p/svicelenka-osta',
     image: '/dekoracni-tabulka.JPG'
   },
   {
@@ -212,7 +210,6 @@ const DEFAULT_CMS_PRODUCTS = [
     wood_types: [],
     availability: 'made_to_order',
     use_context: ['interior'],
-    external_url: 'https://drevito.t2.upgates.shop/p/krabicka-jin-jang',
     image: '/krabicka.JPG'
   },
   {
@@ -227,7 +224,6 @@ const DEFAULT_CMS_PRODUCTS = [
     wood_types: [],
     availability: 'made_to_order',
     use_context: ['interior'],
-    external_url: 'https://drevito.t2.upgates.shop/p/kun',
     image: '/kun-dekorace.JPG'
   },
   {
@@ -242,7 +238,6 @@ const DEFAULT_CMS_PRODUCTS = [
     wood_types: [],
     availability: 'made_to_order',
     use_context: ['interior'],
-    external_url: 'https://drevito.t2.upgates.shop/p/bohyne',
     image: '/dekorace-zena.JPG'
   },
   {
@@ -257,7 +252,6 @@ const DEFAULT_CMS_PRODUCTS = [
     wood_types: [],
     availability: 'made_to_order',
     use_context: ['interior'],
-    external_url: 'https://drevito.t2.upgates.shop/p/vlk',
     image: '/stojan-na-telefon.JPG'
   },
   {
@@ -272,7 +266,6 @@ const DEFAULT_CMS_PRODUCTS = [
     wood_types: [],
     availability: 'made_to_order',
     use_context: ['interior'],
-    external_url: 'https://drevito.t2.upgates.shop/p/lev-kvetinovych-ornamentech',
     image: '/hracka-auticko.JPG'
   }
 ];
@@ -741,7 +734,6 @@ function seedDefaultCmsContent(db) {
       is_featured: true
     }],
     price: product.price,
-    external_url: product.external_url,
     wood_types: product.wood_types || [],
     availability: product.availability || null,
     use_context: product.use_context || [],
@@ -6026,19 +6018,6 @@ function normalizeProductTextList(input) {
   }, []);
 }
 
-function normalizeExternalUrl(value) {
-  const raw = String(value || '').trim();
-  if (!raw) return null;
-  let parsed;
-  try {
-    parsed = new URL(raw);
-  } catch (error) {
-    throw new Error('Externí odkaz musí začínat http:// nebo https://.');
-  }
-  if (!['http:', 'https:'].includes(parsed.protocol)) throw new Error('Externí odkaz musí začínat http:// nebo https://.');
-  return raw;
-}
-
 function normalizeProductInput(input) {
   const title = String(input.title || '').trim();
   const slug = String(input.slug || '').trim().toLowerCase();
@@ -6072,7 +6051,6 @@ function normalizeProductInput(input) {
       description: description || null,
       photos: normalizeProductPhotos(input.photos),
       price,
-      external_url: normalizeExternalUrl(input.external_url || input.externalUrl),
       wood_types: woodTypes,
       availability: availability || null,
       use_context: useContext,
@@ -6148,7 +6126,7 @@ async function listProducts() {
   const [products, categories, links, filters, filterOptions, filterLinks] = await Promise.all([
     supabaseRequest('products', {
       query: {
-        select: 'id,title,slug,short_description,description,photos,price,external_url,wood_types,availability,use_context,sort_order,is_visible,is_published,published_at,archived_at,created_at,updated_at',
+        select: 'id,title,slug,short_description,description,photos,price,wood_types,availability,use_context,sort_order,is_visible,is_published,published_at,archived_at,created_at,updated_at',
         order: 'sort_order.asc,title.asc'
       }
     }),
@@ -6266,7 +6244,7 @@ async function createProduct(input) {
     method: 'POST',
     body: product,
     prefer: 'return=representation',
-    query: { select: 'id,title,slug,short_description,description,photos,price,external_url,wood_types,availability,use_context,sort_order,is_visible,is_published,published_at,archived_at,created_at,updated_at' }
+    query: { select: 'id,title,slug,short_description,description,photos,price,wood_types,availability,use_context,sort_order,is_visible,is_published,published_at,archived_at,created_at,updated_at' }
   });
   const created = Array.isArray(rows) ? rows[0] : rows;
   if (!created || !created.id) throw new Error('Výrobek se nepodařilo vytvořit.');
@@ -6308,7 +6286,7 @@ async function updateProduct(id, input) {
     method: 'PATCH',
     query: {
       id: `eq.${id}`,
-      select: 'id,title,slug,short_description,description,photos,price,external_url,wood_types,availability,use_context,sort_order,is_visible,is_published,published_at,archived_at,created_at,updated_at'
+      select: 'id,title,slug,short_description,description,photos,price,wood_types,availability,use_context,sort_order,is_visible,is_published,published_at,archived_at,created_at,updated_at'
     },
     body: product,
     prefer: 'return=representation'
@@ -6333,7 +6311,7 @@ async function archiveProduct(id) {
     method: 'PATCH',
     query: {
       id: `eq.${id}`,
-      select: 'id,title,slug,short_description,description,photos,price,external_url,wood_types,availability,use_context,sort_order,is_visible,is_published,published_at,archived_at,created_at,updated_at'
+      select: 'id,title,slug,short_description,description,photos,price,wood_types,availability,use_context,sort_order,is_visible,is_published,published_at,archived_at,created_at,updated_at'
     },
     body: {
       is_visible: false,
@@ -6361,7 +6339,7 @@ async function restoreProduct(id) {
     method: 'PATCH',
     query: {
       id: `eq.${id}`,
-      select: 'id,title,slug,short_description,description,photos,price,external_url,wood_types,availability,use_context,sort_order,is_visible,is_published,published_at,archived_at,created_at,updated_at'
+      select: 'id,title,slug,short_description,description,photos,price,wood_types,availability,use_context,sort_order,is_visible,is_published,published_at,archived_at,created_at,updated_at'
     },
     body: {
       archived_at: null
@@ -6976,7 +6954,7 @@ async function getPublicCmsPayload(locale = 'cs') {
     }),
     supabaseRequest('products', {
       query: {
-        select: 'id,title,slug,short_description,description,photos,price,external_url,wood_types,availability,use_context,sort_order,is_visible,is_published,published_at,archived_at,updated_at',
+        select: 'id,title,slug,short_description,description,photos,price,wood_types,availability,use_context,sort_order,is_visible,is_published,published_at,archived_at,updated_at',
         order: 'sort_order.asc,title.asc'
       }
     }),
@@ -7120,7 +7098,6 @@ async function buildPublicCmsPayload(locale, rows, givenMediaMap) {
       short_description: product.short_description || '',
       description: product.description || '',
       price: Number.isFinite(Number(product.price)) ? Number(product.price) : 0,
-      url: product.external_url || product.url || '',
       wood_types: Array.isArray(product.wood_types) ? product.wood_types : [],
       availability: product.availability || '',
       use_context: Array.isArray(product.use_context) ? product.use_context : [],
@@ -7607,7 +7584,6 @@ function fallbackProduct(slug) {
   if (!product) return null;
   return {
     ...product,
-    url: product.external_url || '',
     photos: product.image ? [{ url: product.image, alt: product.title, is_featured: true, sort_order: 0 }] : [],
     featured_image: product.image ? { url: product.image, alt: product.title } : null,
     categories: [],
@@ -7653,7 +7629,6 @@ function renderPublicProductPage(product, statusCode = 200) {
   const formattedPrice = hasPrice
     ? new Intl.NumberFormat('cs-CZ', { style: 'currency', currency: 'CZK', maximumFractionDigits: 0 }).format(price)
     : 'Cena na dotaz';
-  const externalUrl = product.url || product.external_url || '';
   const categoryNames = Array.isArray(product.categories)
     ? product.categories.map((category) => category && category.title).filter(Boolean)
     : [];
@@ -7676,9 +7651,7 @@ function renderPublicProductPage(product, statusCode = 200) {
   const tagsHtml = detailTags.length
     ? `<div class="tags">${detailTags.map((tag) => `<span>${escapeHtml(tag)}</span>`).join('')}</div>`
     : '';
-  const primaryAction = externalUrl
-    ? `<a class="button button--primary" href="${escapeHtml(externalUrl)}" target="_blank" rel="noopener">Koupit v obchodě <span aria-hidden="true">↗</span></a>`
-    : '<a class="button button--primary" href="mailto:info@drevito.cz">Poptat výrobek</a>';
+  const primaryAction = '<a class="button button--primary" href="mailto:info@drevito.cz">Poptat výrobek</a>';
   const schema = {
     '@context': 'https://schema.org',
     '@type': 'Product',
@@ -7689,7 +7662,7 @@ function renderPublicProductPage(product, statusCode = 200) {
     brand: { '@type': 'Brand', name: 'Dřevito' },
     offers: {
       '@type': 'Offer',
-      url: externalUrl || `/vyrobek/${product.slug}`,
+      url: `/vyrobek/${product.slug}`,
       priceCurrency: 'CZK',
       ...(hasPrice ? { price } : {}),
       availability: availability.schema

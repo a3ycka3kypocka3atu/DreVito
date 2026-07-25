@@ -1480,11 +1480,66 @@
             .custom__images { min-height: 430px; }
         }
         @media (max-width: 768px) {
-            :root { --nav-height: 74px; }
-            .nav__logo { min-width: 118px; }
-            .nav__logo::before { width: 116px; height: 116px; top: 4px; left: 0; }
-            .nav__logo img { height: 98px; top: 13px; left: 9px; }
-            .nav__dropdown-toggle { font-size: 0.8rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; }
+            :root { --nav-height: 58px; }
+            .nav__inner { padding-inline: 0.75rem; }
+            .nav__logo { min-width: 112px; }
+            .nav__logo::before {
+                width: 108px;
+                height: 108px;
+                top: 4px;
+                left: 0;
+            }
+            .nav__logo img {
+                width: 102px;
+                height: 102px;
+                top: 7px;
+                left: 3px;
+                object-fit: contain;
+            }
+            .nav__dropdown-toggle {
+                width: 44px;
+                height: 44px;
+                justify-content: center;
+                padding: 0;
+                border: 1px solid rgba(43, 33, 24, 0.14);
+                border-radius: 50%;
+                background: rgba(255, 252, 246, 0.28);
+            }
+            .nav__menu-label {
+                position: absolute;
+                width: 1px;
+                height: 1px;
+                padding: 0;
+                margin: -1px;
+                overflow: hidden;
+                clip: rect(0, 0, 0, 0);
+                white-space: nowrap;
+                border: 0;
+            }
+            .nav__menu-icon {
+                display: grid;
+                width: 18px;
+                gap: 4px;
+            }
+            .nav__menu-icon span {
+                display: block;
+                width: 100%;
+                height: 2px;
+                border-radius: 999px;
+                background: currentColor;
+                transition: transform 0.22s ease, opacity 0.18s ease;
+            }
+            .nav__dropdown-toggle[aria-expanded="true"] .nav__menu-icon span:first-child { transform: translateY(6px) rotate(45deg); }
+            .nav__dropdown-toggle[aria-expanded="true"] .nav__menu-icon span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+            .nav__dropdown-toggle[aria-expanded="true"] .nav__menu-icon span:last-child { transform: translateY(-6px) rotate(-45deg); }
+            .nav__dropdown-menu {
+                top: calc(100% + 3.75rem);
+                right: 0;
+                width: min(280px, calc(100vw - 1.5rem));
+                min-width: 0;
+                max-height: calc(100svh - 7.5rem);
+                overflow-y: auto;
+            }
             .hero__content { padding: 5rem 1.25rem 8rem; }
             .hero__bg::after {
                 background:
@@ -1570,11 +1625,15 @@
                 <a href="/admin/login" class="nav__link nav__link--login">Přihlášení</a>
             </div>
             <div class="nav__dropdown">
-                <button class="nav__dropdown-toggle" aria-expanded="false">
-                    Menu
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                <button class="nav__dropdown-toggle" type="button" aria-expanded="false" aria-controls="mobile-navigation" aria-label="Otevřít menu">
+                    <span class="nav__menu-label">Menu</span>
+                    <span class="nav__menu-icon" aria-hidden="true">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </span>
                 </button>
-                <div class="nav__dropdown-menu">
+                <div class="nav__dropdown-menu" id="mobile-navigation">
                     <a href="#about" class="nav__dropdown-item" data-copy-key="nav.about">O nás</a>
                     <a href="#products" class="nav__dropdown-item has-sub" data-copy-key="nav.products">Výrobky</a>
                     <div class="nav__dropdown-sub">
@@ -2703,6 +2762,7 @@
             e.stopPropagation();
             var expanded = this.getAttribute('aria-expanded') === 'true';
             this.setAttribute('aria-expanded', !expanded);
+            this.setAttribute('aria-label', expanded ? 'Otevřít menu' : 'Zavřít menu');
             dropdownMenu.classList.toggle('open');
         };
     }
@@ -2711,7 +2771,10 @@
     document.onclick = function(e) {
         if (dropdownMenu && !e.target.closest('.nav__dropdown') && !e.target.closest('.nav__item-with-dropdown')) {
             dropdownMenu.classList.remove('open');
-            if (dropdownToggle) dropdownToggle.setAttribute('aria-expanded', 'false');
+            if (dropdownToggle) {
+                dropdownToggle.setAttribute('aria-expanded', 'false');
+                dropdownToggle.setAttribute('aria-label', 'Otevřít menu');
+            }
         }
         if (dropdownPanel && !e.target.closest('.nav__item-with-dropdown')) {
             dropdownPanel.classList.remove('open');
@@ -2744,7 +2807,10 @@
             e.stopPropagation();
             var cat = link.getAttribute('data-cat');
             if (dropdownMenu) dropdownMenu.classList.remove('open');
-            if (dropdownToggle) dropdownToggle.setAttribute('aria-expanded', 'false');
+            if (dropdownToggle) {
+                dropdownToggle.setAttribute('aria-expanded', 'false');
+                dropdownToggle.setAttribute('aria-label', 'Otevřít menu');
+            }
             subMenu.classList.remove('open');
             activateCategory(cat);
             document.getElementById('products').scrollIntoView({ behavior: 'smooth' });

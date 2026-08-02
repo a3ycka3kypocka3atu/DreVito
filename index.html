@@ -18,7 +18,7 @@
     <link rel="apple-touch-icon" sizes="256x256" href="drevito-tab-logo-20260622.png?v=20260622-3">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --color-bg: #F5F0E8;
@@ -1001,8 +1001,8 @@
             --color-text-muted: #706255;
             --color-forest: #314139;
             --color-sand: #DED2C1;
-            --font-display: 'Fraunces', Georgia, serif;
-            --font-body: 'Manrope', system-ui, sans-serif;
+            --font-display: 'Cormorant Garamond', Georgia, serif;
+            --font-body: 'DM Sans', system-ui, sans-serif;
             --shadow-card: 0 16px 44px rgba(43, 33, 24, 0.09);
             --shadow-card-hover: 0 24px 60px rgba(43, 33, 24, 0.16);
             --radius-card: 18px;
@@ -1014,15 +1014,15 @@
             background:
                 radial-gradient(circle at 8% 20%, rgba(182, 120, 66, 0.07), transparent 26rem),
                 var(--color-bg);
-            letter-spacing: -0.006em;
+            letter-spacing: 0;
         }
         a, button, input, select { -webkit-tap-highlight-color: transparent; }
         :focus-visible { outline: 3px solid rgba(182, 120, 66, 0.55); outline-offset: 4px; }
         .section-title {
             font-size: clamp(2.55rem, 5.2vw, 4.7rem);
-            font-weight: 600;
+            font-weight: 500;
             line-height: 0.98;
-            letter-spacing: -0.045em;
+            letter-spacing: -0.025em;
             text-wrap: balance;
         }
         .section-title::before,
@@ -1122,9 +1122,9 @@
             max-width: 820px;
             margin-bottom: 1.25rem;
             font-size: clamp(3.25rem, 7.6vw, 7rem);
-            font-weight: 600;
-            line-height: 0.9;
-            letter-spacing: -0.055em;
+            font-weight: 500;
+            line-height: 0.96;
+            letter-spacing: -0.035em;
             text-wrap: balance;
         }
         .hero__tagline {
@@ -1160,8 +1160,21 @@
         }
         @keyframes heroDrift { to { transform: scale(1.08) translate3d(-0.6%, -0.4%, 0); } }
 
-        .about { padding: clamp(6rem, 10vw, 10rem) clamp(1.25rem, 5vw, 4rem); overflow: hidden; }
-        .about__container { max-width: 1240px; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); gap: clamp(3rem, 8vw, 8rem); }
+        .about {
+            min-height: calc(100svh - var(--nav-height));
+            display: flex;
+            align-items: center;
+            padding: 0 clamp(1.25rem, 5vw, 4rem);
+            overflow: hidden;
+        }
+        .about__container {
+            width: 100%;
+            max-width: 1200px;
+            grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+            gap: clamp(3rem, 7vw, 6rem);
+            align-items: start;
+        }
+        .about__text { padding-block: clamp(4rem, 8vw, 7rem); }
         .about__lead { max-width: 600px; font-size: clamp(1.1rem, 1.7vw, 1.35rem); line-height: 1.65; }
         .about__body { max-width: 610px; }
         .about__values { margin-top: 2.25rem; flex-direction: row; flex-wrap: wrap; gap: 0.75rem; }
@@ -1173,22 +1186,25 @@
             font-size: 0.78rem;
             font-weight: 700;
         }
-        .about__image { position: relative; }
+        .about__image {
+            --about-frame-shape: 50% 50% 44% 56% / 22% 24% 76% 78%;
+            position: relative;
+        }
         .about__image::before {
             content: '';
             position: absolute;
-            inset: -18px 18px 18px -18px;
+            inset: -10px 14px 10px -14px;
             border: 1px solid rgba(182, 120, 66, 0.52);
-            border-radius: 47% 53% 42% 58% / 39% 38% 62% 61%;
-            transform: rotate(-2deg);
+            border-radius: var(--about-frame-shape);
+            transform: rotate(-1deg);
         }
         .about__image-placeholder {
             position: relative;
             aspect-ratio: 4 / 5;
+            max-height: calc(100svh - var(--nav-height));
             padding: 0;
-            border-radius: 47% 53% 42% 58% / 39% 38% 62% 61%;
-            box-shadow: 0 30px 70px rgba(43, 33, 24, 0.17);
-            transform: rotate(1deg);
+            border-radius: var(--about-frame-shape);
+            box-shadow: none;
         }
         .about__image-placeholder img { border-radius: inherit !important; transition: transform 0.9s cubic-bezier(.2,.75,.25,1); }
         .about__image-placeholder:hover img { transform: scale(1.035); }
@@ -1493,7 +1509,9 @@
             }
             .hero__title { max-width: 660px; font-size: clamp(3.2rem, 15vw, 5.5rem); }
             .hero__scroll { right: auto; left: 1.25rem; bottom: 1.75rem; align-items: flex-start; }
+            .about { min-height: 0; padding: 4rem 1.25rem 5rem; }
             .about__container, .author__container { grid-template-columns: 1fr; }
+            .about__text { padding-block: 0; }
             .about__text .section-title, .about__text, .author__text .section-title, .author__text { text-align: left; }
             .about__values { justify-content: flex-start; align-items: flex-start; }
             .about__image { width: min(92%, 560px); margin: 1.5rem auto 0; }

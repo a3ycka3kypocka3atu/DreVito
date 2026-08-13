@@ -323,6 +323,93 @@ const MEDIA_BUCKETS = {
   blog_posts: 'blog-images'
 };
 
+const HOMEPAGE_LAYOUT_CONTENT_KEY = 'homepage.layout';
+const HOMEPAGE_LAYOUT_DRAFT_CONTENT_KEY = 'homepage.layout.draft';
+const HOMEPAGE_RESERVED_CONTENT_KEYS = new Set([
+  HOMEPAGE_LAYOUT_CONTENT_KEY,
+  HOMEPAGE_LAYOUT_DRAFT_CONTENT_KEY
+]);
+const HOMEPAGE_LAYOUT_VERSION = 1;
+const HOMEPAGE_MAX_BLOCKS = 36;
+const HOMEPAGE_FIXED_BLOCKS = [
+  {
+    id: 'hero',
+    kind: 'hero',
+    label: 'Úvodní obrazovka',
+    visible: true,
+    content: {
+      eyebrow: 'Rodinná dílna · Dolní Ředice',
+      title: 'Dřevito — dřevěné výrobky zhotovené srdcem',
+      body: 'Ruční výroba z masivního dřeva. Každý kus je originál.',
+      image: { url: '/main.JPG', alt: 'Dřevito dřevěné výrobky', media_id: '' },
+      primary_label: 'Prohlédnout výrobky',
+      primary_url: '#products',
+      secondary_label: 'Výroba na míru',
+      secondary_url: '#custom'
+    }
+  },
+  {
+    id: 'about',
+    kind: 'about',
+    label: 'Řemeslo s tradicí',
+    visible: true,
+    content: {
+      title: 'Řemeslo s tradicí',
+      lead: 'Každý výrobek Dřevito vzniká z touhy zachovat a předat dál staré řemeslo. Pracujeme s masivním dřevem — dubem, bukem, modřínem — protože jen přírodní materiál nese tu správnou energii a příběh.',
+      body: 'V naší dílně každý kus vzniká ruční prací. Řezbářské umění, které se předává z generace na generaci, spojuje moderní design s úctou k tradici. Věříme, že dřevo má duši — a naším úkolem je ji probudit.',
+      image: { url: '/prods.jpg', alt: 'Řemeslo s tradicí', media_id: '' }
+    }
+  },
+  {
+    id: 'products',
+    kind: 'products',
+    label: 'Výrobky',
+    visible: true,
+    content: {
+      title: 'Naše výrobky',
+      body: 'Tvořím širokou škálu výrobků ze dřeva a rád hledám nové cesty. Mnoho věcí vzniká až v osobní domluvě — podle vašeho přání, konkrétního místa a příběhu, který má výsledný výrobek nést.'
+    }
+  },
+  {
+    id: 'blog',
+    kind: 'blog',
+    label: 'Blog',
+    visible: true,
+    content: {
+      title: 'Z dílny',
+      body: 'Poznámky o dřevě, řemesle a novinkách z dílny Dřevito.'
+    }
+  },
+  {
+    id: 'author',
+    kind: 'author',
+    label: 'Příběh za značkou',
+    visible: true,
+    content: {
+      title: 'Příběh za značkou',
+      lead: 'Stromy jsou mým životem. Sázím je, kácám je, osobně je znám.',
+      body: 'Přinášet krásu dřeva do lidských domovů — udržitelně a s respektem k přírodě — to je to, co mě definuje. Dílna na rodinném statku je splněný téměř dvacetiletý sen.\n\nDnes mám funkční pilu a truhlářskou dílnu, díky které zvládnu celý proces — od pokácení stromu až po dokončení nábytku vlastníma rukama. Netvořím ze dřeva, které kupuji kdovíkde. Tvořím ze stromů, které jsem znal a kterým jsem osobně poděkoval za jejich život.\n\nPráce se dřevem je pro mě meditace a vnitřní naplnění. Jsem milovníkem organických tvarů — příroda je mou učitelkou. Zřídka používám rovné hrany, pokud to zákazník přímo nepožaduje.',
+      signature: '— tvůrce Dřevito',
+      image: { url: '/autor.JPG', alt: 'Autor Dřevito', media_id: '' }
+    }
+  },
+  {
+    id: 'custom',
+    kind: 'custom',
+    label: 'Zakázková výroba a kontakt',
+    visible: true,
+    content: {
+      title: 'Zakázková výroba',
+      body: 'Každý výrobek umíme přizpůsobit vašim představám. Ať už jde o rozměr, motiv, materiál nebo úplně nový návrh — probereme to společně a najdeme řešení.',
+      secondary_body: 'Ozývejte se nám s popisem vaší představy. Těšíme se na nové výzvy.',
+      images: [
+        { url: '/custom-service.jpg', alt: 'Zakázková výroba dřevěných výrobků', media_id: '' },
+        { url: '/custom.JPG', alt: 'Ukázka zakázkové výroby', media_id: '' }
+      ]
+    }
+  }
+];
+
 function escapeHtml(value) {
   return String(value)
     .replace(/&/g, '&amp;')
@@ -911,7 +998,9 @@ function createLocalRow(input, id = '') {
 }
 
 function updateLocalRow(row, input) {
-  Object.assign(row, input, { updated_at: nowIso() });
+  const previousTimestamp = new Date(row.updated_at || 0).getTime();
+  const nextTimestamp = new Date(Math.max(Date.now(), Number.isFinite(previousTimestamp) ? previousTimestamp + 1 : 0)).toISOString();
+  Object.assign(row, input, { updated_at: nextTimestamp });
   return row;
 }
 
@@ -996,6 +1085,35 @@ function countMediaReferences(db, mediaId) {
   return count;
 }
 
+function valueReferencesMediaId(value, mediaId) {
+  if (!value || !mediaId) return false;
+  if (Array.isArray(value)) return value.some((item) => valueReferencesMediaId(item, mediaId));
+  if (typeof value !== 'object') return false;
+  if (String(value.media_id || value.mediaId || '') === String(mediaId)) return true;
+  return Object.values(value).some((item) => valueReferencesMediaId(item, mediaId));
+}
+
+async function hasPersistedMediaReference(mediaId) {
+  if (!isSupabaseConfigured()) {
+    const cms = readCmsDb();
+    return cms.site_content.some((item) => valueReferencesMediaId(item.value, mediaId))
+      || cms.products.some((item) => valueReferencesMediaId(item.photos, mediaId))
+      || cms.product_categories.some((item) => valueReferencesMediaId(item.image, mediaId))
+      || cms.blog_posts.some((item) => valueReferencesMediaId(item.photos, mediaId))
+      || cms.blog_categories.some((item) => valueReferencesMediaId(item.image, mediaId));
+  }
+
+  const [siteContent, products, productCategories, blogPosts, blogCategories] = await Promise.all([
+    supabaseRequest('site_content', { query: { select: 'value' } }),
+    supabaseRequest('products', { query: { select: 'photos' } }),
+    supabaseRequest('product_categories', { query: { select: 'image' } }),
+    supabaseRequest('blog_posts', { query: { select: 'photos' } }),
+    supabaseRequest('blog_categories', { query: { select: 'image' } })
+  ]);
+  return [siteContent, products, productCategories, blogPosts, blogCategories]
+    .some((rows) => (Array.isArray(rows) ? rows : []).some((row) => valueReferencesMediaId(row, mediaId)));
+}
+
 function deleteLocalMediaFile(media) {
   if (!media || media.bucket !== 'local' || !media.storage_path) return;
   const relativePath = String(media.storage_path).replace(/^uploads[\\/]/, '');
@@ -1019,7 +1137,7 @@ async function deleteSupabaseMedia(media) {
 
 async function deleteUnreferencedMedia(db, mediaId) {
   const media = db.media.find((entry) => entry.id === mediaId);
-  if (!media || countMediaReferences(db, mediaId) !== 0) return;
+  if (!media || countMediaReferences(db, mediaId) !== 0 || await hasPersistedMediaReference(mediaId)) return;
 
   db.media = db.media.filter((entry) => entry.id !== mediaId);
   if (isSupabaseConfigured()) {
@@ -2395,6 +2513,7 @@ function adminMasthead(session) {
         </div>
       </a>
       <nav class="admin-nav" aria-label="Administrace">
+        <a class="button button--ghost" href="/admin/homepage">Domovská stránka</a>
         <a class="button button--ghost" href="/admin/products">Výrobky</a>
         <a class="button button--ghost" href="/admin/product-categories">Kategorie výrobků</a>
         <a class="button button--ghost" href="/admin/product-filters">Filtry výrobků</a>
@@ -2414,11 +2533,16 @@ function dashboardPage(session) {
     ${adminMasthead(session)}
     <div class="content">
       <h1>Administrace obsahu</h1>
-      <p>Správa výrobků, kategorií a blogu.</p>
+      <p>Správa domovské stránky, výrobků, kategorií a blogu.</p>
       <div class="admin-hero">
         <h2>Hlavní práce klienta</h2>
         <p>Tady může klient přidávat výrobky, publikovat je, psát články a udržovat kategorie.</p>
         <div class="admin-tools">
+          <a class="admin-tool" href="/admin/homepage">
+            <span>Web</span>
+            <strong>Domovská stránka</strong>
+            <p>Upravit texty a fotografie, změnit pořadí částí stránky nebo přidat vlastní blok.</p>
+          </a>
           <a class="admin-tool" href="/admin/products">
             <span>Katalog</span>
             <strong>Výrobky</strong>
@@ -3517,6 +3641,606 @@ function siteContentAdminPage(session) {
         root.className = 'empty-state';
         root.textContent = 'Obsah se nepodařilo načíst.';
       });
+    })();
+    </script>
+  `);
+}
+
+function homepageEditorPage(session) {
+  return adminLayout('Domovská stránka', `
+    ${adminMasthead(session)}
+    <div class="content homepage-editor" id="homepage-editor">
+      <style>
+        .homepage-editor { max-width: 1460px; }
+        .homepage-editor__toolbar { position: sticky; top: 12px; z-index: 20; display: flex; align-items: center; justify-content: space-between; gap: 18px; padding: 18px 20px; margin-bottom: 22px; border: 1px solid rgba(69,89,48,.18); border-radius: 22px; background: rgba(255,253,247,.94); box-shadow: 0 14px 38px rgba(45,55,34,.12); backdrop-filter: blur(18px); }
+        .homepage-editor__heading h1 { margin: 0 0 4px; font-size: clamp(1.65rem,3vw,2.35rem); }
+        .homepage-editor__heading p { margin: 0; color: #66705c; }
+        .homepage-editor__toolbar-actions { display: flex; align-items: center; justify-content: flex-end; gap: 9px; flex-wrap: wrap; }
+        .homepage-save-status { display: inline-flex; align-items: center; gap: 8px; min-height: 38px; padding: 0 12px; border-radius: 999px; background: #edf2e7; color: #435134; font-size: .84rem; font-weight: 800; }
+        .homepage-save-status::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: #729052; }
+        .homepage-save-status.is-dirty { background: #fff0d8; color: #744d1c; }
+        .homepage-save-status.is-dirty::before { background: #d89535; }
+        .homepage-save-status.is-error { background: #fbe5e1; color: #8d3128; }
+        .homepage-save-status.is-error::before { background: #bf4b40; }
+        .homepage-editor__message { margin: -8px 0 18px; }
+        .homepage-editor__retry { margin: -8px 0 18px; }
+        .homepage-editor__workspace { display: grid; grid-template-columns: minmax(0,1fr) minmax(330px,430px); align-items: start; gap: 24px; }
+        .homepage-editor.is-busy .homepage-editor__workspace { pointer-events: none; opacity: .7; }
+        .homepage-canvas { min-width: 0; padding: 22px; border: 1px solid rgba(69,89,48,.14); border-radius: 26px; background: #f4efe4; box-shadow: inset 0 0 0 1px rgba(255,255,255,.6); }
+        .homepage-canvas__intro { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 18px; }
+        .homepage-canvas__intro h2 { margin: 0 0 5px; }
+        .homepage-canvas__intro p { margin: 0; color: #68705d; }
+        .homepage-block-list { display: grid; gap: 13px; padding: 0; margin: 0; list-style: none; }
+        .homepage-block-card { position: relative; display: grid; grid-template-columns: 34px minmax(0,1fr) auto; align-items: stretch; min-height: 154px; overflow: hidden; border: 2px solid transparent; border-radius: 20px; background: #fffdf8; box-shadow: 0 10px 28px rgba(45,55,34,.08); transition: border-color .18s ease, transform .18s ease, opacity .18s ease; }
+        .homepage-block-card:hover { transform: translateY(-1px); }
+        .homepage-block-card.is-selected { border-color: #6e8251; box-shadow: 0 13px 34px rgba(65,83,43,.17); }
+        .homepage-block-card.is-hidden { opacity: .58; }
+        .homepage-block-card.is-dragging { opacity: .42; }
+        .homepage-block-card__handle { display: grid; place-items: center; border: 0; border-right: 1px solid rgba(69,89,48,.12); background: #edf0e7; color: #647052; font-size: 1.25rem; cursor: grab; }
+        .homepage-block-card__handle[disabled] { cursor: default; color: #a7ad9c; }
+        .homepage-block-card__preview { display: grid; grid-template-columns: minmax(0,1fr) 132px; min-width: 0; cursor: pointer; }
+        .homepage-block-card__copy { align-self: center; min-width: 0; padding: 18px 20px; }
+        .homepage-block-card__meta { display: flex; align-items: center; gap: 7px; flex-wrap: wrap; margin-bottom: 8px; }
+        .homepage-block-card__meta span { display: inline-flex; padding: 4px 8px; border-radius: 999px; background: #edf0e7; color: #536045; font-size: .68rem; font-weight: 850; letter-spacing: .04em; text-transform: uppercase; }
+        .homepage-block-card__meta span.is-auto { background: #e9eef7; color: #435b7a; }
+        .homepage-block-card__meta span.is-off { background: #f4e2df; color: #8b3d33; }
+        .homepage-block-card__copy strong { display: block; overflow: hidden; margin-bottom: 6px; color: #2f3927; font-family: Fraunces, Georgia, serif; font-size: 1.32rem; line-height: 1.14; text-overflow: ellipsis; white-space: nowrap; }
+        .homepage-block-card__copy p { display: -webkit-box; overflow: hidden; margin: 0; color: #6d7464; font-size: .88rem; line-height: 1.55; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
+        .homepage-block-card__image { min-height: 152px; background: linear-gradient(145deg,#d9ddcf,#b8c0a6); }
+        .homepage-block-card__image img { width: 100%; height: 100%; min-height: 152px; object-fit: cover; }
+        .homepage-block-card__image.is-empty { display: grid; place-items: center; padding: 12px; color: #68735b; font-weight: 800; text-align: center; }
+        .homepage-block-card__actions { display: grid; align-content: center; gap: 6px; padding: 10px; border-left: 1px solid rgba(69,89,48,.1); }
+        .homepage-block-card__actions button { min-width: 42px; min-height: 38px; padding: 7px 9px; border: 1px solid rgba(69,89,48,.16); border-radius: 10px; background: #fff; color: #46543b; cursor: pointer; font-weight: 800; }
+        .homepage-block-card__actions button:hover:not(:disabled) { background: #edf0e7; }
+        .homepage-block-card__actions button:disabled { opacity: .35; cursor: not-allowed; }
+        .homepage-add { display: flex; align-items: center; justify-content: center; gap: 9px; width: 100%; min-height: 54px; margin-top: 14px; border: 2px dashed rgba(69,89,48,.35); border-radius: 16px; background: rgba(255,255,255,.52); color: #46593a; cursor: pointer; font-weight: 850; }
+        .homepage-add:hover { border-color: #6e8251; background: #fffdf8; }
+        .homepage-footer-lock { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 14px; padding: 15px 18px; border-radius: 16px; background: #303a2a; color: #f7f1e5; }
+        .homepage-footer-lock span { color: rgba(247,241,229,.7); font-size: .82rem; }
+        .homepage-inspector { position: sticky; top: 118px; max-height: calc(100vh - 136px); overflow: auto; border: 1px solid rgba(69,89,48,.15); border-radius: 24px; background: #fffdf8; box-shadow: 0 14px 38px rgba(45,55,34,.1); }
+        .homepage-inspector__header { position: sticky; top: 0; z-index: 2; padding: 20px 22px 16px; border-bottom: 1px solid rgba(69,89,48,.12); background: rgba(255,253,248,.96); backdrop-filter: blur(12px); }
+        .homepage-inspector__header span { display: block; margin-bottom: 5px; color: #78816e; font-size: .72rem; font-weight: 850; letter-spacing: .08em; text-transform: uppercase; }
+        .homepage-inspector__header h2 { margin: 0; font-size: 1.55rem; }
+        .homepage-inspector__body { display: grid; gap: 16px; padding: 20px 22px 26px; }
+        .homepage-inspector__body label { display: grid; gap: 7px; color: #3f4937; font-weight: 800; }
+        .homepage-inspector__body small { color: #747b6c; font-weight: 500; line-height: 1.45; }
+        .homepage-inspector__body textarea { min-height: 112px; resize: vertical; }
+        .homepage-inspector__hint { padding: 13px 14px; border-radius: 14px; background: #edf2e7; color: #536047; font-size: .86rem; line-height: 1.5; }
+        .homepage-image-field { display: grid; gap: 10px; padding: 14px; border: 1px solid rgba(69,89,48,.14); border-radius: 16px; background: #f7f4ec; }
+        .homepage-image-field__preview { display: grid; place-items: center; min-height: 145px; overflow: hidden; border-radius: 12px; background: #dde2d4; color: #647058; font-weight: 750; }
+        .homepage-image-field__preview img { width: 100%; height: 190px; object-fit: cover; }
+        .homepage-image-field__actions { display: flex; gap: 8px; flex-wrap: wrap; }
+        .homepage-image-field__actions label, .homepage-image-field__actions button { display: inline-flex; align-items: center; justify-content: center; min-height: 42px; padding: 9px 12px; border: 1px solid rgba(69,89,48,.18); border-radius: 11px; background: #fff; color: #435239; cursor: pointer; font-size: .82rem; font-weight: 850; }
+        .homepage-image-field__actions input { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+        .homepage-inspector__empty { padding: 46px 24px; color: #69715f; text-align: center; }
+        .homepage-block-library { width: min(720px,calc(100vw - 28px)); padding: 0; border: 0; border-radius: 24px; background: #fffdf8; box-shadow: 0 26px 80px rgba(30,36,25,.3); }
+        .homepage-block-library::backdrop { background: rgba(27,34,23,.56); backdrop-filter: blur(4px); }
+        .homepage-block-library__inner { padding: 24px; }
+        .homepage-block-library__head { display: flex; align-items: flex-start; justify-content: space-between; gap: 15px; }
+        .homepage-block-library__head h2 { margin: 0 0 5px; }
+        .homepage-block-library__head p { margin: 0; color: #6d7564; }
+        .homepage-block-library__close { min-width: 42px; min-height: 42px; border: 0; border-radius: 50%; background: #edf0e7; cursor: pointer; font-size: 1.2rem; }
+        .homepage-block-library__grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 12px; margin-top: 22px; }
+        .homepage-template { min-height: 170px; padding: 18px; border: 1px solid rgba(69,89,48,.16); border-radius: 17px; background: #f7f3e9; color: #3b4832; cursor: pointer; text-align: left; }
+        .homepage-template:hover { border-color: #718556; background: #edf2e7; }
+        .homepage-template strong { display: block; margin: 10px 0 6px; font-family: Fraunces,Georgia,serif; font-size: 1.12rem; }
+        .homepage-template span { color: #697260; font-size: .82rem; line-height: 1.45; }
+        @media (max-width: 1000px) {
+          .homepage-editor__toolbar { position: static; align-items: flex-start; flex-direction: column; }
+          .homepage-editor__toolbar-actions { justify-content: flex-start; }
+          .homepage-editor__workspace { grid-template-columns: 1fr; }
+          .homepage-inspector { position: static; max-height: none; }
+        }
+        @media (max-width: 640px) {
+          .homepage-editor { padding-inline: 12px; }
+          .homepage-editor__toolbar { padding: 16px; border-radius: 18px; }
+          .homepage-editor__toolbar-actions { width: 100%; }
+          .homepage-editor__toolbar-actions .button { flex: 1 1 135px; min-height: 46px; }
+          .homepage-save-status { width: 100%; justify-content: center; }
+          .homepage-canvas { padding: 12px; border-radius: 19px; }
+          .homepage-canvas__intro { display: block; padding: 7px 4px; }
+          .homepage-canvas__intro .button { margin-top: 12px; }
+          .homepage-block-card { grid-template-columns: 1fr; }
+          .homepage-block-card__handle { display: none; }
+          .homepage-block-card__preview { grid-template-columns: minmax(0,1fr) 92px; min-height: 132px; }
+          .homepage-block-card__copy { padding: 15px; }
+          .homepage-block-card__image, .homepage-block-card__image img { min-height: 132px; }
+          .homepage-block-card__actions { grid-template-columns: repeat(4,1fr); border-top: 1px solid rgba(69,89,48,.1); border-left: 0; }
+          .homepage-block-card__actions button { min-height: 46px; }
+          .homepage-block-library__grid { grid-template-columns: 1fr; }
+          .homepage-template { min-height: 108px; }
+        }
+      </style>
+
+      <div class="homepage-editor__toolbar">
+        <div class="homepage-editor__heading">
+          <h1>Domovská stránka</h1>
+          <p>Stránku skládáte stejně, jak ji návštěvník postupně vidí shora dolů.</p>
+        </div>
+        <div class="homepage-editor__toolbar-actions">
+          <span class="homepage-save-status" id="homepage-save-status" aria-live="polite">Načítám…</span>
+          <a class="button button--ghost" href="/" target="_blank" rel="noopener">Živý web</a>
+          <button class="button button--secondary" id="homepage-reset" type="button" disabled>Vrátit živou verzi</button>
+          <button class="button button--secondary" id="homepage-save" type="button" disabled>Uložit koncept</button>
+          <button class="button" id="homepage-publish" type="button" disabled>Publikovat na web</button>
+        </div>
+      </div>
+
+      <div class="homepage-editor__message" id="homepage-message" hidden aria-live="assertive"></div>
+      <button class="button button--secondary homepage-editor__retry" id="homepage-retry" type="button" hidden>Načíst editor znovu</button>
+      <div class="homepage-editor__workspace" aria-busy="true">
+        <section class="homepage-canvas" aria-labelledby="homepage-canvas-title">
+          <div class="homepage-canvas__intro">
+            <div><h2 id="homepage-canvas-title">Pořadí stránky</h2><p>Kliknutím otevřete úpravy. Šipkami nebo tažením změníte pořadí.</p></div>
+            <button class="button button--secondary" type="button" data-open-library disabled>Přidat blok</button>
+          </div>
+          <ol class="homepage-block-list" id="homepage-block-list" aria-label="Bloky domovské stránky"></ol>
+          <button class="homepage-add" type="button" data-open-library disabled><span aria-hidden="true">＋</span> Přidat další blok</button>
+          <div class="homepage-footer-lock"><strong>Patička webu</strong><span>Pevně na posledním místě</span></div>
+        </section>
+        <aside class="homepage-inspector" id="homepage-inspector" aria-live="polite">
+          <div class="homepage-inspector__empty">Vyberte blok vlevo a tady upravíte jeho texty a fotografie.</div>
+        </aside>
+      </div>
+
+      <dialog class="homepage-block-library" id="homepage-block-library" aria-labelledby="homepage-library-title">
+        <div class="homepage-block-library__inner">
+          <div class="homepage-block-library__head">
+            <div><h2 id="homepage-library-title">Přidat blok</h2><p>Vyberte bezpečnou šablonu, která zapadne do vzhledu webu.</p></div>
+            <button class="homepage-block-library__close" type="button" data-close-library aria-label="Zavřít">×</button>
+          </div>
+          <div class="homepage-block-library__grid">
+            <button class="homepage-template" type="button" data-template="image-right" disabled><span aria-hidden="true">▤ ◼</span><strong>Text a fotografie</strong><span>Univerzální blok s obrázkem vpravo. Stranu lze později změnit.</span></button>
+            <button class="homepage-template" type="button" data-template="text-only" disabled><span aria-hidden="true">☰</span><strong>Samostatný text</strong><span>Klidný obsahový blok bez fotografie.</span></button>
+            <button class="homepage-template" type="button" data-template="image-wide" disabled><span aria-hidden="true">▰</span><strong>Široká fotografie</strong><span>Výrazná fotografie s krátkým textem.</span></button>
+          </div>
+        </div>
+      </dialog>
+    </div>
+    <script>
+    (function() {
+      var app = document.getElementById('homepage-editor');
+      if (!app) return;
+      var list = document.getElementById('homepage-block-list');
+      var inspector = document.getElementById('homepage-inspector');
+      var status = document.getElementById('homepage-save-status');
+      var message = document.getElementById('homepage-message');
+      var library = document.getElementById('homepage-block-library');
+      var workspace = app.querySelector('.homepage-editor__workspace');
+      var retryButton = document.getElementById('homepage-retry');
+      var saveButton = document.getElementById('homepage-save');
+      var publishButton = document.getElementById('homepage-publish');
+      var resetButton = document.getElementById('homepage-reset');
+      var state = { layout: { version: 1, blocks: [] }, selectedId: '', revision: null, dirty: false, draftDiffers: false, busy: false, loaded: false, draggedId: '' };
+      var fixedLabels = { hero: 'Úvodní obrazovka', about: 'Řemeslo s tradicí', products: 'Výrobky', blog: 'Blog', author: 'Příběh za značkou', custom: 'Zakázková výroba a kontakt' };
+
+      workspace.inert = true;
+
+      function setMutationControlsDisabled(disabled) {
+        saveButton.disabled = disabled;
+        publishButton.disabled = disabled;
+        resetButton.disabled = disabled;
+        document.querySelectorAll('[data-open-library], [data-template]').forEach(function(button) {
+          button.disabled = disabled;
+        });
+      }
+
+      function setBusy(busy) {
+        state.busy = busy;
+        app.classList.toggle('is-busy', busy);
+        workspace.inert = busy || !state.loaded;
+        workspace.setAttribute('aria-busy', busy || !state.loaded ? 'true' : 'false');
+        setMutationControlsDisabled(busy || !state.loaded);
+      }
+
+      function escapeHtml(value) {
+        return String(value == null ? '' : value).replace(/[&<>"']/g, function(char) {
+          return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char];
+        });
+      }
+
+      function requestJson(url, options) {
+        return fetch(url, Object.assign({ headers: { 'Content-Type': 'application/json', Accept: 'application/json' } }, options || {})).then(function(response) {
+          return response.json().catch(function() { return {}; }).then(function(data) {
+            if (!response.ok) {
+              var error = new Error(data.error || 'Požadavek se nepodařil.');
+              error.status = response.status;
+              throw error;
+            }
+            return data;
+          });
+        });
+      }
+
+      function setMessage(text, type) {
+        if (!text) { message.hidden = true; message.textContent = ''; return; }
+        message.hidden = false;
+        message.className = 'homepage-editor__message ' + (type === 'error' ? 'alert' : 'success');
+        message.textContent = text;
+      }
+
+      function setStatus(text, className) {
+        status.textContent = text;
+        status.className = 'homepage-save-status' + (className ? ' ' + className : '');
+      }
+
+      function updateStatus() {
+        if (state.busy) return setStatus('Ukládám…', 'is-dirty');
+        if (state.dirty) return setStatus('Neuložené změny', 'is-dirty');
+        if (state.draftDiffers) return setStatus('Koncept čeká na publikaci', 'is-dirty');
+        setStatus('Vše uloženo');
+      }
+
+      function blockById(id) {
+        return state.layout.blocks.find(function(block) { return block.id === id; });
+      }
+
+      function blockTitle(block) {
+        return (block.content && block.content.title) || fixedLabels[block.id] || block.label || 'Vlastní blok';
+      }
+
+      function blockSummary(block) {
+        var content = block.content || {};
+        return content.body || content.lead || content.secondary_body || 'Kliknutím doplňte obsah tohoto bloku.';
+      }
+
+      function blockImage(block) {
+        var content = block.content || {};
+        if (content.image && content.image.url) return content.image;
+        if (Array.isArray(content.images)) return content.images.find(function(image) { return image && image.url; }) || null;
+        return null;
+      }
+
+      function renderCards() {
+        list.innerHTML = state.layout.blocks.map(function(block, index) {
+          var image = blockImage(block);
+          var selected = block.id === state.selectedId;
+          var isAuto = block.id === 'products' || block.id === 'blog';
+          var imageHtml = image
+            ? '<span class="homepage-block-card__image"><img src="' + escapeHtml(image.url) + '" alt="' + escapeHtml(image.alt || '') + '"></span>'
+            : '<span class="homepage-block-card__image is-empty">' + (block.kind === 'story' ? 'Přidat fotografii' : 'Textový blok') + '</span>';
+          var meta = '<span>' + escapeHtml(block.kind === 'story' ? 'Vlastní blok' : fixedLabels[block.id]) + '</span>';
+          if (isAuto) meta += '<span class="is-auto">Automatický obsah</span>';
+          if (block.visible === false) meta += '<span class="is-off">Skryto</span>';
+          return '<li class="homepage-block-card' + (selected ? ' is-selected' : '') + (block.visible === false ? ' is-hidden' : '') + '" data-block-id="' + escapeHtml(block.id) + '" draggable="' + (block.id === 'hero' ? 'false' : 'true') + '"' + (selected ? ' aria-current="true"' : '') + '>' +
+            '<button class="homepage-block-card__handle" type="button" tabindex="-1" aria-label="Přetáhnout blok"' + (block.id === 'hero' ? ' disabled' : '') + '>⋮⋮</button>' +
+            '<button class="homepage-block-card__preview" type="button" data-action="edit" style="padding:0;border:0;background:transparent;text-align:left;">' +
+              '<span class="homepage-block-card__copy"><span class="homepage-block-card__meta">' + meta + '</span><strong>' + escapeHtml(blockTitle(block)) + '</strong><p>' + escapeHtml(blockSummary(block)) + '</p></span>' + imageHtml +
+            '</button>' +
+            '<span class="homepage-block-card__actions">' +
+              '<button type="button" data-action="up" aria-label="Posunout nahoru" title="Posunout nahoru"' + (index <= 1 ? ' disabled' : '') + '>↑</button>' +
+              '<button type="button" data-action="down" aria-label="Posunout dolů" title="Posunout dolů"' + (index === state.layout.blocks.length - 1 || block.id === 'hero' ? ' disabled' : '') + '>↓</button>' +
+              '<button type="button" data-action="visibility" aria-label="' + (block.visible === false ? 'Zobrazit blok' : 'Skrýt blok') + '" title="' + (block.visible === false ? 'Zobrazit' : 'Skrýt') + '"' + (block.id === 'hero' ? ' disabled' : '') + '>' + (block.visible === false ? '◉' : '◌') + '</button>' +
+              (block.kind === 'story' ? '<button type="button" data-action="remove" aria-label="Přesunout blok do archivu" title="Odebrat blok">×</button>' : '<button type="button" data-action="edit" aria-label="Upravit blok" title="Upravit">✎</button>') +
+            '</span></li>';
+        }).join('');
+      }
+
+      function inputField(label, key, value, type, help) {
+        var control = type === 'textarea'
+          ? '<textarea data-content-key="' + key + '">' + escapeHtml(value) + '</textarea>'
+          : '<input data-content-key="' + key + '" value="' + escapeHtml(value) + '"' + (type === 'url' ? ' inputmode="url" placeholder="#část-stránky nebo https://…"' : '') + '>';
+        return '<label>' + escapeHtml(label) + control + (help ? '<small>' + escapeHtml(help) + '</small>' : '') + '</label>';
+      }
+
+      function selectField(label, key, value, options) {
+        return '<label>' + escapeHtml(label) + '<select data-content-key="' + key + '">' + options.map(function(option) {
+          return '<option value="' + escapeHtml(option[0]) + '"' + (option[0] === value ? ' selected' : '') + '>' + escapeHtml(option[1]) + '</option>';
+        }).join('') + '</select></label>';
+      }
+
+      function imageField(block, slot, label) {
+        var content = block.content || {};
+        var image = slot.indexOf('images.') === 0 ? (content.images || [])[Number(slot.split('.')[1])] : content.image;
+        image = image || { url: '', alt: '', media_id: '' };
+        var preview = image.url
+          ? '<img src="' + escapeHtml(image.url) + '" alt="' + escapeHtml(image.alt || '') + '">'
+          : '<span>Zatím bez fotografie</span>';
+        return '<div class="homepage-image-field" data-image-slot="' + escapeHtml(slot) + '"><strong>' + escapeHtml(label) + '</strong><div class="homepage-image-field__preview">' + preview + '</div>' +
+          '<div class="homepage-image-field__actions"><label>Nahradit fotografii<input type="file" accept="image/jpeg,image/png,image/webp,image/gif" data-image-upload="' + escapeHtml(slot) + '"></label>' +
+          (image.url ? '<button type="button" data-image-remove="' + escapeHtml(slot) + '">Odebrat z bloku</button>' : '') + '</div>' +
+          '<label>Popis fotografie<input value="' + escapeHtml(image.alt || '') + '" data-image-alt="' + escapeHtml(slot) + '"><small>Krátký popis pomáhá lidem, kteří obrázek nevidí.</small></label></div>';
+      }
+
+      function renderInspector() {
+        var block = blockById(state.selectedId);
+        if (!block) {
+          inspector.innerHTML = '<div class="homepage-inspector__empty">Vyberte blok vlevo a tady upravíte jeho texty a fotografie.</div>';
+          return;
+        }
+        var content = block.content || {};
+        var fields = '';
+        if (block.id === 'hero') {
+          fields += inputField('Malý nadpis', 'eyebrow', content.eyebrow, 'text');
+          fields += inputField('Hlavní nadpis', 'title', content.title, 'text');
+          fields += inputField('Úvodní text', 'body', content.body, 'textarea');
+          fields += imageField(block, 'image', 'Úvodní fotografie');
+          fields += inputField('Text hlavního tlačítka', 'primary_label', content.primary_label, 'text');
+          fields += inputField('Cíl hlavního tlačítka', 'primary_url', content.primary_url, 'url');
+          fields += inputField('Text druhého tlačítka', 'secondary_label', content.secondary_label, 'text');
+          fields += inputField('Cíl druhého tlačítka', 'secondary_url', content.secondary_url, 'url');
+        } else if (block.id === 'about') {
+          fields += inputField('Nadpis', 'title', content.title, 'text');
+          fields += inputField('Úvodní odstavec', 'lead', content.lead, 'textarea');
+          fields += inputField('Další text', 'body', content.body, 'textarea');
+          fields += imageField(block, 'image', 'Fotografie řemesla');
+        } else if (block.id === 'products' || block.id === 'blog') {
+          fields += '<div class="homepage-inspector__hint">Karty v této části se doplňují automaticky ze samostatné správy ' + (block.id === 'products' ? '<a href="/admin/products">výrobků</a>' : '<a href="/admin/blog-posts">článků</a>') + '. Zde měníte jen nadpis, úvod a umístění celého bloku.</div>';
+          fields += inputField('Nadpis sekce', 'title', content.title, 'text');
+          fields += inputField('Úvodní text', 'body', content.body, 'textarea');
+        } else if (block.id === 'author') {
+          fields += inputField('Nadpis', 'title', content.title, 'text');
+          fields += inputField('Výrazný úvod', 'lead', content.lead, 'textarea');
+          fields += inputField('Příběh', 'body', content.body, 'textarea', 'Prázdný řádek vytvoří nový odstavec.');
+          fields += inputField('Podpis', 'signature', content.signature, 'text');
+          fields += imageField(block, 'image', 'Fotografie autora');
+        } else if (block.id === 'custom') {
+          fields += inputField('Nadpis', 'title', content.title, 'text');
+          fields += inputField('Hlavní text', 'body', content.body, 'textarea');
+          fields += inputField('Doplňující text', 'secondary_body', content.secondary_body, 'textarea');
+          fields += imageField(block, 'images.0', 'První fotografie');
+          fields += imageField(block, 'images.1', 'Druhá fotografie');
+          fields += '<div class="homepage-inspector__hint">Telefon, e-mail, sociální sítě a mapa zůstávají bezpečně nastavené ve webu.</div>';
+        } else {
+          fields += inputField('Malý nadpis', 'eyebrow', content.eyebrow, 'text');
+          fields += inputField('Nadpis', 'title', content.title, 'text');
+          fields += inputField('Text', 'body', content.body, 'textarea', 'Prázdný řádek vytvoří nový odstavec.');
+          fields += imageField(block, 'image', 'Fotografie');
+          fields += selectField('Rozložení', 'layout', content.layout, [['image-right','Fotografie vpravo'],['image-left','Fotografie vlevo'],['text-only','Jen text'],['image-wide','Široká fotografie']]);
+          fields += selectField('Barevná nálada', 'theme', content.theme, [['paper','Světlý papír'],['cream','Teplá krémová'],['wood','Tmavé dřevo']]);
+          fields += inputField('Text tlačítka (volitelné)', 'cta_label', content.cta_label, 'text');
+          fields += inputField('Cíl tlačítka', 'cta_url', content.cta_url, 'url');
+        }
+        inspector.innerHTML = '<div class="homepage-inspector__header"><span>Upravujete blok</span><h2>' + escapeHtml(fixedLabels[block.id] || blockTitle(block)) + '</h2></div><div class="homepage-inspector__body">' + fields + '</div>';
+      }
+
+      function markDirty() {
+        if (!state.loaded || state.busy) return;
+        state.dirty = true;
+        updateStatus();
+      }
+
+      function selectBlock(id, scroll) {
+        state.selectedId = id;
+        renderCards();
+        renderInspector();
+        if (scroll && window.innerWidth <= 1000) inspector.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+
+      function moveBlock(id, direction) {
+        if (!state.loaded || state.busy) return;
+        var index = state.layout.blocks.findIndex(function(block) { return block.id === id; });
+        var target = index + direction;
+        if (index < 1 || target < 1 || target >= state.layout.blocks.length) return;
+        var moved = state.layout.blocks.splice(index, 1)[0];
+        state.layout.blocks.splice(target, 0, moved);
+        markDirty();
+        renderCards();
+      }
+
+      function toggleVisibility(block) {
+        if (!state.loaded || state.busy) return;
+        if (!block || block.id === 'hero') return;
+        if (block.visible !== false && (block.id === 'products' || block.id === 'custom')) {
+          var consequence = block.id === 'products' ? 'Skryjete celý katalog výrobků i jeho odkaz v menu.' : 'Skryjete zakázkovou výrobu, kontakt i mapu z hlavní stránky.';
+          if (!window.confirm(consequence + '\\n\\nChcete pokračovat?')) return;
+        }
+        block.visible = block.visible === false;
+        markDirty();
+        renderCards();
+        renderInspector();
+      }
+
+      function newStory(layout) {
+        var uuid = window.crypto && window.crypto.randomUUID ? window.crypto.randomUUID() : Date.now() + '-' + Math.random().toString(16).slice(2);
+        return { id: 'story-' + uuid.toLowerCase(), kind: 'story', label: 'Vlastní blok', visible: true, content: { eyebrow: 'Z naší dílny', title: 'Nový blok', body: 'Sem napište vlastní text. Můžete použít více odstavců.', image: { url: '', alt: '', media_id: '' }, layout: layout, theme: 'paper', cta_label: '', cta_url: '' } };
+      }
+
+      function addStory(layout) {
+        if (!state.loaded || state.busy) return;
+        if (state.layout.blocks.length >= 36) return setMessage('Dosáhli jste maximálního počtu bloků.', 'error');
+        var block = newStory(layout);
+        var selectedIndex = state.layout.blocks.findIndex(function(item) { return item.id === state.selectedId; });
+        var insertAt = selectedIndex >= 0 ? selectedIndex + 1 : state.layout.blocks.length;
+        state.layout.blocks.splice(insertAt, 0, block);
+        state.selectedId = block.id;
+        markDirty();
+        renderCards();
+        renderInspector();
+        library.close();
+        if (window.innerWidth <= 1000) inspector.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+
+      function applyServerState(data) {
+        state.layout = data.layout;
+        state.revision = data.draft_revision;
+        state.dirty = false;
+        state.draftDiffers = Boolean(data.is_dirty);
+        if (!blockById(state.selectedId)) state.selectedId = state.layout.blocks[0] && state.layout.blocks[0].id;
+        renderCards();
+        renderInspector();
+        updateStatus();
+      }
+
+      function persist(url, successMessage) {
+        if (!state.loaded || state.busy) return Promise.resolve();
+        var dirtyBeforeRequest = state.dirty;
+        setBusy(true);
+        setMessage('', '');
+        updateStatus();
+        return requestJson(url, { method: url.indexOf('/draft') !== -1 ? 'PUT' : 'POST', body: JSON.stringify({ layout: state.layout, expected_revision: state.revision }) })
+          .then(function(data) { applyServerState(data); setMessage(successMessage, 'success'); })
+          .catch(function(error) {
+            state.dirty = dirtyBeforeRequest;
+            setStatus(error.status === 409 ? 'Novější verze v jiném okně' : 'Uložení se nepodařilo', 'is-error');
+            setMessage(error.message, 'error');
+          })
+          .finally(function() {
+            setBusy(false);
+            if (!message.classList.contains('alert')) updateStatus();
+          });
+      }
+
+      list.addEventListener('click', function(event) {
+        if (!state.loaded || state.busy) return;
+        var card = event.target.closest('[data-block-id]');
+        var actionButton = event.target.closest('[data-action]');
+        if (!card || !actionButton) return;
+        var id = card.getAttribute('data-block-id');
+        var block = blockById(id);
+        var action = actionButton.getAttribute('data-action');
+        if (action === 'edit') selectBlock(id, true);
+        if (action === 'up') moveBlock(id, -1);
+        if (action === 'down') moveBlock(id, 1);
+        if (action === 'visibility') toggleVisibility(block);
+        if (action === 'remove' && block && window.confirm('Odebrat tento vlastní blok z konceptu? Nahraná fotografie zůstane bezpečně v médiích.')) {
+          var index = state.layout.blocks.indexOf(block);
+          state.layout.blocks.splice(index, 1);
+          state.selectedId = (state.layout.blocks[Math.max(0, index - 1)] || {}).id || '';
+          markDirty();
+          renderCards();
+          renderInspector();
+        }
+      });
+
+      list.addEventListener('dragstart', function(event) {
+        if (!state.loaded || state.busy) return event.preventDefault();
+        var card = event.target.closest('[data-block-id]');
+        if (!card || card.getAttribute('data-block-id') === 'hero') return event.preventDefault();
+        state.draggedId = card.getAttribute('data-block-id');
+        card.classList.add('is-dragging');
+        event.dataTransfer.effectAllowed = 'move';
+      });
+      list.addEventListener('dragover', function(event) { if (state.draggedId) event.preventDefault(); });
+      list.addEventListener('drop', function(event) {
+        event.preventDefault();
+        if (!state.loaded || state.busy) return;
+        var targetCard = event.target.closest('[data-block-id]');
+        if (!targetCard || !state.draggedId) return;
+        var targetId = targetCard.getAttribute('data-block-id');
+        if (targetId === 'hero' || targetId === state.draggedId) return;
+        var from = state.layout.blocks.findIndex(function(block) { return block.id === state.draggedId; });
+        var to = state.layout.blocks.findIndex(function(block) { return block.id === targetId; });
+        var moved = state.layout.blocks.splice(from, 1)[0];
+        state.layout.blocks.splice(to, 0, moved);
+        markDirty();
+        renderCards();
+      });
+      list.addEventListener('dragend', function() { state.draggedId = ''; renderCards(); });
+
+      inspector.addEventListener('input', function(event) {
+        if (!state.loaded || state.busy) return;
+        var block = blockById(state.selectedId);
+        if (!block) return;
+        var key = event.target.getAttribute('data-content-key');
+        var altSlot = event.target.getAttribute('data-image-alt');
+        if (key) block.content[key] = event.target.value;
+        if (altSlot) {
+          var image = altSlot.indexOf('images.') === 0 ? block.content.images[Number(altSlot.split('.')[1])] : block.content.image;
+          if (image) image.alt = event.target.value;
+        }
+        markDirty();
+        renderCards();
+      });
+
+      inspector.addEventListener('change', function(event) {
+        if (!state.loaded || state.busy) return;
+        var uploadSlot = event.target.getAttribute('data-image-upload');
+        if (!uploadSlot || !event.target.files || !event.target.files[0]) return;
+        var block = blockById(state.selectedId);
+        if (!block) return;
+        var uploadInput = event.target;
+        var blockId = block.id;
+        var form = new FormData();
+        form.append('image', uploadInput.files[0]);
+        form.append('targetKey', 'homepage-' + block.id + '-' + uploadSlot.replace('.', '-'));
+        form.append('targetLabel', fixedLabels[block.id] || blockTitle(block));
+        var currentImage = uploadSlot.indexOf('images.') === 0 ? block.content.images[Number(uploadSlot.split('.')[1])] : block.content.image;
+        form.append('alt', (currentImage && currentImage.alt) || blockTitle(block));
+        setBusy(true);
+        setStatus('Nahrávám fotografii…', 'is-dirty');
+        fetch('/admin/api/site-content/photo-upload', { method: 'POST', body: form, headers: { Accept: 'application/json' } }).then(function(response) {
+          return response.json().then(function(data) { if (!response.ok) throw new Error(data.error || 'Fotografii se nepodařilo nahrát.'); return data; });
+        }).then(function(data) {
+          var currentBlock = blockById(blockId);
+          if (!currentBlock) throw new Error('Upravovaný blok už v konceptu není. Fotografii najdete v médiích.');
+          var photo = data.photo || { media_id: data.media.id, url: data.media.public_url, alt: data.media.alt_text || '', caption: '' };
+          if (uploadSlot.indexOf('images.') === 0) currentBlock.content.images[Number(uploadSlot.split('.')[1])] = photo;
+          else currentBlock.content.image = photo;
+          state.dirty = true;
+          renderCards();
+          renderInspector();
+          setMessage('Fotografie je v konceptu. Uložte koncept nebo vše rovnou publikujte.', 'success');
+        }).catch(function(error) {
+          setStatus('Nahrání se nepodařilo', 'is-error');
+          setMessage(error.message, 'error');
+        }).finally(function() {
+          uploadInput.value = '';
+          setBusy(false);
+          if (!message.classList.contains('alert')) updateStatus();
+        });
+      });
+
+      inspector.addEventListener('click', function(event) {
+        if (!state.loaded || state.busy) return;
+        var slot = event.target.getAttribute('data-image-remove');
+        if (!slot) return;
+        var block = blockById(state.selectedId);
+        if (!block) return;
+        var empty = { url: '', alt: '', media_id: '' };
+        if (slot.indexOf('images.') === 0) block.content.images[Number(slot.split('.')[1])] = empty;
+        else block.content.image = empty;
+        markDirty();
+        renderCards();
+        renderInspector();
+      });
+
+      document.querySelectorAll('[data-open-library]').forEach(function(button) { button.addEventListener('click', function() { if (state.loaded && !state.busy) library.showModal(); }); });
+      document.querySelector('[data-close-library]').addEventListener('click', function() { library.close(); });
+      library.addEventListener('click', function(event) { if (event.target === library) library.close(); });
+      library.querySelectorAll('[data-template]').forEach(function(button) { button.addEventListener('click', function() { addStory(button.getAttribute('data-template')); }); });
+      saveButton.addEventListener('click', function() { persist('/admin/api/homepage/draft', 'Koncept je bezpečně uložený. Živý web se nezměnil.'); });
+      publishButton.addEventListener('click', function() {
+        if (!state.loaded || state.busy) return;
+        if (!window.confirm('Publikovat tento koncept na živý web? Návštěvníci změny uvidí ihned.')) return;
+        persist('/admin/api/homepage/publish', 'Domovská stránka byla publikována.');
+      });
+      resetButton.addEventListener('click', function() {
+        if (!state.loaded || state.busy) return;
+        if (!window.confirm('Zahodit rozpracovaný koncept a vrátit se k právě publikované verzi?')) return;
+        var dirtyBeforeRequest = state.dirty;
+        setBusy(true);
+        updateStatus();
+        requestJson('/admin/api/homepage/reset-draft', { method: 'POST', body: JSON.stringify({ expected_revision: state.revision }) })
+          .then(function(data) { applyServerState(data); setMessage('Koncept byl vrácen k živé verzi.', 'success'); })
+          .catch(function(error) { state.dirty = dirtyBeforeRequest; setStatus('Obnovení se nepodařilo', 'is-error'); setMessage(error.message, 'error'); })
+          .finally(function() { setBusy(false); if (!message.classList.contains('alert')) updateStatus(); });
+      });
+      window.addEventListener('beforeunload', function(event) { if (state.dirty) { event.preventDefault(); event.returnValue = ''; } });
+
+      function loadHomepage() {
+        if (state.busy) return;
+        state.loaded = false;
+        retryButton.hidden = true;
+        setBusy(true);
+        setMessage('', '');
+        setStatus('Načítám…');
+        requestJson('/admin/api/homepage').then(function(data) {
+          state.loaded = true;
+          setBusy(false);
+          applyServerState(data);
+          if (!data.has_draft && !data.has_published_layout) setStatus('Připraveno – zatím neuloženo', 'is-dirty');
+        }).catch(function(error) {
+          state.loaded = false;
+          setBusy(false);
+          retryButton.hidden = false;
+          setStatus('Načtení se nepodařilo', 'is-error');
+          setMessage(error.message, 'error');
+        });
+      }
+
+      retryButton.addEventListener('click', loadHomepage);
+      loadHomepage();
     })();
     </script>
   `);
@@ -6642,10 +7366,319 @@ async function restoreBlogPost(id) {
   return getBlogPostById(id);
 }
 
+function cloneJson(value) {
+  return JSON.parse(JSON.stringify(value));
+}
+
+function defaultHomepageLayout() {
+  return {
+    version: HOMEPAGE_LAYOUT_VERSION,
+    blocks: cloneJson(HOMEPAGE_FIXED_BLOCKS)
+  };
+}
+
+function legacySiteContentText(item) {
+  const value = item && item.value && typeof item.value === 'object' ? item.value : {};
+  return stripHtmlToText(value.text || value.html || '').trim();
+}
+
+function splitLegacyParagraphs(value) {
+  return String(value || '').split(/\n\s*\n+/).map((part) => part.trim()).filter(Boolean);
+}
+
+function homepageLayoutFromLegacyRows(rows) {
+  const layout = defaultHomepageLayout();
+  const byKey = new Map((Array.isArray(rows) ? rows : []).filter((item) => item && item.status === 'published').map((item) => [item.content_key, item]));
+  const blockMap = new Map(layout.blocks.map((block) => [block.id, block]));
+  const heroText = splitLegacyParagraphs(legacySiteContentText(byKey.get('homepage.hero')));
+  if (heroText[0]) blockMap.get('hero').content.title = heroText[0];
+  if (heroText[1]) blockMap.get('hero').content.body = heroText.slice(1).join(' ');
+  const heroImage = byKey.get('homepage.hero.image');
+  if (heroImage && heroImage.value) blockMap.get('hero').content.image = normalizeHomepageImage(heroImage.value, blockMap.get('hero').content.image);
+
+  const aboutText = splitLegacyParagraphs(legacySiteContentText(byKey.get('about.text')));
+  if (aboutText[0]) blockMap.get('about').content.lead = aboutText[0];
+  if (aboutText[1]) blockMap.get('about').content.body = aboutText.slice(1).join('\n\n');
+  const aboutImage = byKey.get('about.image');
+  if (aboutImage && aboutImage.value) blockMap.get('about').content.image = normalizeHomepageImage(aboutImage.value, blockMap.get('about').content.image);
+
+  const craftText = splitLegacyParagraphs(legacySiteContentText(byKey.get('craft.philosophy')));
+  if (craftText[0]) blockMap.get('author').content.lead = craftText[0];
+  if (craftText[1]) blockMap.get('author').content.body = craftText.slice(1).join('\n\n');
+  const authorImage = byKey.get('author.image');
+  if (authorImage && authorImage.value) blockMap.get('author').content.image = normalizeHomepageImage(authorImage.value, blockMap.get('author').content.image);
+
+  const contactText = splitLegacyParagraphs(legacySiteContentText(byKey.get('contact.text')));
+  if (contactText[0]) blockMap.get('custom').content.body = contactText[0];
+  if (contactText[1]) blockMap.get('custom').content.secondary_body = contactText.slice(1).join(' ');
+  const productsTitle = legacySiteContentText(byKey.get('products.title'));
+  const productsIntro = legacySiteContentText(byKey.get('products.intro'));
+  const blogTitle = legacySiteContentText(byKey.get('blog.title'));
+  const blogIntro = legacySiteContentText(byKey.get('blog.intro'));
+  if (productsTitle) blockMap.get('products').content.title = productsTitle;
+  if (productsIntro) blockMap.get('products').content.body = productsIntro;
+  if (blogTitle) blockMap.get('blog').content.title = blogTitle;
+  if (blogIntro) blockMap.get('blog').content.body = blogIntro;
+  return normalizeHomepageLayout(layout);
+}
+
+function applyManagedImagesToHomepageLayout(layout, mediaDb) {
+  const normalized = normalizeHomepageLayout(layout);
+  const blockMap = new Map(normalized.blocks.map((block) => [block.id, block]));
+  const targets = mediaDb && mediaDb.targets && mediaDb.targets.site_sections
+    ? mediaDb.targets.site_sections
+    : {};
+  const firstImage = (key) => {
+    const images = targets[key] && Array.isArray(targets[key].images) ? targets[key].images : [];
+    return images[0] || null;
+  };
+  const heroImage = firstImage('hero');
+  const aboutImage = firstImage('about');
+  const authorImage = firstImage('author');
+  const customPrimary = firstImage('custom_primary');
+  const customSecondary = firstImage('custom_secondary');
+  if (heroImage) blockMap.get('hero').content.image = normalizeHomepageImage(heroImage, blockMap.get('hero').content.image);
+  if (aboutImage) blockMap.get('about').content.image = normalizeHomepageImage(aboutImage, blockMap.get('about').content.image);
+  if (authorImage) blockMap.get('author').content.image = normalizeHomepageImage(authorImage, blockMap.get('author').content.image);
+  if (customPrimary) blockMap.get('custom').content.images[0] = normalizeHomepageImage(customPrimary, blockMap.get('custom').content.images[0]);
+  if (customSecondary) blockMap.get('custom').content.images[1] = normalizeHomepageImage(customSecondary, blockMap.get('custom').content.images[1]);
+  return normalized;
+}
+
+function homepageString(value, fallback = '', maxLength = 6000) {
+  const source = value === undefined || value === null ? fallback : value;
+  return String(source || '').trim().slice(0, maxLength);
+}
+
+function homepageContentField(content, key, fallback, maxLength) {
+  const source = content && Object.prototype.hasOwnProperty.call(content, key)
+    ? content[key]
+    : fallback;
+  return homepageString(source, fallback, maxLength);
+}
+
+function normalizeHomepageLink(value, fieldName = 'Odkaz') {
+  const url = String(value || '').trim();
+  if (!url) return '';
+  if (url.startsWith('#')) {
+    if (!/^#[a-zA-Z][a-zA-Z0-9_-]*$/.test(url)) throw new Error(`${fieldName} nemá platný odkaz na část stránky.`);
+    return url;
+  }
+  if (url.startsWith('/') && !url.startsWith('//')) return url;
+
+  let parsed;
+  try {
+    parsed = new URL(url);
+  } catch (error) {
+    throw new Error(`${fieldName} musí začínat #, /, http://, https://, mailto: nebo tel:.`);
+  }
+  if (!['http:', 'https:', 'mailto:', 'tel:'].includes(parsed.protocol)) {
+    throw new Error(`${fieldName} musí začínat #, /, http://, https://, mailto: nebo tel:.`);
+  }
+  return url;
+}
+
+function normalizeHomepageImage(value, fallback) {
+  if (value === undefined || value === null) return cloneJson(fallback || { url: '', alt: '', media_id: '' });
+  const image = normalizeSiteContentImageValue(value);
+  image.alt = homepageString(image.alt, '', 400);
+  image.caption = homepageString(image.caption, '', 800);
+  image.media_id = homepageString(image.media_id, '', 80);
+  return image;
+}
+
+function normalizeHomepageFixedBlock(definition, rawBlock = {}) {
+  const rawContent = rawBlock.content && typeof rawBlock.content === 'object' ? rawBlock.content : {};
+  const defaults = definition.content;
+  const content = {};
+
+  if (definition.id === 'hero') {
+    content.eyebrow = homepageContentField(rawContent, 'eyebrow', defaults.eyebrow, 120);
+    content.title = homepageContentField(rawContent, 'title', defaults.title, 180);
+    content.body = homepageContentField(rawContent, 'body', defaults.body, 800);
+    content.image = normalizeHomepageImage(rawContent.image, defaults.image);
+    content.primary_label = homepageContentField(rawContent, 'primary_label', defaults.primary_label, 80);
+    content.primary_url = normalizeHomepageLink(
+      Object.prototype.hasOwnProperty.call(rawContent, 'primary_url') ? rawContent.primary_url : defaults.primary_url,
+      'Odkaz hlavního tlačítka'
+    );
+    content.secondary_label = homepageContentField(rawContent, 'secondary_label', defaults.secondary_label, 80);
+    content.secondary_url = normalizeHomepageLink(
+      Object.prototype.hasOwnProperty.call(rawContent, 'secondary_url') ? rawContent.secondary_url : defaults.secondary_url,
+      'Odkaz druhého tlačítka'
+    );
+  } else if (definition.id === 'about') {
+    content.title = homepageContentField(rawContent, 'title', defaults.title, 180);
+    content.lead = homepageContentField(rawContent, 'lead', defaults.lead, 1400);
+    content.body = homepageContentField(rawContent, 'body', defaults.body, 4000);
+    content.image = normalizeHomepageImage(rawContent.image, defaults.image);
+  } else if (definition.id === 'products' || definition.id === 'blog') {
+    content.title = homepageContentField(rawContent, 'title', defaults.title, 180);
+    content.body = homepageContentField(rawContent, 'body', defaults.body, 1600);
+  } else if (definition.id === 'author') {
+    content.title = homepageContentField(rawContent, 'title', defaults.title, 180);
+    content.lead = homepageContentField(rawContent, 'lead', defaults.lead, 1400);
+    content.body = homepageContentField(rawContent, 'body', defaults.body, 6000);
+    content.signature = homepageContentField(rawContent, 'signature', defaults.signature, 120);
+    content.image = normalizeHomepageImage(rawContent.image, defaults.image);
+  } else if (definition.id === 'custom') {
+    content.title = homepageContentField(rawContent, 'title', defaults.title, 180);
+    content.body = homepageContentField(rawContent, 'body', defaults.body, 2600);
+    content.secondary_body = homepageContentField(rawContent, 'secondary_body', defaults.secondary_body, 1600);
+    const rawImages = Array.isArray(rawContent.images) ? rawContent.images : defaults.images;
+    content.images = [0, 1].map((index) => normalizeHomepageImage(rawImages[index], defaults.images[index]));
+  }
+
+  return {
+    id: definition.id,
+    kind: definition.kind,
+    label: definition.label,
+    visible: definition.id === 'hero' ? true : rawBlock.visible !== false,
+    content
+  };
+}
+
+function normalizeHomepageStoryBlock(rawBlock = {}) {
+  const rawContent = rawBlock.content && typeof rawBlock.content === 'object' ? rawBlock.content : {};
+  const rawId = homepageString(rawBlock.id, '', 100);
+  const id = rawId && /^story-[a-z0-9][a-z0-9-]*$/.test(rawId)
+    ? rawId
+    : `story-${slugify(rawId || crypto.randomUUID(), 'block')}`;
+  const title = homepageContentField(rawContent, 'title', 'Nový blok', 180);
+  const layout = ['image-right', 'image-left', 'text-only', 'image-wide'].includes(rawContent.layout)
+    ? rawContent.layout
+    : 'image-right';
+  const theme = ['paper', 'cream', 'wood'].includes(rawContent.theme) ? rawContent.theme : 'paper';
+
+  return {
+    id,
+    kind: 'story',
+    label: title || 'Vlastní blok',
+    visible: rawBlock.visible !== false,
+    content: {
+      eyebrow: homepageContentField(rawContent, 'eyebrow', '', 120),
+      title,
+      body: homepageContentField(rawContent, 'body', '', 6000),
+      image: normalizeHomepageImage(rawContent.image, { url: '', alt: '', media_id: '' }),
+      layout,
+      theme,
+      cta_label: homepageContentField(rawContent, 'cta_label', '', 80),
+      cta_url: normalizeHomepageLink(rawContent.cta_url || '', 'Odkaz tlačítka')
+    }
+  };
+}
+
+function normalizeHomepageLayout(input) {
+  const source = input && input.layout && typeof input.layout === 'object' ? input.layout : input;
+  const rawBlocks = source && Array.isArray(source.blocks) ? source.blocks : [];
+  if (!rawBlocks.length) return defaultHomepageLayout();
+
+  const definitions = new Map(HOMEPAGE_FIXED_BLOCKS.map((block) => [block.id, block]));
+  const seenIds = new Set();
+  const blocks = [];
+
+  rawBlocks.slice(0, HOMEPAGE_MAX_BLOCKS).forEach((rawBlock) => {
+    if (!rawBlock || typeof rawBlock !== 'object') return;
+    const rawId = String(rawBlock.id || '').trim();
+    const definition = definitions.get(rawId);
+    const block = definition
+      ? normalizeHomepageFixedBlock(definition, rawBlock)
+      : rawBlock.kind === 'story'
+        ? normalizeHomepageStoryBlock(rawBlock)
+        : null;
+    if (!block || seenIds.has(block.id)) return;
+    seenIds.add(block.id);
+    if (block.kind === 'story' && blocks.filter((item) => item.kind === 'story').length >= HOMEPAGE_MAX_BLOCKS - HOMEPAGE_FIXED_BLOCKS.length) return;
+    blocks.push(block);
+  });
+
+  HOMEPAGE_FIXED_BLOCKS.forEach((definition) => {
+    if (seenIds.has(definition.id)) return;
+    seenIds.add(definition.id);
+    blocks.push(normalizeHomepageFixedBlock(definition));
+  });
+
+  const heroIndex = blocks.findIndex((block) => block.id === 'hero');
+  if (heroIndex > 0) blocks.unshift(blocks.splice(heroIndex, 1)[0]);
+
+  return {
+    version: HOMEPAGE_LAYOUT_VERSION,
+    blocks: blocks.slice(0, HOMEPAGE_MAX_BLOCKS)
+  };
+}
+
+function validateHomepageLayoutInput(input) {
+  const source = input && input.layout && typeof input.layout === 'object' ? input.layout : input;
+  if (!source || typeof source !== 'object' || !Array.isArray(source.blocks)) {
+    throw new Error('Rozložení stránky nemá platný seznam bloků.');
+  }
+  if (source.blocks.length > HOMEPAGE_MAX_BLOCKS) {
+    throw new Error(`Stránka může obsahovat nejvýše ${HOMEPAGE_MAX_BLOCKS} bloků.`);
+  }
+  if (JSON.stringify(source).length > 120000) {
+    throw new Error('Rozložení stránky je příliš velké.');
+  }
+
+  const definitions = new Map(HOMEPAGE_FIXED_BLOCKS.map((block) => [block.id, block]));
+  const seenIds = new Set();
+  source.blocks.forEach((rawBlock) => {
+    if (!rawBlock || typeof rawBlock !== 'object' || Array.isArray(rawBlock)) {
+      throw new Error('Každý blok musí mít platná data.');
+    }
+    const rawId = String(rawBlock.id || '').trim();
+    if (rawBlock.visible !== undefined && typeof rawBlock.visible !== 'boolean') {
+      throw new Error('Viditelnost bloku musí být zapnutá nebo vypnutá.');
+    }
+    Object.values(rawBlock.content || {}).forEach((value) => {
+      if (typeof value === 'string' && value.length > 6000) throw new Error('Text v bloku je příliš dlouhý.');
+    });
+    const definition = definitions.get(rawId);
+    if (definition) {
+      if (rawBlock.kind && rawBlock.kind !== definition.kind) {
+        throw new Error(`Blok ${definition.label} má neplatný typ.`);
+      }
+    } else if (rawBlock.kind !== 'story') {
+      throw new Error('Rozložení obsahuje nepodporovaný typ bloku.');
+    } else if (rawId && !/^story-[a-z0-9][a-z0-9-]*$/.test(rawId)) {
+      throw new Error('Vlastní blok má neplatný identifikátor.');
+    }
+    if (rawId) {
+      if (seenIds.has(rawId)) throw new Error('Rozložení obsahuje blok dvakrát.');
+      seenIds.add(rawId);
+    }
+    if (rawBlock.content !== undefined && (!rawBlock.content || typeof rawBlock.content !== 'object' || Array.isArray(rawBlock.content))) {
+      throw new Error('Obsah bloku nemá platný formát.');
+    }
+  });
+  return normalizeHomepageLayout(source);
+}
+
+function collectMediaIdsFromHomepageLayout(mediaIds, layout) {
+  const normalized = normalizeHomepageLayout(layout);
+  normalized.blocks.forEach((block) => {
+    const content = block.content || {};
+    collectMediaId(mediaIds, content.image);
+    if (Array.isArray(content.images)) content.images.forEach((image) => collectMediaId(mediaIds, image));
+  });
+}
+
+function hydrateHomepageLayout(layout, mediaMap) {
+  const normalized = normalizeHomepageLayout(layout);
+  normalized.blocks = normalized.blocks.map((block) => {
+    const content = { ...(block.content || {}) };
+    if (content.image) content.image = hydratePublicImageRef(content.image, mediaMap) || normalizeHomepageImage(content.image);
+    if (Array.isArray(content.images)) {
+      content.images = content.images.map((image) => hydratePublicImageRef(image, mediaMap) || normalizeHomepageImage(image));
+    }
+    return { ...block, content };
+  });
+  return normalized;
+}
+
 function normalizeSiteContentUrl(value, fieldName = 'URL') {
   const url = String(value || '').trim();
   if (!url) return '';
-  if (url.startsWith('/')) return url;
+  if (url.startsWith('/') && !url.startsWith('//')) return url;
 
   let parsed;
   try {
@@ -6788,6 +7821,210 @@ async function listSiteContent() {
   return sortSiteContent(Array.isArray(rows) ? rows : []);
 }
 
+async function findSiteContentByKey(contentKey, locale = 'cs') {
+  if (!isSupabaseConfigured()) {
+    return readCmsDb().site_content.find((item) => item.content_key === contentKey && item.locale === locale) || null;
+  }
+  const rows = await supabaseRequest('site_content', {
+    query: {
+      select: 'id,content_key,locale,section,label,content_type,value,status,sort_order,published_at,created_at,updated_at',
+      content_key: `eq.${contentKey}`,
+      locale: `eq.${locale}`,
+      limit: '1'
+    }
+  });
+  return Array.isArray(rows) && rows.length ? rows[0] : null;
+}
+
+async function findHomepageContentRows(locale = 'cs') {
+  if (!isSupabaseConfigured()) {
+    const rows = readCmsDb().site_content.filter((item) => (
+      item.locale === locale && isHomepageReservedContentKey(item.content_key)
+    ));
+    return {
+      publishedRow: rows.find((item) => item.content_key === HOMEPAGE_LAYOUT_CONTENT_KEY) || null,
+      draftRow: rows.find((item) => item.content_key === HOMEPAGE_LAYOUT_DRAFT_CONTENT_KEY) || null
+    };
+  }
+  const rows = await supabaseRequest('site_content', {
+    query: {
+      select: 'id,content_key,locale,section,label,content_type,value,status,sort_order,published_at,created_at,updated_at',
+      locale: `eq.${locale}`,
+      content_key: 'in.(homepage.layout,homepage.layout.draft)'
+    }
+  });
+  const contents = Array.isArray(rows) ? rows : [];
+  return {
+    publishedRow: contents.find((item) => item.content_key === HOMEPAGE_LAYOUT_CONTENT_KEY) || null,
+    draftRow: contents.find((item) => item.content_key === HOMEPAGE_LAYOUT_DRAFT_CONTENT_KEY) || null
+  };
+}
+
+function isHomepageReservedContentKey(contentKey) {
+  return HOMEPAGE_RESERVED_CONTENT_KEYS.has(String(contentKey || '').trim().toLowerCase());
+}
+
+function assertGenericSiteContentKeyAllowed(contentKey) {
+  if (isHomepageReservedContentKey(contentKey)) {
+    throw new Error('Tento obsah spravuje vizuální editor domovské stránky. Ve starém editoru jej nelze měnit.');
+  }
+}
+
+async function findSiteContentById(id) {
+  if (!isSupabaseConfigured()) {
+    return readCmsDb().site_content.find((item) => item.id === id) || null;
+  }
+  const rows = await supabaseRequest('site_content', {
+    query: {
+      select: 'id,content_key,locale,section,label,content_type,value,status,sort_order,published_at,created_at,updated_at',
+      id: `eq.${id}`,
+      limit: '1'
+    }
+  });
+  return Array.isArray(rows) && rows.length ? rows[0] : null;
+}
+
+async function listGenericSiteContent() {
+  const contents = await listSiteContent();
+  return contents.filter((item) => !isHomepageReservedContentKey(item.content_key));
+}
+
+function homepageWriteUnavailableError() {
+  const error = new Error('Ukládání domovské stránky vyžaduje připojení k Supabase.');
+  error.statusCode = 503;
+  return error;
+}
+
+function homepageConflictError() {
+  const error = new Error('Koncept mezitím změnil někdo v jiném okně. Obnovte editor a zkontrolujte novější verzi.');
+  error.statusCode = 409;
+  return error;
+}
+
+function assertHomepageWritesAvailable() {
+  if (process.env.NODE_ENV === 'production' && !isSupabaseConfigured()) {
+    throw homepageWriteUnavailableError();
+  }
+}
+
+function homepageLayoutContent(layout, publish) {
+  return {
+    content_key: publish ? HOMEPAGE_LAYOUT_CONTENT_KEY : HOMEPAGE_LAYOUT_DRAFT_CONTENT_KEY,
+    section: 'homepage',
+    label: publish ? 'Publikovaná domovská stránka' : 'Koncept domovské stránky',
+    content_type: 'json',
+    value: layout,
+    status: publish ? 'published' : 'draft',
+    sort_order: publish ? 0 : 1,
+    published_at: publish ? nowIso() : null
+  };
+}
+
+function homepageRevisionMatches(existing, expectedRevision) {
+  return (expectedRevision === null && !existing)
+    || (expectedRevision !== null
+      && existing
+      && String(existing.updated_at || '') === String(expectedRevision));
+}
+
+async function writeHomepageLayout(layout, { operation = 'draft', locale = 'cs', expectedRevision } = {}) {
+  assertHomepageWritesAvailable();
+  if (!['draft', 'publish', 'reset'].includes(operation)) throw new Error('Operace domovské stránky není platná.');
+  if (expectedRevision === undefined) throw new Error('Chybí verze upravovaného konceptu.');
+  const normalized = validateHomepageLayoutInput(layout);
+
+  if (!isSupabaseConfigured()) {
+    const db = readCmsDb();
+    const draftRow = db.site_content.find((item) => item.content_key === HOMEPAGE_LAYOUT_DRAFT_CONTENT_KEY && item.locale === locale);
+    if (!homepageRevisionMatches(draftRow, expectedRevision)) throw homepageConflictError();
+
+    const publishedRow = db.site_content.find((item) => item.content_key === HOMEPAGE_LAYOUT_CONTENT_KEY && item.locale === locale);
+    const layoutToWrite = operation === 'reset' && publishedRow && publishedRow.status === 'published'
+      ? normalizeHomepageLayout(publishedRow.value)
+      : normalized;
+    const draftContent = { ...homepageLayoutContent(layoutToWrite, false), locale };
+    if (draftRow) updateLocalRow(draftRow, draftContent);
+    else db.site_content.push(createLocalRow(draftContent));
+
+    if (operation === 'publish') {
+      const publishedContent = { ...homepageLayoutContent(layoutToWrite, true), locale };
+      if (publishedRow) updateLocalRow(publishedRow, publishedContent);
+      else db.site_content.push(createLocalRow(publishedContent));
+    }
+
+    writeCmsDb(db);
+    return getHomepageEditorState(locale);
+  }
+
+  try {
+    const result = await supabaseRequest('rpc/write_homepage_layout', {
+      method: 'POST',
+      body: {
+        p_locale: locale,
+        p_layout: normalized,
+        p_expected_draft_updated_at: expectedRevision,
+        p_operation: operation
+      }
+    });
+    const state = Array.isArray(result) ? result[0] : result;
+    if (!state || !state.layout) throw new Error('Supabase nevrátil uloženou domovskou stránku.');
+    return {
+      ...state,
+      layout: normalizeHomepageLayout(state.layout),
+      published_layout: state.published_layout ? normalizeHomepageLayout(state.published_layout) : null
+    };
+  } catch (error) {
+    if (error && (error.code === '40001' || String(error.message || '').includes('homepage_revision_conflict'))) {
+      throw homepageConflictError();
+    }
+    throw error;
+  }
+}
+
+async function getHomepageEditorState(locale = 'cs') {
+  const { publishedRow, draftRow } = await findHomepageContentRows(locale);
+  const [legacyRows, mediaDb] = !draftRow && !publishedRow
+    ? await Promise.all([listSiteContent(), getMediaDb()])
+    : [[], null];
+  const layout = draftRow
+    ? normalizeHomepageLayout(draftRow.value)
+    : publishedRow
+      ? normalizeHomepageLayout(publishedRow.value)
+      : applyManagedImagesToHomepageLayout(
+          homepageLayoutFromLegacyRows(legacyRows.filter((item) => item.locale === locale)),
+          mediaDb
+        );
+  return {
+    ok: true,
+    locale,
+    has_draft: Boolean(draftRow),
+    has_published_layout: Boolean(publishedRow),
+    draft_revision: draftRow ? draftRow.updated_at : null,
+    draft_updated_at: draftRow ? draftRow.updated_at : null,
+    published_at: publishedRow ? publishedRow.published_at : null,
+    published_revision: publishedRow ? publishedRow.updated_at : null,
+    is_dirty: Boolean(draftRow && (!publishedRow || JSON.stringify(normalizeHomepageLayout(draftRow.value)) !== JSON.stringify(normalizeHomepageLayout(publishedRow.value)))),
+    layout,
+    published_layout: publishedRow ? normalizeHomepageLayout(publishedRow.value) : null
+  };
+}
+
+async function saveHomepageDraft(layout, { locale = 'cs', expectedRevision } = {}) {
+  return writeHomepageLayout(layout, { locale, expectedRevision, operation: 'draft' });
+}
+
+async function publishHomepageLayout(layout, { locale = 'cs', expectedRevision } = {}) {
+  return writeHomepageLayout(layout, { locale, expectedRevision, operation: 'publish' });
+}
+
+async function resetHomepageDraft({ locale = 'cs', expectedRevision } = {}) {
+  const publishedRow = await findSiteContentByKey(HOMEPAGE_LAYOUT_CONTENT_KEY, locale);
+  const layout = publishedRow && publishedRow.status === 'published'
+    ? normalizeHomepageLayout(publishedRow.value)
+    : defaultHomepageLayout();
+  return writeHomepageLayout(layout, { locale, expectedRevision, operation: 'reset' });
+}
+
 function isPublishedAtPublic(value) {
   if (!value) return true;
   const publishedAt = new Date(value).getTime();
@@ -6824,6 +8061,7 @@ function isPublicSiteContentItem(item, locale) {
   return Boolean(
     item
     && item.locale === locale
+    && item.content_key !== HOMEPAGE_LAYOUT_DRAFT_CONTENT_KEY
     && item.status === 'published'
     && isPublishedAtPublic(item.published_at)
   );
@@ -6842,8 +8080,12 @@ function collectMediaIdsFromPhotos(mediaIds, photos) {
   photos.forEach((photo) => collectMediaId(mediaIds, photo));
 }
 
-function collectMediaIdsFromSiteValue(mediaIds, contentType, value) {
+function collectMediaIdsFromSiteValue(mediaIds, contentType, value, contentKey = '') {
   if (!value || typeof value !== 'object') return;
+  if (contentKey === HOMEPAGE_LAYOUT_CONTENT_KEY) {
+    collectMediaIdsFromHomepageLayout(mediaIds, value);
+    return;
+  }
   if (contentType === 'image') collectMediaId(mediaIds, value);
   if (contentType === 'gallery' && Array.isArray(value.images)) {
     value.images.forEach((image) => collectMediaId(mediaIds, image));
@@ -6900,6 +8142,7 @@ function hydratePublicPhotos(photos, mediaMap) {
 
 function hydratePublicSiteValue(item, mediaMap) {
   const value = item.value && typeof item.value === 'object' ? item.value : {};
+  if (item.content_key === HOMEPAGE_LAYOUT_CONTENT_KEY) return hydrateHomepageLayout(value, mediaMap);
   if (item.content_type === 'image') return hydratePublicImageRef(value, mediaMap);
   if (item.content_type === 'gallery') {
     const images = Array.isArray(value.images) ? value.images : [];
@@ -6929,7 +8172,7 @@ async function getPublicCmsPayload(locale = 'cs') {
       || publicRows.blogPostRows.length
       || publicRows.blogCategoryRows.length;
     if (!hasAnyContent) {
-      return { ok: true, configured: false, locale, site_content: {}, products: [], product_categories: [], product_filters: [], blog_posts: [], blog_categories: [] };
+      return { ok: true, configured: false, locale, homepage_layout: null, site_content: {}, products: [], product_categories: [], product_filters: [], blog_posts: [], blog_categories: [] };
     }
     return buildPublicCmsPayload(locale, publicRows, new Map());
   }
@@ -7042,7 +8285,7 @@ async function buildPublicCmsPayload(locale, rows, givenMediaMap) {
   const productFilterLinks = (Array.isArray(productFilterLinkRows) ? productFilterLinkRows : []).filter((link) => publicProductIds.has(link.product_id) && publicOptionIds.has(link.option_id));
 
   const mediaIds = new Set();
-  siteContent.forEach((item) => collectMediaIdsFromSiteValue(mediaIds, item.content_type, item.value));
+  siteContent.forEach((item) => collectMediaIdsFromSiteValue(mediaIds, item.content_type, item.value, item.content_key));
   productCategories.forEach((category) => collectMediaId(mediaIds, category.image));
   products.forEach((product) => collectMediaIdsFromPhotos(mediaIds, product.photos));
   blogCategories.forEach((category) => collectMediaId(mediaIds, category.image));
@@ -7151,6 +8394,9 @@ async function buildPublicCmsPayload(locale, rows, givenMediaMap) {
     ok: true,
     configured: true,
     locale,
+    homepage_layout: publicSiteContent[HOMEPAGE_LAYOUT_CONTENT_KEY]
+      ? publicSiteContent[HOMEPAGE_LAYOUT_CONTENT_KEY].value
+      : null,
     site_content: publicSiteContent,
     products: publicProducts,
     product_categories: [...productCategoryMap.values()],
@@ -7183,6 +8429,7 @@ async function assertSiteContentKeyUnique(locale, contentKey, excludeId = '') {
 
 async function createSiteContent(input) {
   const content = normalizeSiteContentInput(input);
+  assertGenericSiteContentKeyAllowed(content.content_key);
   await assertSiteContentKeyUnique(content.locale, content.content_key);
   if (!isSupabaseConfigured()) {
     const db = readCmsDb();
@@ -7202,7 +8449,11 @@ async function createSiteContent(input) {
 
 async function updateSiteContent(id, input) {
   assertUuid(id);
+  const existing = await findSiteContentById(id);
+  if (!existing) throw new Error('Obsah nebyl nalezen.');
+  assertGenericSiteContentKeyAllowed(existing.content_key);
   const content = normalizeSiteContentInput(input);
+  assertGenericSiteContentKeyAllowed(content.content_key);
   await assertSiteContentKeyUnique(content.locale, content.content_key, id);
   if (!isSupabaseConfigured()) {
     const db = readCmsDb();
@@ -7216,6 +8467,7 @@ async function updateSiteContent(id, input) {
     method: 'PATCH',
     query: {
       id: `eq.${id}`,
+      content_key: 'not.in.(homepage.layout,homepage.layout.draft)',
       select: 'id,content_key,locale,section,label,content_type,value,status,sort_order,published_at,created_at,updated_at'
     },
     body: content,
@@ -7227,6 +8479,9 @@ async function updateSiteContent(id, input) {
 
 async function archiveSiteContent(id) {
   assertUuid(id);
+  const existing = await findSiteContentById(id);
+  if (!existing) throw new Error('Obsah nebyl nalezen.');
+  assertGenericSiteContentKeyAllowed(existing.content_key);
   if (!isSupabaseConfigured()) {
     const db = readCmsDb();
     const row = db.site_content.find((item) => item.id === id);
@@ -7239,6 +8494,7 @@ async function archiveSiteContent(id) {
     method: 'PATCH',
     query: {
       id: `eq.${id}`,
+      content_key: 'not.in.(homepage.layout,homepage.layout.draft)',
       select: 'id,content_key,locale,section,label,content_type,value,status,sort_order,published_at,created_at,updated_at'
     },
     body: {
@@ -7253,6 +8509,9 @@ async function archiveSiteContent(id) {
 
 async function restoreSiteContent(id) {
   assertUuid(id);
+  const existing = await findSiteContentById(id);
+  if (!existing) throw new Error('Obsah nebyl nalezen.');
+  assertGenericSiteContentKeyAllowed(existing.content_key);
   if (!isSupabaseConfigured()) {
     const db = readCmsDb();
     const row = db.site_content.find((item) => item.id === id);
@@ -7265,6 +8524,7 @@ async function restoreSiteContent(id) {
     method: 'PATCH',
     query: {
       id: `eq.${id}`,
+      content_key: 'not.in.(homepage.layout,homepage.layout.draft)',
       select: 'id,content_key,locale,section,label,content_type,value,status,sort_order,published_at,created_at,updated_at'
     },
     body: {
@@ -7282,6 +8542,14 @@ function validateUploadedImage(file) {
   const extension = IMAGE_EXTENSIONS[mimeType] || IMAGE_EXTENSIONS[mimeType.split(';')[0]];
   if (!extension) throw new Error('Podporované jsou jen JPG, PNG, WebP nebo GIF obrázky.');
   if (!file.buffer.length) throw new Error('Vyberte obrázek k nahrání.');
+  const bytes = file.buffer;
+  const isJpeg = bytes.length >= 3 && bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff;
+  const isPng = bytes.length >= 8 && bytes.subarray(0, 8).equals(Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]));
+  const gifHeader = bytes.length >= 6 ? bytes.subarray(0, 6).toString('ascii') : '';
+  const isGif = gifHeader === 'GIF87a' || gifHeader === 'GIF89a';
+  const isWebp = bytes.length >= 12 && bytes.subarray(0, 4).toString('ascii') === 'RIFF' && bytes.subarray(8, 12).toString('ascii') === 'WEBP';
+  const signatureMatches = extension === '.jpg' ? isJpeg : extension === '.png' ? isPng : extension === '.gif' ? isGif : isWebp;
+  if (!signatureMatches) throw new Error('Soubor není platný obrázek nebo neodpovídá vybranému formátu.');
   return { mimeType, extension };
 }
 
@@ -7434,7 +8702,7 @@ async function handleMediaUpload(req, res, session) {
     if (!isSupabaseConfigured()) writeMediaDb(db);
     sendJson(res, 201, { ok: true, media, target });
   } catch (error) {
-    sendJson(res, 400, { ok: false, error: error.message || 'Nahrání se nepodařilo.' });
+    sendJson(res, error.statusCode || 400, { ok: false, error: error.message || 'Nahrání se nepodařilo.' });
   }
 }
 
@@ -7447,6 +8715,11 @@ async function handleMediaDelete(req, res) {
     const mediaId = body.mediaId;
     if (!TARGET_TYPES[targetType] || !targetKey || !mediaId) {
       throw new Error('Chybí údaje pro smazání fotky.');
+    }
+    if (await hasPersistedMediaReference(mediaId)) {
+      const error = new Error('Fotku stále používá uložený obsah. Nejprve ji odeberte ze všech bloků, výrobků nebo článků.');
+      error.statusCode = 409;
+      throw error;
     }
 
     const target = db.targets[targetType] && db.targets[targetType][targetKey];
@@ -7462,7 +8735,7 @@ async function handleMediaDelete(req, res) {
     if (!isSupabaseConfigured()) writeMediaDb(db);
     sendJson(res, 200, { ok: true });
   } catch (error) {
-    sendJson(res, 400, { ok: false, error: error.message || 'Smazání se nepodařilo.' });
+    sendJson(res, error.statusCode || 400, { ok: false, error: error.message || 'Smazání se nepodařilo.' });
   }
 }
 
@@ -7538,6 +8811,7 @@ async function handleBlogPostPhotoUpload(req, res, session) {
 
 async function handleSiteContentPhotoUpload(req, res, session) {
   try {
+    assertHomepageWritesAvailable();
     const { fields, files } = await parseMultipart(req);
     const image = files.image;
     if (!image) throw new Error('Vyberte obrázek k nahrání.');
@@ -7568,7 +8842,7 @@ async function handleSiteContentPhotoUpload(req, res, session) {
     if (!isSupabaseConfigured()) writeMediaDb(db);
     sendJson(res, 201, { ok: true, media, photo, target });
   } catch (error) {
-    sendJson(res, 400, { ok: false, error: error.message || 'Nahrání se nepodařilo.' });
+    sendJson(res, error.statusCode || 400, { ok: false, error: error.message || 'Nahrání se nepodařilo.' });
   }
 }
 
@@ -8391,8 +9665,30 @@ async function handleAdmin(req, res, url) {
   }
 
   if (!session) {
+    if (url.pathname.startsWith('/admin/api/')) {
+      sendJson(res, 401, { ok: false, error: 'Přihlášení vypršelo. Přihlaste se znovu.' }, {
+        'Cache-Control': 'no-store'
+      });
+      return;
+    }
     redirect(res, `/admin/login?next=${encodeURIComponent(url.pathname)}`);
     return;
+  }
+
+  if (url.pathname.startsWith('/admin/api/') && !['GET', 'HEAD'].includes(req.method)) {
+    const requestOrigin = String(req.headers.origin || '').trim();
+    if (requestOrigin) {
+      let originMatches = false;
+      try {
+        originMatches = new URL(requestOrigin).host === String(req.headers.host || '');
+      } catch (error) {}
+      if (!originMatches) {
+        sendJson(res, 403, { ok: false, error: 'Požadavek nepřišel z administrace Dřevito.' }, {
+          'Cache-Control': 'no-store'
+        });
+        return;
+      }
+    }
   }
 
   if (url.pathname === '/admin/api/media' && req.method === 'GET') {
@@ -8418,9 +9714,57 @@ async function handleAdmin(req, res, url) {
     return;
   }
 
+  if (url.pathname === '/admin/api/homepage' && req.method === 'GET') {
+    try {
+      sendJson(res, 200, await getHomepageEditorState(), { 'Cache-Control': 'no-store' });
+    } catch (error) {
+      sendJson(res, error.statusCode || 500, { ok: false, error: normalizeSupabaseError(error) }, { 'Cache-Control': 'no-store' });
+    }
+    return;
+  }
+
+  if (url.pathname === '/admin/api/homepage/draft' && req.method === 'PUT') {
+    try {
+      const input = await parseJsonBody(req);
+      if (!Object.prototype.hasOwnProperty.call(input, 'expected_revision')) throw new Error('Chybí verze upravovaného konceptu.');
+      sendJson(res, 200, await saveHomepageDraft(input.layout, {
+        expectedRevision: input.expected_revision
+      }), { 'Cache-Control': 'no-store' });
+    } catch (error) {
+      sendJson(res, error.statusCode || 400, { ok: false, error: normalizeSupabaseError(error) }, { 'Cache-Control': 'no-store' });
+    }
+    return;
+  }
+
+  if (url.pathname === '/admin/api/homepage/publish' && req.method === 'POST') {
+    try {
+      const input = await parseJsonBody(req);
+      if (!Object.prototype.hasOwnProperty.call(input, 'expected_revision')) throw new Error('Chybí verze upravovaného konceptu.');
+      sendJson(res, 200, await publishHomepageLayout(input.layout, {
+        expectedRevision: input.expected_revision
+      }), { 'Cache-Control': 'no-store' });
+    } catch (error) {
+      sendJson(res, error.statusCode || 400, { ok: false, error: normalizeSupabaseError(error) }, { 'Cache-Control': 'no-store' });
+    }
+    return;
+  }
+
+  if (url.pathname === '/admin/api/homepage/reset-draft' && req.method === 'POST') {
+    try {
+      const input = await parseJsonBody(req);
+      if (!Object.prototype.hasOwnProperty.call(input, 'expected_revision')) throw new Error('Chybí verze upravovaného konceptu.');
+      sendJson(res, 200, await resetHomepageDraft({
+        expectedRevision: input.expected_revision
+      }), { 'Cache-Control': 'no-store' });
+    } catch (error) {
+      sendJson(res, error.statusCode || 400, { ok: false, error: normalizeSupabaseError(error) }, { 'Cache-Control': 'no-store' });
+    }
+    return;
+  }
+
   if (url.pathname === '/admin/api/site-content' && req.method === 'GET') {
     try {
-      sendJson(res, 200, { ok: true, contents: await listSiteContent() }, {
+      sendJson(res, 200, { ok: true, contents: await listGenericSiteContent() }, {
         'Cache-Control': 'no-store'
       });
     } catch (error) {
@@ -8788,8 +10132,10 @@ async function handleAdmin(req, res, url) {
     return;
   }
 
-  if (url.pathname === '/admin/site-content' && req.method === 'GET') {
-    redirect(res, '/admin');
+  if ((url.pathname === '/admin/homepage' || url.pathname === '/admin/site-content') && req.method === 'GET') {
+    send(res, 200, homepageEditorPage(session), {
+      'Cache-Control': 'no-store'
+    });
     return;
   }
 
@@ -8886,6 +10232,11 @@ function handleRequest(req, res) {
 
   if (req.method !== 'GET' && req.method !== 'HEAD') {
     send(res, 405, 'Method not allowed', { Allow: 'GET, HEAD' });
+    return;
+  }
+
+  if (isPublicProductsRoute(url.pathname)) {
+    serveStatic(req, res, '/index.html');
     return;
   }
 

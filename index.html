@@ -1346,6 +1346,127 @@
         .btn--primary { background: var(--color-primary); color: var(--color-card); }
         .btn--primary:hover { background: var(--color-forest); box-shadow: 0 8px 24px rgba(43, 33, 24, 0.24); }
         .custom__map { border-color: rgba(43, 33, 24, 0.16); border-radius: 24px; box-shadow: 0 20px 60px rgba(43, 33, 24, 0.18); }
+
+        .homepage-story {
+            position: relative;
+            overflow: hidden;
+            padding: clamp(5.5rem, 9vw, 8.5rem) clamp(1.25rem, 5vw, 4rem);
+            background: var(--color-card);
+            color: var(--color-primary);
+        }
+        .homepage-story[hidden],
+        [data-homepage-block-id][hidden] { display: none !important; }
+        .homepage-story--cream {
+            background:
+                radial-gradient(circle at 92% 8%, rgba(182, 120, 66, 0.12), transparent 26rem),
+                var(--color-bg);
+        }
+        .homepage-story--wood {
+            background:
+                radial-gradient(circle at 12% 88%, rgba(255, 252, 246, 0.14), transparent 28rem),
+                #C9A77F;
+        }
+        .homepage-story__container {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) minmax(320px, 0.9fr);
+            gap: clamp(2.75rem, 7vw, 7rem);
+            align-items: center;
+            width: min(100%, 1240px);
+            margin: 0 auto;
+        }
+        .homepage-story--image-left .homepage-story__media { order: -1; }
+        .homepage-story--text-only .homepage-story__container {
+            display: block;
+            width: min(100%, 880px);
+        }
+        .homepage-story.homepage-story--without-image .homepage-story__container {
+            display: block;
+            width: min(100%, 880px);
+        }
+        .homepage-story--image-wide .homepage-story__container {
+            grid-template-columns: 1fr;
+            gap: clamp(2.25rem, 5vw, 4rem);
+        }
+        .homepage-story--image-wide .homepage-story__media { order: -1; }
+        .homepage-story__copy { max-width: 720px; }
+        .homepage-story__eyebrow {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin: 0 0 1.1rem;
+            color: #8A5730;
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 0.17em;
+            text-transform: uppercase;
+        }
+        .homepage-story__eyebrow::before {
+            content: '';
+            width: 38px;
+            height: 1px;
+            background: currentColor;
+        }
+        .homepage-story__title {
+            max-width: 780px;
+            margin: 0 0 1.5rem;
+            font: 600 clamp(2.7rem, 5.5vw, 5rem)/0.98 var(--font-display);
+            letter-spacing: -0.05em;
+            text-wrap: balance;
+        }
+        .homepage-story__body { max-width: 680px; }
+        .homepage-story__body p {
+            margin: 0 0 1rem;
+            color: var(--color-text-muted);
+            font-size: clamp(1rem, 1.5vw, 1.12rem);
+            line-height: 1.8;
+        }
+        .homepage-story__body p:last-child { margin-bottom: 0; }
+        .homepage-story__cta {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 50px;
+            margin-top: 2rem;
+            padding: 0 1.65rem;
+            border-radius: 999px;
+            background: var(--color-primary);
+            color: var(--color-card);
+            font-size: 0.78rem;
+            font-weight: 700;
+            text-decoration: none;
+            transition: background 0.25s ease, transform 0.25s ease, box-shadow 0.25s ease;
+        }
+        .homepage-story__cta:hover {
+            background: var(--color-forest);
+            box-shadow: 0 10px 28px rgba(43, 33, 24, 0.2);
+            transform: translateY(-2px);
+        }
+        .homepage-story__media {
+            position: relative;
+            margin: 0;
+        }
+        .homepage-story__media::before {
+            content: '';
+            position: absolute;
+            inset: -13px 17px 17px -13px;
+            border: 1px solid rgba(123, 71, 38, 0.36);
+            border-radius: 34px 12px 34px 34px;
+            transform: rotate(-1deg);
+        }
+        .homepage-story__media img {
+            position: relative;
+            display: block;
+            width: 100%;
+            aspect-ratio: 4 / 4.5;
+            border-radius: 34px 12px 34px 34px;
+            object-fit: cover;
+            background: var(--color-sand);
+            box-shadow: 0 28px 70px rgba(43, 33, 24, 0.16);
+        }
+        .homepage-story--image-wide .homepage-story__media img { aspect-ratio: 16 / 8; }
+        .homepage-story--wood .homepage-story__eyebrow { color: #6F4025; }
+        .homepage-story--wood .homepage-story__body p { color: rgba(43, 33, 24, 0.78); }
+        .nav [hidden] { display: none !important; }
         .footer { background: #221A14; }
         .footer__brand { background: #C9A77F; box-shadow: 0 16px 45px rgba(0, 0, 0, 0.24); }
 
@@ -1355,7 +1476,8 @@
         body.file-product-active > .products,
         body.file-product-active > .blog,
         body.file-product-active > .author,
-        body.file-product-active > .custom { display: none; }
+        body.file-product-active > .custom,
+        body.file-product-active > .homepage-story { display: none; }
         .file-product-page {
             min-height: calc(100svh - var(--nav-height));
             padding: clamp(3rem, 6vw, 5rem) clamp(1.25rem, 5vw, 4rem) 8rem;
@@ -1519,6 +1641,13 @@
             .author__container .author__image { order: 0; }
             .products__tabs, .products__subtabs, .blog__tabs { justify-content: flex-start; }
             .custom__images { min-height: 380px; }
+            .homepage-story__container { grid-template-columns: 1fr; }
+            .homepage-story__media {
+                order: -1;
+                width: min(92%, 620px);
+                margin-inline: auto;
+            }
+            .homepage-story__copy { max-width: 760px; }
             .file-product__hero { grid-template-columns: 1fr; }
             .file-product__info { order: -1; }
             .file-product__visual { width: min(100%, 620px); margin: 0 auto; }
@@ -1545,6 +1674,12 @@
             .custom__images .custom__image:last-child { right: 0; }
             .custom__contact { gap: 1rem; flex-direction: column; align-items: center; }
             .custom__social { margin-top: 0; }
+            .homepage-story { padding: 4.5rem 1.25rem 5rem; }
+            .homepage-story__title { font-size: clamp(2.65rem, 13vw, 3.8rem); }
+            .homepage-story__media { width: 100%; }
+            .homepage-story__media img { aspect-ratio: 4 / 4.25; }
+            .homepage-story--image-wide .homepage-story__media img { aspect-ratio: 16 / 10; }
+            .homepage-story__cta { width: 100%; }
             .file-product-page { padding: 2rem 0.9rem 5rem; }
             .file-product__title { font-size: clamp(3rem, 16vw, 4.8rem); }
             .file-product__purchase { align-items: stretch; flex-direction: column; }
@@ -1648,7 +1783,7 @@
     <main class="file-product-page" id="file-product-page" hidden aria-live="polite"></main>
 
     <!-- HERO -->
-    <section class="hero">
+    <section class="hero" data-homepage-block-id="hero">
         <div class="hero__bg"></div>
         <div class="hero__content">
             <p class="hero__eyebrow">Rodinná dílna · Dolní Ředice</p>
@@ -1666,7 +1801,7 @@
     </section>
 
     <!-- ABOUT -->
-    <section class="about" id="about">
+    <section class="about" id="about" data-homepage-block-id="about">
         <div class="about__container">
             <div class="about__text">
                 <h2 class="section-title">Řemeslo s tradicí</h2>
@@ -1685,7 +1820,7 @@
     </section>
 
     <!-- PRODUCTS -->
-    <section class="products" id="products">
+    <section class="products" id="products" data-homepage-block-id="products">
         <div class="products__container">
             <h2 class="section-title products__title">Naše výrobky</h2>
             <p class="products__intro" id="products-intro">Tvořím širokou škálu výrobků ze dřeva a rád hledám nové cesty. Mnoho věcí vzniká až v osobní domluvě — podle vašeho přání, konkrétního místa a příběhu, který má výsledný výrobek nést.</p>
@@ -1719,7 +1854,7 @@
     </section>
 
     <!-- BLOG -->
-    <section class="blog" id="blog">
+    <section class="blog" id="blog" data-homepage-block-id="blog">
         <div class="blog__container">
             <h2 class="section-title blog__title">Z dílny</h2>
             <p class="blog__intro" id="blog-intro">Poznámky o dřevě, řemesle a novinkách z dílny Dřevito.</p>
@@ -1730,7 +1865,7 @@
     </section>
 
     <!-- AUTHOR -->
-    <section class="author" id="author">
+    <section class="author" id="author" data-homepage-block-id="author">
         <div class="author__container">
             <div class="author__image">
                 <div class="author__image-placeholder"><img src="autor.JPG" alt="Autor Dřevito" style="width:100%;height:100%;object-fit:cover;border-radius:8px;"></div>
@@ -1747,7 +1882,7 @@
     </section>
 
     <!-- CUSTOM ORDERS -->
-    <section class="custom" id="custom">
+    <section class="custom" id="custom" data-homepage-block-id="custom">
         <div class="custom__container">
             <div class="custom__images">
                 <div class="custom__image">
@@ -2509,9 +2644,369 @@
         applySiteImage('.author__image-placeholder img', siteContent['author.image'] && siteContent['author.image'].value);
     }
 
+    var homepageFixedBlockIds = ['hero', 'about', 'products', 'blog', 'author', 'custom'];
+    var homepageStoryLayouts = ['image-right', 'image-left', 'text-only', 'image-wide'];
+    var homepageStoryThemes = ['paper', 'cream', 'wood'];
+
+    function homepageTextValue(value, maxLength) {
+        return typeof value === 'string' ? value.trim().slice(0, maxLength || 6000) : '';
+    }
+
+    function homepageSafeHref(value, allowHash) {
+        var raw = typeof value === 'string' ? value.trim() : '';
+        if (!raw) return '';
+        if (allowHash && /^#[a-z0-9][a-z0-9-]*$/i.test(raw)) return raw;
+        if (raw.charAt(0) === '/' && raw.slice(0, 2) !== '//') {
+            try {
+                var localUrl = new URL(raw, window.location.origin);
+                return localUrl.pathname + localUrl.search + localUrl.hash;
+            } catch (error) {
+                return '';
+            }
+        }
+        try {
+            var parsed = new URL(raw);
+            var allowedProtocols = allowHash
+                ? ['http:', 'https:', 'mailto:', 'tel:']
+                : ['http:', 'https:'];
+            return allowedProtocols.indexOf(parsed.protocol) !== -1 ? parsed.href : '';
+        } catch (error) {
+            return '';
+        }
+    }
+
+    function homepageImageIsValid(image) {
+        return Boolean(
+            image
+            && typeof image === 'object'
+            && typeof image.url === 'string'
+            && typeof image.alt === 'string'
+            && (!image.url.trim() || homepageSafeHref(image.url, false))
+        );
+    }
+
+    function homepageFieldsAreStrings(content, fields) {
+        return fields.every(function(field) { return typeof content[field] === 'string'; });
+    }
+
+    function homepageFixedContentIsValid(id, content) {
+        if (!content || typeof content !== 'object') return false;
+        if (id === 'hero') {
+            return homepageFieldsAreStrings(content, [
+                'eyebrow', 'title', 'body', 'primary_label', 'primary_url', 'secondary_label', 'secondary_url'
+            ])
+                && homepageImageIsValid(content.image)
+                && (!content.primary_url || homepageSafeHref(content.primary_url, true))
+                && (!content.secondary_url || homepageSafeHref(content.secondary_url, true));
+        }
+        if (id === 'about') {
+            return homepageFieldsAreStrings(content, ['title', 'lead', 'body'])
+                && homepageImageIsValid(content.image);
+        }
+        if (id === 'products' || id === 'blog') {
+            return homepageFieldsAreStrings(content, ['title', 'body']);
+        }
+        if (id === 'author') {
+            return homepageFieldsAreStrings(content, ['title', 'lead', 'body', 'signature'])
+                && homepageImageIsValid(content.image);
+        }
+        if (id === 'custom') {
+            return homepageFieldsAreStrings(content, ['title', 'body', 'secondary_body'])
+                && Array.isArray(content.images)
+                && content.images.length === 2
+                && content.images.every(homepageImageIsValid);
+        }
+        return false;
+    }
+
+    function homepageStoryContentIsValid(content) {
+        return Boolean(
+            content
+            && typeof content === 'object'
+            && homepageFieldsAreStrings(content, [
+                'eyebrow', 'title', 'body', 'layout', 'theme', 'cta_label', 'cta_url'
+            ])
+            && homepageStoryLayouts.indexOf(content.layout) !== -1
+            && homepageStoryThemes.indexOf(content.theme) !== -1
+            && homepageImageIsValid(content.image)
+            && (!content.cta_url || homepageSafeHref(content.cta_url, true))
+        );
+    }
+
+    function validateHomepageLayout(layout) {
+        if (!layout || typeof layout !== 'object' || Number(layout.version) !== 1) return null;
+        if (!Array.isArray(layout.blocks) || layout.blocks.length < homepageFixedBlockIds.length || layout.blocks.length > 36) return null;
+
+        var seen = {};
+        var fixedSeen = {};
+        var blocks = [];
+        for (var index = 0; index < layout.blocks.length; index += 1) {
+            var block = layout.blocks[index];
+            if (!block || typeof block !== 'object' || typeof block.id !== 'string') return null;
+            var id = block.id.trim();
+            if (!/^[a-z0-9][a-z0-9-]*$/.test(id) || seen[id] || typeof block.visible !== 'boolean') return null;
+            if (!block.content || typeof block.content !== 'object') return null;
+            seen[id] = true;
+
+            if (homepageFixedBlockIds.indexOf(id) !== -1) {
+                if (block.kind !== id || !homepageFixedContentIsValid(id, block.content)) return null;
+                fixedSeen[id] = true;
+            } else if (block.kind !== 'story' || !/^story-[a-z0-9][a-z0-9-]*$/.test(id) || !homepageStoryContentIsValid(block.content)) {
+                return null;
+            }
+            blocks.push(block);
+        }
+
+        if (!homepageFixedBlockIds.every(function(id) { return fixedSeen[id]; })) return null;
+        var heroIndex = blocks.findIndex(function(block) { return block.id === 'hero'; });
+        if (heroIndex > 0) blocks.unshift(blocks.splice(heroIndex, 1)[0]);
+        return blocks;
+    }
+
+    function setHomepageElementText(root, selector, value, maxLength) {
+        var element = root && root.querySelector(selector);
+        if (!element) return;
+        var text = homepageTextValue(value, maxLength);
+        element.textContent = text;
+        element.hidden = !text;
+    }
+
+    function setHomepageImage(root, selector, image, maxAltLength) {
+        var element = root && root.querySelector(selector);
+        if (!element) return;
+        var url = homepageSafeHref(image && image.url, false);
+        var alt = homepageTextValue(image && image.alt, maxAltLength || 400);
+        if (url) element.src = url;
+        else element.removeAttribute('src');
+        element.alt = alt;
+        element.hidden = !url;
+    }
+
+    function setHomepageLink(link, label, href) {
+        if (!link) return;
+        var text = homepageTextValue(label, 120);
+        var safeHref = homepageSafeHref(href, true);
+        link.textContent = text;
+        link.hidden = !(text && safeHref);
+        if (safeHref) link.setAttribute('href', safeHref);
+        else link.removeAttribute('href');
+    }
+
+    function replaceHomepageParagraphs(container, selector, body, beforeElement) {
+        if (!container) return;
+        Array.prototype.slice.call(container.querySelectorAll(selector)).forEach(function(paragraph) {
+            paragraph.remove();
+        });
+        textParagraphs(homepageTextValue(body, 6000)).forEach(function(text) {
+            var paragraph = document.createElement('p');
+            paragraph.className = selector.replace(/^\./, '');
+            paragraph.textContent = text;
+            container.insertBefore(paragraph, beforeElement || null);
+        });
+    }
+
+    function applyHomepageFixedBlock(block, section) {
+        var content = block.content;
+        section.hidden = block.visible === false;
+
+        if (block.id === 'hero') {
+            setHomepageElementText(section, '.hero__eyebrow', content.eyebrow, 120);
+            setHomepageElementText(section, '.hero__title', content.title, 180);
+            setHomepageElementText(section, '.hero__tagline', content.body, 800);
+            var heroImage = homepageSafeHref(content.image.url, false);
+            var heroBackground = section.querySelector('.hero__bg');
+            if (heroBackground) {
+                heroBackground.style.backgroundImage = heroImage
+                    ? 'url("' + heroImage.replace(/"/g, '%22') + '")'
+                    : 'linear-gradient(135deg, #2A1F16 0%, #3D2B1F 50%, #4A3728 100%)';
+            }
+            setHomepageLink(section.querySelector('.hero__action--primary'), content.primary_label, content.primary_url);
+            setHomepageLink(section.querySelector('.hero__action:not(.hero__action--primary)'), content.secondary_label, content.secondary_url);
+            return;
+        }
+
+        if (block.id === 'about') {
+            setHomepageElementText(section, '.section-title', content.title, 180);
+            setHomepageElementText(section, '.about__lead', content.lead, 1400);
+            setHomepageElementText(section, '.about__body', content.body, 4000);
+            setHomepageImage(section, '.about__image-placeholder img', content.image);
+            return;
+        }
+
+        if (block.id === 'products') {
+            setHomepageElementText(section, '.products__title', content.title, 180);
+            setHomepageElementText(section, '.products__intro', content.body, 1600);
+            return;
+        }
+
+        if (block.id === 'blog') {
+            setHomepageElementText(section, '.blog__title', content.title, 180);
+            setHomepageElementText(section, '.blog__intro', content.body, 1600);
+            return;
+        }
+
+        if (block.id === 'author') {
+            setHomepageElementText(section, '.section-title', content.title, 180);
+            setHomepageElementText(section, '.author__lead', content.lead, 1400);
+            var authorText = section.querySelector('.author__text');
+            var signature = section.querySelector('.author__signature');
+            replaceHomepageParagraphs(authorText, '.author__body', content.body, signature);
+            setHomepageElementText(section, '.author__signature', content.signature, 120);
+            setHomepageImage(section, '.author__image-placeholder img', content.image);
+            return;
+        }
+
+        if (block.id === 'custom') {
+            setHomepageElementText(section, '.custom__title', content.title, 180);
+            setHomepageElementText(section, '.custom__text', content.body, 2600);
+            setHomepageElementText(section, '.custom__subtext', content.secondary_body, 1600);
+            setHomepageImage(section, '.custom__images .custom__image:nth-child(1) img', content.images[0]);
+            setHomepageImage(section, '.custom__images .custom__image:nth-child(2) img', content.images[1]);
+        }
+    }
+
+    function createHomepageStoryBlock(block) {
+        var content = block.content;
+        var section = document.createElement('section');
+        var layout = content.layout;
+        var theme = content.theme;
+        var imageUrl = homepageSafeHref(content.image.url, false);
+        section.className = 'homepage-story homepage-story--' + layout + ' homepage-story--' + theme;
+        section.dataset.homepageBlockId = block.id;
+        section.id = block.id;
+        section.hidden = block.visible === false;
+        if (!imageUrl || layout === 'text-only') section.classList.add('homepage-story--without-image');
+
+        var container = document.createElement('div');
+        container.className = 'homepage-story__container';
+        var copy = document.createElement('div');
+        copy.className = 'homepage-story__copy';
+
+        var eyebrowText = homepageTextValue(content.eyebrow, 120);
+        if (eyebrowText) {
+            var eyebrow = document.createElement('p');
+            eyebrow.className = 'homepage-story__eyebrow';
+            eyebrow.textContent = eyebrowText;
+            copy.appendChild(eyebrow);
+        }
+
+        var titleText = homepageTextValue(content.title, 180);
+        if (titleText) {
+            var title = document.createElement('h2');
+            title.className = 'homepage-story__title';
+            title.id = block.id + '-title';
+            title.textContent = titleText;
+            copy.appendChild(title);
+            section.setAttribute('aria-labelledby', title.id);
+        }
+
+        var paragraphs = textParagraphs(homepageTextValue(content.body, 6000));
+        if (paragraphs.length) {
+            var body = document.createElement('div');
+            body.className = 'homepage-story__body';
+            paragraphs.forEach(function(text) {
+                var paragraph = document.createElement('p');
+                paragraph.textContent = text;
+                body.appendChild(paragraph);
+            });
+            copy.appendChild(body);
+        }
+
+        var ctaLabel = homepageTextValue(content.cta_label, 80);
+        var ctaUrl = homepageSafeHref(content.cta_url, true);
+        if (ctaLabel && ctaUrl) {
+            var cta = document.createElement('a');
+            cta.className = 'homepage-story__cta';
+            cta.href = ctaUrl;
+            cta.textContent = ctaLabel;
+            copy.appendChild(cta);
+        }
+
+        var media = null;
+        if (imageUrl && layout !== 'text-only') {
+            media = document.createElement('figure');
+            media.className = 'homepage-story__media';
+            var image = document.createElement('img');
+            image.src = imageUrl;
+            image.alt = homepageTextValue(content.image.alt, 400);
+            image.loading = 'lazy';
+            image.decoding = 'async';
+            media.appendChild(image);
+        }
+
+        if (layout === 'image-wide' && media) {
+            container.appendChild(media);
+            container.appendChild(copy);
+        } else {
+            container.appendChild(copy);
+            if (media) container.appendChild(media);
+        }
+        section.appendChild(container);
+        return section;
+    }
+
+    function setHomepageNavigationVisibility(blockId, visible) {
+        var hashes = blockId === 'custom' ? ['custom', 'contact'] : [blockId];
+        hashes.forEach(function(hash) {
+            document.querySelectorAll('.nav a[href="#' + hash + '"]').forEach(function(link) {
+                link.hidden = !visible;
+            });
+        });
+        if (blockId === 'products') {
+            document.querySelectorAll('.nav__item-with-dropdown, .nav__dropdown-sub').forEach(function(element) {
+                element.hidden = !visible;
+            });
+        }
+    }
+
+    function applyHomepageLayout(layout) {
+        var blocks = validateHomepageLayout(layout);
+        if (!blocks) return false;
+
+        var footer = document.querySelector('body > .footer');
+        if (!footer || footer.parentNode !== document.body) return false;
+        var fixedNodes = {};
+        for (var fixedIndex = 0; fixedIndex < homepageFixedBlockIds.length; fixedIndex += 1) {
+            var fixedId = homepageFixedBlockIds[fixedIndex];
+            var fixedNode = document.querySelector('[data-homepage-block-id="' + fixedId + '"]');
+            if (!fixedNode || fixedNode.parentNode !== document.body) return false;
+            fixedNodes[fixedId] = fixedNode;
+        }
+
+        var plannedNodes = blocks.map(function(block) {
+            return homepageFixedBlockIds.indexOf(block.id) !== -1
+                ? fixedNodes[block.id]
+                : createHomepageStoryBlock(block);
+        });
+
+        document.querySelectorAll('body > .homepage-story[data-homepage-block-id]').forEach(function(story) {
+            story.remove();
+        });
+        plannedNodes.forEach(function(node) { document.body.insertBefore(node, footer); });
+
+        var visibility = {};
+        blocks.forEach(function(block, index) {
+            visibility[block.id] = block.visible !== false;
+            if (homepageFixedBlockIds.indexOf(block.id) !== -1) applyHomepageFixedBlock(block, plannedNodes[index]);
+        });
+        homepageFixedBlockIds.forEach(function(id) {
+            setHomepageNavigationVisibility(id, visibility[id] !== false);
+        });
+
+        var heroScroll = fixedNodes.hero.querySelector('.hero__scroll');
+        if (heroScroll) heroScroll.hidden = visibility.about === false;
+        fixedNodes.hero.querySelectorAll('.hero__action[href^="#"]').forEach(function(link) {
+            var target = link.getAttribute('href').slice(1);
+            if (Object.prototype.hasOwnProperty.call(visibility, target) && visibility[target] === false) link.hidden = true;
+            if (target === 'contact' && visibility.custom === false) link.hidden = true;
+        });
+        return true;
+    }
+
     function applyPublicContent(payload) {
         if (!payload || payload.ok === false || !payload.configured) return;
         applySiteContent(payload.site_content || {});
+        applyHomepageLayout(payload.homepage_layout);
         var cmsProducts = Array.isArray(payload.products) ? payload.products : [];
         var cmsProductCategories = Array.isArray(payload.product_categories) ? payload.product_categories : [];
         var hasCmsProducts = cmsProducts.length > 0;

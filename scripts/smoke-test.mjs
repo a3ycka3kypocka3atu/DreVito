@@ -35,6 +35,10 @@ function check(condition, message) {
   assert.ok(condition, message);
 }
 
+function cloneJson(value) {
+  return JSON.parse(JSON.stringify(value));
+}
+
 async function waitForServer() {
   for (let attempt = 0; attempt < 60; attempt += 1) {
     try {
@@ -107,6 +111,14 @@ try {
   });
   check((protectedResponse.headers.get('location') || '').startsWith('/admin/login'), 'Admin did not redirect to login.');
 
+  const unauthenticatedHomepageApi = await request('/admin/api/homepage', {
+    authenticated: false,
+    expectedStatus: 401
+  });
+  check((unauthenticatedHomepageApi.headers.get('content-type') || '').includes('application/json'), 'Unauthenticated homepage API response was not JSON.');
+  const unauthenticatedHomepageData = await unauthenticatedHomepageApi.json();
+  check(unauthenticatedHomepageData.ok === false, 'Unauthenticated homepage API response did not return ok:false.');
+
   const loginResponse = await request('/admin/dev-login?next=/admin', {
     method: 'POST',
     authenticated: false,
@@ -118,6 +130,165 @@ try {
 
   const dashboardResponse = await request('/admin', { expectedStatus: 200 });
   check((await dashboardResponse.text()).includes('Administrace obsahu'), 'Authenticated dashboard did not render.');
+
+  const homepageEditorResponse = await request('/admin/homepage', { expectedStatus: 200 });
+  const homepageEditorHtml = await homepageEditorResponse.text();
+  check(homepageEditorHtml.includes('id="homepage-editor"') && homepageEditorHtml.includes('Domovská stránka'), 'Authenticated homepage editor did not render.');
+  check(homepageEditorHtml.includes('id="homepage-publish" type="button" disabled'), 'Homepage publish control was enabled before initial state loading.');
+  check(homepageEditorHtml.includes('data-open-library disabled'), 'Homepage add-block control was enabled before initial state loading.');
+
+  const reservedHomepageCreate = await request('/admin/api/site-content', {
+    method: 'POST',
+    json: {
+      content_key: 'homepage.layout.draft',
+      locale: 'cs',
+      section: 'homepage',
+      label: 'Unsafe generic draft',
+      content_type: 'json',
+      value: { version: 1, blocks: [] },
+      status: 'published',
+      sort_order: 0
+    },
+    expectedStatus: 400
+  });
+  check((await reservedHomepageCreate.json()).ok === false, 'Generic site-content API accepted a reserved homepage key.');
+
+  const fixedHomepageBlockIds = ['hero', 'about', 'products', 'blog', 'author', 'custom'];
+  let homepageState = await jsonRequest('/admin/api/homepage');
+  check(homepageState.has_draft === false, 'Fresh homepage state unexpectedly contained a draft.');
+  check(homepageState.has_published_layout === false, 'Fresh homepage state unexpectedly contained a published layout.');
+  check(homepageState.draft_revision === null, 'Fresh homepage state unexpectedly had a draft revision.');
+  check(homepageState.layout?.blocks?.length === fixedHomepageBlockIds.length, 'Default homepage did not contain exactly six fixed blocks.');
+  check(fixedHomepageBlockIds.every((id) => homepageState.layout.blocks.some((block) => block.id === id)), 'Default homepage was missing a fixed block.');
+
+  let publicContent = await jsonRequest('/api/public-content?locale=cs', { authenticated: false });
+  check(publicContent.homepage_layout === null, 'Public content unexpectedly exposed a homepage layout before publication.');
+
+  await request('/vyrobky', { authenticated: false, expectedStatus: 200 });
+  await request('/vyrobky/rustikalni-nabytek', { authenticated: false, expectedStatus: 200 });
+  await request('/vyrobky/rustikalni-nabytek/stoly', { authenticated: false, expectedStatus: 200 });
+  await request('/vyrobky/rustikalni-nabytek/stoly/neplatna-uroven', { authenticated: false, expectedStatus: 404 });
+
+  const defaultHomepageBlocks = new Map(homepageState.layout.blocks.map((block) => [block.id, cloneJson(block)]));
+  const homepageStory = {
+    id: 'story-smoke-homepage',
+    kind: 'story',
+    label: 'Smoke příběh',
+    visible: true,
+    content: {
+      eyebrow: 'Ze zákulisí',
+      title: 'Smoke blok domovské stránky',
+      body: 'První publikovaný text vlastního bloku.',
+      image: { url: '', alt: '', caption: '', media_id: '' },
+      layout: 'image-left',
+      theme: 'cream',
+      cta_label: 'Napište nám',
+      cta_url: '#contact'
+    }
+  };
+  const homepageDraftLayout = {
+    version: 1,
+    blocks: [
+      defaultHomepageBlocks.get('blog'),
+      defaultHomepageBlocks.get('about'),
+      homepageStory,
+      defaultHomepageBlocks.get('author'),
+      defaultHomepageBlocks.get('custom'),
+      defaultHomepageBlocks.get('hero')
+    ]
+  };
+
+  homepageState = await jsonRequest('/admin/api/homepage/draft', {
+    method: 'PUT',
+    json: {
+      layout: homepageDraftLayout,
+      expected_revision: homepageState.draft_revision
+    }
+  });
+  check(homepageState.has_draft === true && homepageState.draft_revision, 'Saving the homepage draft did not create a revision.');
+  check(homepageState.layout.blocks.length === fixedHomepageBlockIds.length + 1, 'Saved homepage draft did not contain six fixed blocks and one story.');
+  check(homepageState.layout.blocks[0]?.id === 'hero', 'Homepage normalization did not keep the hero first.');
+  check(homepageState.layout.blocks.some((block) => block.id === 'products'), 'Homepage normalization did not restore an omitted fixed block.');
+  check(homepageState.layout.blocks.some((block) => block.id === homepageStory.id), 'Saved homepage draft was missing its story block.');
+  check(homepageState.layout.blocks.map((block) => block.id).join(',') === 'hero,blog,about,story-smoke-homepage,author,custom,products', 'Homepage fixed-block reorder was not preserved after normalization.');
+
+  const firstHomepageRevision = homepageState.draft_revision;
+  const reloadedHomepageState = await jsonRequest('/admin/api/homepage');
+  check(reloadedHomepageState.draft_revision === firstHomepageRevision, 'Reloaded homepage draft had a different revision.');
+  assert.deepEqual(reloadedHomepageState.layout, homepageState.layout, 'Reloaded homepage draft did not match the saved draft.');
+
+  publicContent = await jsonRequest('/api/public-content?locale=cs', { authenticated: false });
+  check(publicContent.homepage_layout === null, 'Saving a draft changed the public homepage layout.');
+
+  const publishableHomepageLayout = cloneJson(homepageState.layout);
+  publishableHomepageLayout.blocks.find((block) => block.id === homepageStory.id).content.body = 'Publikovaná verze vlastního bloku.';
+  await new Promise((resolve) => setTimeout(resolve, 10));
+  homepageState = await jsonRequest('/admin/api/homepage/draft', {
+    method: 'PUT',
+    json: {
+      layout: publishableHomepageLayout,
+      expected_revision: firstHomepageRevision
+    }
+  });
+  const latestHomepageRevision = homepageState.draft_revision;
+  check(latestHomepageRevision && latestHomepageRevision !== firstHomepageRevision, 'Updating the homepage draft did not advance its revision.');
+
+  const staleHomepageResponse = await request('/admin/api/homepage/draft', {
+    method: 'PUT',
+    json: {
+      layout: homepageState.layout,
+      expected_revision: firstHomepageRevision
+    },
+    expectedStatus: 409
+  });
+  const staleHomepageData = await staleHomepageResponse.json();
+  check(staleHomepageData.ok === false, 'Stale homepage save did not return ok:false.');
+
+  homepageState = await jsonRequest('/admin/api/homepage/publish', {
+    method: 'POST',
+    json: {
+      layout: homepageState.layout,
+      expected_revision: latestHomepageRevision
+    }
+  });
+  check(homepageState.has_published_layout === true && homepageState.published_layout, 'Publishing did not create a public homepage layout.');
+  check(homepageState.is_dirty === false, 'Homepage remained dirty immediately after publishing.');
+
+  const genericSiteContent = await jsonRequest('/admin/api/site-content');
+  check(!genericSiteContent.contents.some((item) => item.content_key === 'homepage.layout' || item.content_key === 'homepage.layout.draft'), 'Generic site-content list exposed reserved homepage rows.');
+
+  publicContent = await jsonRequest('/api/public-content?locale=cs', { authenticated: false });
+  check(publicContent.homepage_layout?.blocks?.some((block) => block.id === homepageStory.id), 'Published homepage layout was missing the story block.');
+  check(publicContent.homepage_layout.blocks.map((block) => block.id).join(',') === 'hero,blog,about,story-smoke-homepage,author,custom,products', 'Published homepage block order did not match the draft.');
+  check(publicContent.homepage_layout.blocks.find((block) => block.id === homepageStory.id)?.content.body === 'Publikovaná verze vlastního bloku.', 'Published homepage story content was incorrect.');
+  const publishedHomepageLayout = cloneJson(publicContent.homepage_layout);
+
+  const changedDraftLayout = cloneJson(homepageState.layout);
+  changedDraftLayout.blocks.find((block) => block.id === homepageStory.id).content.body = 'Tato změna musí zůstat jen v konceptu.';
+  await new Promise((resolve) => setTimeout(resolve, 10));
+  homepageState = await jsonRequest('/admin/api/homepage/draft', {
+    method: 'PUT',
+    json: {
+      layout: changedDraftLayout,
+      expected_revision: homepageState.draft_revision
+    }
+  });
+  check(homepageState.is_dirty === true, 'Changed homepage draft was not marked dirty.');
+  publicContent = await jsonRequest('/api/public-content?locale=cs', { authenticated: false });
+  assert.deepEqual(publicContent.homepage_layout, publishedHomepageLayout, 'A subsequent draft edit changed the published homepage layout.');
+
+  const unsafeHomepageLayout = cloneJson(homepageState.layout);
+  unsafeHomepageLayout.blocks.find((block) => block.id === homepageStory.id).content.cta_url = '//unsafe.example.test';
+  const unsafeHomepageResponse = await request('/admin/api/homepage/draft', {
+    method: 'PUT',
+    json: {
+      layout: unsafeHomepageLayout,
+      expected_revision: homepageState.draft_revision
+    },
+    expectedStatus: 400
+  });
+  const unsafeHomepageData = await unsafeHomepageResponse.json();
+  check(unsafeHomepageData.ok === false, 'Unsafe protocol-relative homepage link did not return ok:false.');
 
   const productCategory = (await jsonRequest('/admin/api/product-categories', {
     method: 'POST',
@@ -187,7 +358,7 @@ try {
   check(product.category_ids.includes(productCategory.id), 'Product category link was not saved.');
   check(product.filter_option_ids.includes(filterOption.id), 'Product filter link was not saved.');
 
-  let publicContent = await jsonRequest('/api/public-content?locale=cs', { authenticated: false });
+  publicContent = await jsonRequest('/api/public-content?locale=cs', { authenticated: false });
   let publicProduct = publicContent.products.find((item) => item.slug === productPayload.slug);
   check(publicProduct, 'Published product was missing from public content.');
   check(publicProduct.categories.some((item) => item.id === productCategory.id), 'Public product category was missing.');
@@ -308,7 +479,7 @@ try {
   await request('/admin', { expectedStatus: [302, 303] });
 
   console.log('Dřevito smoke test passed.');
-  console.log('Verified: login/logout, products, photos, categories, filters, blog posts, archive/restore, public API, and detail routes.');
+  console.log('Verified: login/logout, homepage draft/publish/revisions, catalog routes, products, photos, categories, filters, blog posts, archive/restore, public API, and detail routes.');
 } finally {
   if (child && !child.killed) {
     child.kill('SIGTERM');
